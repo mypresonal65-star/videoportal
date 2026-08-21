@@ -51,6 +51,11 @@
     .btn-sm { padding: 8px 18px; font-size: 0.85rem; flex: 0; }
     .btn-copy { background: #2d7a9b; color: white; padding: 6px 16px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
     .btn-copy:hover { background: #1f5f7a; }
+    .btn-highlight { padding: 4px 14px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.75rem; transition: 0.15s; }
+    .btn-highlight.active { background: #1a7a3a; color: white; }
+    .btn-highlight.active:hover { background: #0f5c28; }
+    .btn-highlight.inactive { background: #6a7c94; color: white; }
+    .btn-highlight.inactive:hover { background: #5a6a80; }
     
     .entry-list { background: #f5f8fe; border-radius: 20px; padding: 6px 0; margin: 12px 0 6px; max-height: 350px; overflow-y: auto; }
     .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #e6edf6; }
@@ -89,6 +94,11 @@
     .key-display .key-text { font-size: 1.1rem; color: #0b1a33; }
     
     .important-item { background: #fef9e7; border-left: 4px solid #f7971e; }
+    .important-item.hidden { opacity: 0.6; border-left-color: #6a7c94; }
+    
+    .visibility-badge { font-size: 0.7rem; padding: 2px 12px; border-radius: 40px; font-weight: 600; }
+    .visibility-badge.visible { background: #e6f5e6; color: #1a5d3c; }
+    .visibility-badge.hidden { background: #fee; color: #b33a3a; }
   </style>
 </head>
 <body>
@@ -156,7 +166,7 @@
     <div id="tab-important" class="tab-content">
       <div class="section-title">⭐ Important Section</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
-        Add important classes that will appear at the top of user website.
+        Add important classes. Use Hide/Show to control visibility on user website.
       </p>
       
       <div class="flex-row">
@@ -358,7 +368,7 @@
     // ==================== IMPORTANT SECTION ====================
     async function loadImportant() {
         try {
-            const data = await apiCall('/important');
+            const data = await apiCall('/important/all');
             if (data.success) {
                 importantItems = data.items || [];
                 renderImportantList();
@@ -397,6 +407,24 @@
         }
     }
 
+    async function toggleImportantVisibility(id) {
+        try {
+            const data = await apiCall('/important/toggle', {
+                method: 'POST',
+                body: JSON.stringify({ id })
+            });
+
+            if (data.success) {
+                showFeedback(data.message, 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to toggle: ' + data.error, 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
     async function deleteImportant(id) {
         if (!confirm('Delete this important class?')) return;
         try {
@@ -423,17 +451,31 @@
         }
         let html = '';
         importantItems.forEach(item => {
+            const isVisible = item.is_visible === 1;
+            const itemClass = isVisible ? '' : 'hidden';
             html += `
-                <div class="entry-item important-item">
+                <div class="entry-item important-item ${itemClass}">
                     <div class="info">
-                        <span class="name">⭐ ${item.title}</span>
+                        <span class="name">
+                            ${isVisible ? '👁️' : '🚫'} ${item.title}
+                            <span class="visibility-badge ${isVisible ? 'visible' : 'hidden'}" style="margin-left:8px;">
+                                ${isVisible ? 'Visible' : 'Hidden'}
+                            </span>
+                        </span>
                         <span class="sub">${item.link}</span>
                     </div>
-                    <button class="del-btn" onclick="window.deleteImportant('${item.id}')">✕</button>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-highlight ${isVisible ? 'active' : 'inactive'}" 
+                                onclick="window.toggleImportantVisibility('${item.id}')">
+                            ${isVisible ? '👁️ Hide' : '🚫 Show'}
+                        </button>
+                        <button class="del-btn" onclick="window.deleteImportant('${item.id}')">✕</button>
+                    </div>
                 </div>
             `;
         });
         list.innerHTML = html;
+        window.toggleImportantVisibility = toggleImportantVisibility;
         window.deleteImportant = deleteImportant;
     }
 
@@ -727,6 +769,8 @@
             }
         });
         list.innerHTML = html;
+        window.deletePlaylist = deletePlaylist;
+        window.deleteChapter = deleteChapter;
     }
 
     function renderUserList() {
@@ -752,6 +796,9 @@
             `;
         });
         list.innerHTML = html;
+        window.deleteUser = deleteUser;
+        window.viewKeys = viewKeys;
+        window.resetUser = resetUser;
     }
 
     function updatePlaylistSelect() {
@@ -822,12 +869,15 @@
     }
 
     // ==================== GLOBAL FUNCTIONS ====================
+    // Make all functions globally accessible for onclick
     window.deletePlaylist = deletePlaylist;
     window.deleteChapter = deleteChapter;
     window.deleteUser = deleteUser;
     window.resetUser = resetUser;
     window.copyKey = copyKey;
     window.viewKeys = viewKeys;
+    window.toggleImportantVisibility = toggleImportantVisibility;
+    window.deleteImportant = deleteImportant;
 
     // ==================== EVENT LISTENERS ====================
     document.getElementById('addPlaylistBtn').addEventListener('click', addPlaylist);
