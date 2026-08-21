@@ -8,7 +8,6 @@
   <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@0.14.17/dist/hls.min.js"></script>
   <style>
-    /* ===== ALL EXISTING STYLES ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
     body { background: #f0f4fb; min-height: 100vh; display: flex; justify-content: center; padding: 30px 16px; }
     .app { max-width: 1100px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); padding: 28px 30px; }
@@ -676,7 +675,7 @@
         startResetTimer();
     }
 
-    // ==================== LOAD LIVE STREAM ====================
+    // ==================== LOAD LIVE STREAM (FIXED - SAME AS RECORDED) ====================
     async function loadLiveStream() {
         try {
             const response = await fetch(API_BASE + '/live');
@@ -716,7 +715,7 @@
                 
                 const newVideoEl = document.getElementById('live-video');
                 
-                // ========== PLAY WITH HLS.js OR VIDEO.JS ==========
+                // ========== SAME AS RECORDED PLAYER ==========
                 if (data.link && data.link.includes('.m3u8') && Hls.isSupported()) {
                     liveHls = new Hls({
                         enableWorker: true,
@@ -752,6 +751,7 @@
                         }
                     });
                     
+                    // Video.js for controls overlay (same as recorded)
                     livePlayer = videojs(newVideoEl, {
                         controls: true,
                         fluid: true,
@@ -780,12 +780,13 @@
         }
     }
 
-    // ========== FALLBACK LIVE PLAYER ==========
+    // ========== FALLBACK LIVE PLAYER (SAME AS RECORDED FALLBACK) ==========
     function tryFallbackLivePlayer(videoEl, link) {
         if (liveHls) {
             try { liveHls.destroy(); } catch(e) {}
             liveHls = null;
         }
+        
         const player = videojs(videoEl, {
             autoplay: true,
             controls: true,
@@ -800,13 +801,16 @@
                 nativeVideoTracks: false,
             }
         });
+        
         livePlayer = player;
+        
         if (link && link.includes('.m3u8')) {
             player.src({ src: link, type: 'application/x-mpegURL' });
         } else if (link) {
             player.src({ src: link, type: 'video/mp4' });
         }
         player.play();
+        
         if (!liveStartTime) {
             liveStartTime = Date.now();
             updateLiveDuration();
@@ -1189,7 +1193,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Live with recorded video');
+    console.log('✅ Video Portal loaded - Live with recorded player');
 })();
 </script>
 </body>
