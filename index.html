@@ -27,8 +27,6 @@
       .search-container input { width: 100%; }
       .duration-bar { flex-wrap: wrap; gap: 6px; }
       .duration-bar .value { font-size: 14px; min-width: 80px; }
-      .controls-bar { flex-direction: column; }
-      .btn { width: 100%; justify-content: center; padding: 10px 20px; font-size: 14px; }
     }
 
     @media (max-width: 480px) {
@@ -63,6 +61,12 @@
       margin-bottom: 24px;
       box-shadow: 0 4px 30px rgba(247, 151, 30, 0.15);
       position: relative;
+      transition: all 0.3s ease;
+    }
+    .important-section.hidden-section {
+      opacity: 0.5;
+      border-color: #4a4a6a;
+      background: linear-gradient(135deg, #1a1a2e, #22223a);
     }
     .important-section::before {
       content: "⭐ Live Class";
@@ -76,6 +80,11 @@
       font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+    .important-section.hidden-section::before {
+      background: #6a7c94;
+      content: "⛔ Live Class (Hidden)";
     }
     .important-section .title {
       font-size: 1.2rem;
@@ -83,7 +92,12 @@
       color: #ffffff;
       margin-top: 4px;
       margin-bottom: 12px;
+      transition: all 0.3s ease;
     }
+    .important-section.hidden-section .title {
+      color: #6a7c94;
+    }
+    
     .important-item {
       background: rgba(255,255,255,0.05);
       border-radius: 16px;
@@ -95,6 +109,11 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
+      transition: all 0.3s ease;
+    }
+    .important-section.hidden-section .important-item {
+      opacity: 0.4;
+      pointer-events: none;
     }
     .important-item:last-child { margin-bottom: 0; }
     .important-item .name {
@@ -117,6 +136,10 @@
       background: #e08a0b;
       transform: scale(1.02);
     }
+    .important-section.hidden-section .important-play-btn {
+      opacity: 0.3;
+      pointer-events: none;
+    }
     .empty-important {
       color: #6a7c94;
       padding: 20px 0;
@@ -134,8 +157,13 @@
       background: rgba(18, 18, 30, 0.6);
       border-radius: 12px;
       border: 1px solid #2a2a4e;
-      margin-bottom: 16px;
+      margin-top: 12px;
       flex-wrap: wrap;
+      transition: all 0.3s ease;
+    }
+    .important-section.hidden-section .duration-bar {
+      opacity: 0.3;
+      pointer-events: none;
     }
     .duration-bar .label {
       color: #a0a0b8;
@@ -158,54 +186,6 @@
       0% { opacity: 1; }
       50% { opacity: 0.3; }
       100% { opacity: 1; }
-    }
-
-    /* ===== LIVE REFRESH BUTTON ===== */
-    .controls-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-      background: rgba(18, 18, 30, 0.6);
-      padding: 14px 18px;
-      border-radius: 12px;
-      border: 1px solid #2a2a4e;
-      margin-bottom: 16px;
-    }
-    .btn {
-      padding: 12px 36px;
-      border: none;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .btn-live {
-      background: linear-gradient(135deg, #ff0044, #cc0033);
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(255, 0, 68, 0.3);
-      transition: 0.3s;
-    }
-    .btn-live:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 30px rgba(255, 0, 68, 0.5);
-    }
-    .btn-live .pulse-ring {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      background: #fff;
-      border-radius: 50%;
-      animation: pulse-ring 1.5s infinite;
-    }
-    @keyframes pulse-ring {
-      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
     }
     
     .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
@@ -320,6 +300,11 @@
       border: none;
       border-radius: 12px;
     }
+
+    /* Duration bar hidden state */
+    .duration-bar.hidden {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
@@ -382,26 +367,19 @@
       <div id="sessionTimer" class="session-timer">⏰ 72:00:00</div>
     </div>
     
-    <!-- Important Section with Duration Bar & Live Refresh -->
+    <!-- Important Section -->
     <div id="importantSection" class="important-section">
       <div class="title" id="importantTitle">⭐ Live Classes</div>
       
-      <!-- ===== DURATION BAR ===== -->
-      <div class="duration-bar">
+      <div id="importantItems">
+        <div class="empty-important">Loading Live classes...</div>
+      </div>
+      
+      <!-- ===== DURATION BAR - MOVED TO BOTTOM ===== -->
+      <div class="duration-bar" id="durationBar">
         <span class="live-icon">●</span>
         <span class="label">⏱️ Lecture Duration:</span>
         <span class="value" id="durationDisplay">00:00:00</span>
-      </div>
-
-      <!-- ===== LIVE REFRESH BUTTON ===== -->
-      <div class="controls-bar">
-        <button class="btn btn-live" onclick="loadLiveStream()">
-          <span class="pulse-ring"></span> LIVE REFRESH
-        </button>
-      </div>
-      
-      <div id="importantItems">
-        <div class="empty-important">Loading Live classes...</div>
       </div>
     </div>
     
@@ -467,7 +445,7 @@
 })();
 
 // ========================================================================
-//  MAIN APP WITH DURATION & LIVE REFRESH
+//  MAIN APP WITH DURATION & HIDE/SHOW SUPPORT
 // ========================================================================
 (function() {
     const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
@@ -484,6 +462,7 @@
     let timerStartTime = Date.now();
     let sessionValidationInterval = null;
     let isHijacked = false;
+    let isImportantHidden = false;
     
     // ============================================================
     // 🔥 LECTURE DURATION - GLOBAL VARIABLES
@@ -533,7 +512,7 @@
         return device + ' - ' + (navigator.platform || 'Unknown');
     }
 
-    // ==================== SESSION VALIDATION WITH HIJACK DETECTION ====================
+    // ==================== SESSION VALIDATION ====================
     async function validateSession() {
         const session = getSession();
         if (!session) {
@@ -818,9 +797,7 @@
             clearInterval(resetCheckInterval);
             resetCheckInterval = null;
         }
-        // Reset duration display
         document.getElementById('durationDisplay').textContent = '00:00:00';
-        // Dispose players
         for (let key in window) {
             if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
                 try { window[key].dispose(); } catch(e) {}
@@ -898,7 +875,6 @@
     // 🔥 LECTURE DURATION - SETUP FUNCTION
     // ============================================================
     function setupDurationTracking(player, playerId) {
-        // Clear previous tracking
         if (currentPlayer && currentPlayer !== player) {
             try { currentPlayer.off('timeupdate'); } catch(e) {}
             try { currentPlayer.off('ended'); } catch(e) {}
@@ -909,7 +885,6 @@
         currentPlayerId = playerId;
         const durationDisplay = document.getElementById('durationDisplay');
 
-        // Update duration on timeupdate
         player.on('timeupdate', function() {
             const currentTime = player.currentTime();
             if (currentTime && !isNaN(currentTime) && currentTime > 0) {
@@ -931,7 +906,6 @@
             durationDisplay.textContent = '00:00:00';
         });
         
-        // Also reset when player is disposed
         player.on('dispose', function() {
             durationDisplay.textContent = '00:00:00';
             if (currentPlayer === player) {
@@ -939,42 +913,6 @@
                 currentPlayerId = null;
             }
         });
-    }
-
-    // ============================================================
-    // 🎬 LOAD LIVE STREAM (LIVE REFRESH)
-    // ============================================================
-    window.loadLiveStream = function() {
-        // Find the first important item's play button
-        const firstImportantItem = document.querySelector('.important-item');
-        if (!firstImportantItem) {
-            showToast('⚠️ No live stream available', 'error');
-            return;
-        }
-        
-        const playBtn = firstImportantItem.querySelector('.important-play-btn');
-        if (!playBtn) {
-            showToast('⚠️ No play button found', 'error');
-            return;
-        }
-        
-        // Trigger click on play button
-        playBtn.click();
-        showToast('🔄 Live stream refreshed!', 'success');
-    };
-
-    // Toast notification helper
-    function showToast(message, type = 'info') {
-        const statusBar = document.getElementById('statusBar');
-        if (statusBar) {
-            statusBar.textContent = message;
-            statusBar.style.background = type === 'error' ? '#fee' : type === 'success' ? '#e6f5e6' : '#fff3cd';
-            statusBar.style.color = type === 'error' ? '#b33a3a' : type === 'success' ? '#1a5d3c' : '#856404';
-            setTimeout(() => {
-                statusBar.style.background = '#f0f4fb';
-                statusBar.style.color = '#4c637f';
-            }, 3000);
-        }
     }
 
     // ==================== FETCH IMPORTANT SECTION ====================
@@ -987,8 +925,13 @@
                 let html = '';
                 data.items.forEach(item => {
                     const playerId = `important-${item.id}`;
+                    const isVisible = item.is_visible !== 0;
+                    // If any item is hidden, mark section as hidden
+                    if (!isVisible) {
+                        isImportantHidden = true;
+                    }
                     html += `
-                        <div class="important-item">
+                        <div class="important-item" data-id="${item.id}" data-visible="${isVisible}">
                             <span class="name">${item.title}</span>
                             <button class="important-play-btn" 
                                     data-player-id="${playerId}" 
@@ -1003,9 +946,21 @@
                     `;
                 });
                 container.innerHTML = html;
+                
+                // Apply hidden state to section if any item is hidden
+                const section = document.getElementById('importantSection');
+                if (isImportantHidden) {
+                    section.classList.add('hidden-section');
+                    document.getElementById('durationBar').classList.add('hidden');
+                } else {
+                    section.classList.remove('hidden-section');
+                    document.getElementById('durationBar').classList.remove('hidden');
+                }
+                
                 attachImportantPlayEvents();
             } else {
                 container.innerHTML = `<div class="empty-important">No Live classes available</div>`;
+                document.getElementById('durationBar').classList.add('hidden');
             }
         } catch (error) {
             console.error('Error fetching important section:', error);
@@ -1021,6 +976,16 @@
                 const link = this.dataset.link;
                 const wrapper = document.getElementById(`wrapper-${playerId}`);
                 if (!wrapper) return;
+                
+                // Get the parent important-item
+                const parentItem = this.closest('.important-item');
+                const isVisible = parentItem?.dataset?.visible === 'true';
+                
+                // If item is hidden, don't play
+                if (!isVisible) {
+                    showToast('⛔ This class is currently hidden by admin', 'error');
+                    return;
+                }
                 
                 if (wrapper.style.display === 'block') {
                     wrapper.style.display = 'none';
@@ -1061,7 +1026,6 @@
                 const videoEl = document.getElementById(playerId);
                 if (!videoEl) return;
 
-                // Reset duration
                 document.getElementById('durationDisplay').textContent = '00:00:00';
 
                 // YouTube Support
@@ -1136,7 +1100,6 @@
                     });
                     window[`player_${playerId}`] = player;
                     
-                    // ===== SETUP DURATION TRACKING =====
                     setupDurationTracking(player, playerId);
                     
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1169,7 +1132,6 @@
                     player.src({ src: link, type: 'video/mp4' });
                     player.play();
                     
-                    // ===== SETUP DURATION TRACKING =====
                     setupDurationTracking(player, playerId);
                     
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1185,6 +1147,19 @@
                 wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
         });
+    }
+
+    function showToast(message, type = 'info') {
+        const statusBar = document.getElementById('statusBar');
+        if (statusBar) {
+            statusBar.textContent = message;
+            statusBar.style.background = type === 'error' ? '#fee' : type === 'success' ? '#e6f5e6' : '#fff3cd';
+            statusBar.style.color = type === 'error' ? '#b33a3a' : type === 'success' ? '#1a5d3c' : '#856404';
+            setTimeout(() => {
+                statusBar.style.background = '#f0f4fb';
+                statusBar.style.color = '#4c637f';
+            }, 3000);
+        }
     }
 
     // ==================== FETCH PLAYLISTS ====================
@@ -1551,7 +1526,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Duration & Live Refresh added');
+    console.log('✅ Video Portal loaded - Duration at bottom, Hide/Show supported');
 })();
 </script>
 </body>
