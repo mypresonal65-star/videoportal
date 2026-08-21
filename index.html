@@ -26,8 +26,6 @@
       .status-bar { font-size: 0.7rem; padding: 6px 12px; }
       .search-container { flex-direction: column; }
       .search-container input { width: 100%; }
-      .tab-buttons { flex-direction: column; }
-      .tab-btn { width: 100%; text-align: center; }
     }
 
     @media (max-width: 480px) {
@@ -52,13 +50,75 @@
     .key-gen-section h3 { font-size: 1rem; color: #0b1a33; margin-bottom: 8px; }
     .key-gen-section .info { font-size: 0.8rem; color: #6a7c94; margin-bottom: 12px; }
     
-    .tab-buttons { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
-    .tab-btn { padding: 10px 24px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; cursor: pointer; font-weight: 500; transition: 0.15s; flex: 1; min-width: 120px; text-align: center; }
-    .tab-btn.active { border-color: #1a2b4c; background: #1a2b4c; color: white; }
-    .tab-btn:hover { border-color: #1a2b4c; background: #f0f4fe; }
-    .tab-btn.active:hover { background: #1a2b4c; color: white; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
+    /* ===== IMPORTANT SECTION ===== */
+    .important-section {
+      background: linear-gradient(135deg, #fff8e1, #fff3cd);
+      border: 2px solid #f7971e;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(247, 151, 30, 0.15);
+      position: relative;
+    }
+    .important-section::before {
+      content: "⭐ IMPORTANT";
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #f7971e;
+      color: white;
+      padding: 2px 16px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .important-section .title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #0b1a33;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+    .important-item {
+      background: white;
+      border-radius: 16px;
+      padding: 14px 18px;
+      margin-bottom: 10px;
+      border: 1px solid #e6edf6;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .important-item:last-child { margin-bottom: 0; }
+    .important-item .name {
+      font-weight: 600;
+      color: #0b1a33;
+      font-size: 1rem;
+    }
+    .important-play-btn {
+      background: #f7971e;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 6px 20px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .important-play-btn:hover {
+      background: #e08a0b;
+      transform: scale(1.02);
+    }
+    .empty-important {
+      color: #6a7c94;
+      padding: 20px 0;
+      text-align: center;
+      font-style: italic;
+    }
     
     .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
     .playlist-selector select { padding: 10px 20px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; color: #1a2b4c; font-weight: 500; cursor: pointer; flex: 1; min-width: 150px; }
@@ -81,20 +141,6 @@
     .play-btn:hover { background: #1f3457; }
     .player-wrapper { width: 100%; margin-top: 12px; border-radius: 16px; overflow: hidden; background: #000; min-height: 200px; }
     .player-wrapper iframe { width: 100%; height: 100%; min-height: 200px; aspect-ratio: 16/9; border: none; }
-    
-    .live-container { padding: 20px; background: #f8faff; border-radius: 20px; border: 1px solid #e6edf6; }
-    .live-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
-    .live-badge { background: #ff0044; color: white; padding: 4px 16px; border-radius: 40px; font-size: 0.8rem; font-weight: 700; animation: pulse-live 1.5s infinite; display: inline-flex; align-items: center; gap: 8px; }
-    .live-badge::before { content: "●"; font-size: 16px; animation: pulse-dot 1s infinite; }
-    @keyframes pulse-live { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
-    
-    .live-refresh-btn { padding: 8px 24px; border: none; border-radius: 40px; background: #1a2b4c; color: white; font-weight: 500; cursor: pointer; transition: 0.15s; }
-    .live-refresh-btn:hover { background: #2f4370; }
-    
-    .live-duration { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #eef3fa; border-radius: 12px; margin-top: 12px; }
-    .live-duration .label { color: #4c637f; font-size: 0.9rem; }
-    .live-duration .value { font-weight: 700; color: #0b1a33; font-family: 'Courier New', monospace; font-size: 1.1rem; }
     
     .empty-state { color: #6a7c94; padding: 40px 0; text-align: center; font-style: italic; }
     .playlist-title { font-size: 1.4rem; font-weight: 600; color: #0b1a33; margin-bottom: 16px; }
@@ -128,8 +174,6 @@
     .key-gen-status.success { color: #1a7a3a; }
     .key-gen-status.error { color: #b33a3a; }
     .key-gen-status.info { color: #856404; }
-    
-    .live-title { font-size: 1.2rem; font-weight: 600; color: #0b1a33; margin-bottom: 12px; }
     
     .video-js .vjs-big-play-button {
       background: rgba(11, 26, 51, 0.8) !important;
@@ -195,57 +239,30 @@
       <div id="sessionTimer" class="session-timer">⏰ 72:00:00</div>
     </div>
     
-    <!-- Tabs -->
-    <div class="tab-buttons">
-      <button class="tab-btn active" data-tab="live">🔴 Live</button>
-      <button class="tab-btn" data-tab="recorded">📁 Recorded</button>
+    <!-- Important Section -->
+    <div id="importantSection" class="important-section">
+      <div class="title" id="importantTitle">⭐ Important Classes</div>
+      <div id="importantItems">
+        <div class="empty-important">Loading important classes...</div>
+      </div>
     </div>
     
-    <!-- Live Tab -->
-    <div id="tab-live" class="tab-content active">
-      <div class="live-container">
-        <div class="live-header">
-          <div class="live-badge">🔴 LIVE</div>
-          <button class="live-refresh-btn" id="liveRefreshBtn">🔄 Refresh</button>
-        </div>
-        
-        <div class="live-title" id="liveTitle">Loading live stream...</div>
-        
-        <!-- Video Player -->
-        <div class="player-wrapper" id="livePlayerWrapper" style="min-height: 300px;">
-          <video id="live-video" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="auto"></video>
-        </div>
-        
-        <!-- Timer -->
-        <div class="live-duration">
-          <span class="label">⏱️ Lecture Completed:</span>
-          <span class="value" id="liveDuration">00:00:00</span>
-        </div>
-        
-        <div id="liveStatus" style="margin-top:12px;font-size:0.9rem;color:#4c637f;">
-          🔴 Live stream is ready
+    <!-- Recorded Videos -->
+    <div class="playlist-selector">
+      <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
+        <select id="playlistDropdown" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
+          <option value="">Select a playlist...</option>
+        </select>
+        <div class="search-container">
+          <input type="text" id="searchInput" placeholder="🔍 Search playlists..." />
+          <button class="search-btn" id="searchBtn">Search</button>
+          <button class="clear-btn" id="clearSearchBtn">Clear</button>
         </div>
       </div>
     </div>
     
-    <!-- Recorded Tab -->
-    <div id="tab-recorded" class="tab-content">
-      <div class="playlist-selector">
-        <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
-          <div class="search-container">
-            <input type="text" id="searchInput" placeholder="🔍 Search playlists..." />
-            <button class="search-btn" id="searchBtn">Search</button>
-            <button class="clear-btn" id="clearSearchBtn">Clear</button>
-          </div>
-        </div>
-      </div>
-      
-      <div id="chaptersContainer">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+    <div id="chaptersContainer">
+      <div class="empty-state">Select a playlist to view chapters</div>
     </div>
   </div>
   
@@ -307,10 +324,6 @@
     let googleAccessToken = null;
     let resetCheckInterval = null;
     let timerStartTime = Date.now();
-    let livePlayer = null;
-    let liveDurationInterval = null;
-    let liveStartTime = null;
-    let liveHls = null;
 
     // ==================== SESSION MANAGEMENT ====================
     function generateSessionId() {
@@ -432,7 +445,7 @@
                     document.getElementById('loginSuccess').textContent = '✅ Google Sign-In successful!';
                     showVideoContent();
                     fetchPlaylists();
-                    loadLiveStream();
+                    fetchImportantSection();
                 } catch(e) {
                     console.error('Token decode error:', e);
                 }
@@ -532,7 +545,7 @@
                 saveSession(data.user, key, sessionId);
                 showVideoContent();
                 fetchPlaylists();
-                loadLiveStream();
+                fetchImportantSection();
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Login failed');
             }
@@ -575,18 +588,6 @@
             clearInterval(resetCheckInterval);
             resetCheckInterval = null;
         }
-        if (liveDurationInterval) {
-            clearInterval(liveDurationInterval);
-            liveDurationInterval = null;
-        }
-        if (liveHls) {
-            try { liveHls.destroy(); } catch(e) {}
-            liveHls = null;
-        }
-        if (livePlayer) {
-            try { livePlayer.dispose(); } catch(e) {}
-            livePlayer = null;
-        }
         for (let key in window) {
             if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
                 try { window[key].dispose(); } catch(e) {}
@@ -596,21 +597,6 @@
             }
         }
     };
-
-    // ==================== TABS ====================
-    function setupTabs() {
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-                if (this.dataset.tab === 'live') {
-                    loadLiveStream();
-                }
-            });
-        });
-    }
 
     // ==================== SHOW VIDEO CONTENT ====================
     function showVideoContent() {
@@ -675,49 +661,114 @@
         startResetTimer();
     }
 
-    // ==================== LOAD LIVE STREAM (FIXED - SAME AS RECORDED) ====================
-    async function loadLiveStream() {
+    // ==================== FETCH IMPORTANT SECTION ====================
+    async function fetchImportantSection() {
+        const container = document.getElementById('importantItems');
         try {
-            const response = await fetch(API_BASE + '/live');
+            const response = await fetch(API_BASE + '/important');
             const data = await response.json();
-            
-            const liveTitle = document.getElementById('liveTitle');
-            const liveStatus = document.getElementById('liveStatus');
-            const videoEl = document.getElementById('live-video');
-            
-            if (data.success && data.link) {
-                liveTitle.textContent = data.title || 'Live Stream';
-                liveStatus.textContent = '🔴 Live stream is playing';
-                liveStatus.style.color = '#ff0044';
+            if (data.success && data.items && data.items.length > 0) {
+                let html = '';
+                data.items.forEach(item => {
+                    const playerId = `important-${item.id}`;
+                    const isYouTube = item.link && (item.link.includes('youtube.com') || item.link.includes('youtu.be'));
+                    html += `
+                        <div class="important-item">
+                            <span class="name">${item.title}</span>
+                            <button class="important-play-btn" 
+                                    data-player-id="${playerId}" 
+                                    data-link="${item.link}" 
+                                    data-title="${item.title}">
+                                ▶ Play
+                            </button>
+                            <div class="player-wrapper" id="wrapper-${playerId}" style="display: none;">
+                                <video id="${playerId}" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="auto"></video>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                attachImportantPlayEvents();
+            } else {
+                container.innerHTML = `<div class="empty-important">No important classes available</div>`;
+            }
+        } catch (error) {
+            console.error('Error fetching important section:', error);
+            container.innerHTML = `<div class="empty-important">⚠️ Failed to load important classes</div>`;
+        }
+    }
+
+    // ==================== ATTACH IMPORTANT PLAY EVENTS ====================
+    function attachImportantPlayEvents() {
+        document.querySelectorAll('.important-play-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const playerId = this.dataset.playerId;
+                const link = this.dataset.link;
+                const wrapper = document.getElementById(`wrapper-${playerId}`);
+                if (!wrapper) return;
                 
-                // Destroy existing players
-                if (liveHls) {
-                    try { liveHls.destroy(); } catch(e) {}
-                    liveHls = null;
+                if (wrapper.style.display === 'block') {
+                    wrapper.style.display = 'none';
+                    wrapper.innerHTML = '';
+                    if (window[`hls_${playerId}`]) {
+                        try { window[`hls_${playerId}`].destroy(); } catch(e) {}
+                        delete window[`hls_${playerId}`];
+                    }
+                    if (window[`player_${playerId}`]) {
+                        try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                        delete window[`player_${playerId}`];
+                    }
+                    return;
                 }
-                if (livePlayer) {
-                    try { livePlayer.dispose(); } catch(e) {}
-                    livePlayer = null;
+                
+                wrapper.style.display = 'block';
+                
+                if (window[`hls_${playerId}`]) {
+                    try { window[`hls_${playerId}`].destroy(); } catch(e) {}
+                    delete window[`hls_${playerId}`];
                 }
-                
-                // Reset video element
-                const wrapper = document.getElementById('livePlayerWrapper');
-                wrapper.innerHTML = '';
-                const newVideo = document.createElement('video');
-                newVideo.id = 'live-video';
-                newVideo.className = 'video-js vjs-default-skin';
-                newVideo.setAttribute('controls', '');
-                newVideo.setAttribute('preload', 'auto');
-                newVideo.style.width = '100%';
-                newVideo.style.height = '100%';
-                newVideo.style.aspectRatio = '16/9';
-                wrapper.appendChild(newVideo);
-                
-                const newVideoEl = document.getElementById('live-video');
-                
-                // ========== SAME AS RECORDED PLAYER ==========
-                if (data.link && data.link.includes('.m3u8') && Hls.isSupported()) {
-                    liveHls = new Hls({
+                if (window[`player_${playerId}`]) {
+                    try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                    delete window[`player_${playerId}`];
+                }
+
+                const videoEl = document.getElementById(playerId);
+                if (!videoEl) return;
+
+                if (link && (link.includes('youtube.com') || link.includes('youtu.be'))) {
+                    const videoId = extractYouTubeId(link);
+                    if (videoId) {
+                        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+                        if (googleUser) {
+                            embedUrl += `&origin=${window.location.origin}`;
+                        }
+                        wrapper.innerHTML = `
+                            <iframe 
+                                src="${embedUrl}"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen
+                                style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"
+                            ></iframe>
+                        `;
+                        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
+                }
+
+                if (link && link.includes('.m3u8') && Hls.isSupported()) {
+                    const videoEl2 = document.createElement('video');
+                    videoEl2.id = playerId;
+                    videoEl2.className = 'video-js vjs-default-skin';
+                    videoEl2.setAttribute('controls', '');
+                    videoEl2.setAttribute('preload', 'auto');
+                    videoEl2.style.width = '100%';
+                    videoEl2.style.height = '100%';
+                    videoEl2.style.aspectRatio = '16/9';
+                    wrapper.innerHTML = '';
+                    wrapper.appendChild(videoEl2);
+                    
+                    const hls = new Hls({
                         enableWorker: true,
                         lowLatencyMode: true,
                         maxBufferLength: 30,
@@ -729,30 +780,22 @@
                         }
                     });
                     
-                    liveHls.loadSource(data.link);
-                    liveHls.attachMedia(newVideoEl);
+                    hls.loadSource(link);
+                    hls.attachMedia(videoEl2);
                     
-                    liveHls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        newVideoEl.play().catch(e => console.log('Play error:', e));
-                        if (!liveStartTime) {
-                            liveStartTime = Date.now();
-                            updateLiveDuration();
-                            if (liveDurationInterval) clearInterval(liveDurationInterval);
-                            liveDurationInterval = setInterval(updateLiveDuration, 1000);
-                        }
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        videoEl2.play().catch(e => console.log('Play error:', e));
                     });
                     
-                    liveHls.on(Hls.Events.ERROR, function(event, data) {
-                        console.error('HLS Error:', data);
+                    hls.on(Hls.Events.ERROR, function(event, data) {
                         if (data.fatal) {
-                            liveStatus.textContent = '❌ Live stream error. Please refresh.';
-                            liveStatus.style.color = '#b33a3a';
-                            tryFallbackLivePlayer(newVideoEl, data.link);
+                            tryFallbackHLSPlayer(videoEl2, link, playerId);
                         }
                     });
                     
-                    // Video.js for controls overlay (same as recorded)
-                    livePlayer = videojs(newVideoEl, {
+                    window[`hls_${playerId}`] = hls;
+                    
+                    const player = videojs(videoEl2, {
                         controls: true,
                         fluid: true,
                         html5: {
@@ -760,73 +803,50 @@
                             nativeVideoTracks: false,
                         }
                     });
+                    window[`player_${playerId}`] = player;
                     
-                } else if (data.link) {
-                    tryFallbackLivePlayer(newVideoEl, data.link);
-                } else {
-                    liveStatus.textContent = '⚠️ No live stream available';
-                    liveStatus.style.color = '#856404';
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
                 }
-                
-            } else {
-                liveTitle.textContent = 'No live stream';
-                liveStatus.textContent = '⚠️ No live stream configured. Please check admin panel.';
-                liveStatus.style.color = '#856404';
-            }
-        } catch (error) {
-            console.error('Live stream error:', error);
-            document.getElementById('liveStatus').textContent = '❌ Failed to load live stream: ' + error.message;
-            document.getElementById('liveStatus').style.color = '#b33a3a';
-        }
-    }
 
-    // ========== FALLBACK LIVE PLAYER (SAME AS RECORDED FALLBACK) ==========
-    function tryFallbackLivePlayer(videoEl, link) {
-        if (liveHls) {
-            try { liveHls.destroy(); } catch(e) {}
-            liveHls = null;
-        }
-        
-        const player = videojs(videoEl, {
-            autoplay: true,
-            controls: true,
-            fluid: true,
-            html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    smoothQualityChange: true,
-                    overrideNative: true,
-                },
-                nativeAudioTracks: false,
-                nativeVideoTracks: false,
-            }
+                if (link && (link.includes('.mp4') || link.includes('.webm'))) {
+                    const videoEl2 = document.createElement('video');
+                    videoEl2.id = playerId;
+                    videoEl2.className = 'video-js vjs-default-skin';
+                    videoEl2.setAttribute('controls', '');
+                    videoEl2.setAttribute('preload', 'auto');
+                    videoEl2.style.width = '100%';
+                    videoEl2.style.height = '100%';
+                    videoEl2.style.aspectRatio = '16/9';
+                    wrapper.innerHTML = '';
+                    wrapper.appendChild(videoEl2);
+                    
+                    const player = videojs(videoEl2, {
+                        autoplay: true,
+                        controls: true,
+                        fluid: true,
+                        html5: {
+                            nativeAudioTracks: false,
+                            nativeVideoTracks: false,
+                        }
+                    });
+                    window[`player_${playerId}`] = player;
+                    player.src({ src: link, type: 'video/mp4' });
+                    player.play();
+                    
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
+                wrapper.innerHTML = `
+                    <div style="padding:40px;text-align:center;color:#b33a3a;background:#0d1117;border-radius:12px;">
+                        ⚠️ Unsupported video format.<br>
+                        <small style="color:#6a7c94;">Supported: YouTube, HLS (.m3u8), MP4</small>
+                    </div>
+                `;
+                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
         });
-        
-        livePlayer = player;
-        
-        if (link && link.includes('.m3u8')) {
-            player.src({ src: link, type: 'application/x-mpegURL' });
-        } else if (link) {
-            player.src({ src: link, type: 'video/mp4' });
-        }
-        player.play();
-        
-        if (!liveStartTime) {
-            liveStartTime = Date.now();
-            updateLiveDuration();
-            if (liveDurationInterval) clearInterval(liveDurationInterval);
-            liveDurationInterval = setInterval(updateLiveDuration, 1000);
-        }
-    }
-
-    function updateLiveDuration() {
-        if (!liveStartTime) return;
-        const elapsed = Math.floor((Date.now() - liveStartTime) / 1000);
-        const hours = Math.floor(elapsed / 3600);
-        const minutes = Math.floor((elapsed % 3600) / 60);
-        const seconds = elapsed % 60;
-        document.getElementById('liveDuration').textContent = 
-            `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     // ==================== FETCH PLAYLISTS ====================
@@ -1122,7 +1142,7 @@
         if (checkGoogleSession()) {
             showVideoContent();
             fetchPlaylists();
-            loadLiveStream();
+            fetchImportantSection();
             return true;
         }
         const session = getSession();
@@ -1130,7 +1150,7 @@
             currentUser = session.user;
             showVideoContent();
             fetchPlaylists();
-            loadLiveStream();
+            fetchImportantSection();
             return true;
         }
         return false;
@@ -1157,23 +1177,10 @@
         if (e.key === 'Enter') searchPlaylists();
         if (e.key === 'Escape') clearSearch();
     });
-    document.getElementById('liveRefreshBtn').addEventListener('click', function() {
-        liveStartTime = Date.now();
-        updateLiveDuration();
-        loadLiveStream();
-    });
-    setupTabs();
 
     // ==================== DISPOSE PLAYERS ====================
     window.addEventListener('beforeunload', function() {
         if (resetCheckInterval) clearInterval(resetCheckInterval);
-        if (liveDurationInterval) clearInterval(liveDurationInterval);
-        if (liveHls) {
-            try { liveHls.destroy(); } catch(e) {}
-        }
-        if (livePlayer) {
-            try { livePlayer.dispose(); } catch(e) {}
-        }
         for (let key in window) {
             if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
                 try { window[key].dispose(); } catch(e) {}
@@ -1193,7 +1200,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Live with recorded player');
+    console.log('✅ Video Portal loaded - Important Section added');
 })();
 </script>
 </body>
