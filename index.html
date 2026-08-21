@@ -61,7 +61,7 @@
       position: relative;
     }
     .important-section::before {
-      content: "⭐ IMPORTANT";
+      content: "⭐ Live Class";
       position: absolute;
       top: -12px;
       left: 20px;
@@ -241,9 +241,9 @@
     
     <!-- Important Section -->
     <div id="importantSection" class="important-section">
-      <div class="title" id="importantTitle">⭐ Important Classes</div>
+      <div class="title" id="importantTitle">⭐ Live Classes</div>
       <div id="importantItems">
-        <div class="empty-important">Loading important classes...</div>
+        <div class="empty-important">Loading Live classes...</div>
       </div>
     </div>
     
@@ -690,11 +690,11 @@
                 container.innerHTML = html;
                 attachImportantPlayEvents();
             } else {
-                container.innerHTML = `<div class="empty-important">No important classes available</div>`;
+                container.innerHTML = `<div class="empty-important">No Live classes available</div>`;
             }
         } catch (error) {
             console.error('Error fetching important section:', error);
-            container.innerHTML = `<div class="empty-important">⚠️ Failed to load important classes</div>`;
+            container.innerHTML = `<div class="empty-important">⚠️ Failed to load Live classes</div>`;
         }
     }
 
