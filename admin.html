@@ -51,10 +51,6 @@
     .btn-sm { padding: 8px 18px; font-size: 0.85rem; flex: 0; }
     .btn-copy { background: #2d7a9b; color: white; padding: 6px 16px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
     .btn-copy:hover { background: #1f5f7a; }
-    .btn-highlight { background: #f7971e; color: white; padding: 4px 14px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.75rem; transition: 0.15s; }
-    .btn-highlight:hover { background: #e08a0b; }
-    .btn-highlight.active { background: #1a7a3a; }
-    .btn-highlight.active:hover { background: #0f5c28; }
     
     .entry-list { background: #f5f8fe; border-radius: 20px; padding: 6px 0; margin: 12px 0 6px; max-height: 350px; overflow-y: auto; }
     .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #e6edf6; }
@@ -62,7 +58,6 @@
     .entry-item .info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
     .entry-item .name { font-weight: 600; color: #0b1a33; }
     .entry-item .sub { color: #4c637f; font-size: 0.8rem; word-break: break-all; }
-    .entry-item .actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .entry-item .del-btn { background: none; border: none; color: #b33a3a; font-size: 1.2rem; cursor: pointer; padding: 4px 10px; border-radius: 40px; }
     .entry-item .del-btn:hover { background: #ffe6e6; }
     .entry-item .key-btn { background: none; border: 1px solid #d0dae8; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.8rem; }
@@ -93,8 +88,7 @@
     .key-display { background: #f0f4fb; padding: 12px 16px; border-radius: 12px; font-family: monospace; word-break: break-all; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .key-display .key-text { font-size: 1.1rem; color: #0b1a33; }
     
-    .highlight-badge { background: #f7971e; color: white; font-size: 0.6rem; padding: 2px 10px; border-radius: 40px; font-weight: 600; }
-    .live-status-active { color: #ff0044; font-weight: 700; }
+    .important-item { background: #fef9e7; border-left: 4px solid #f7971e; }
   </style>
 </head>
 <body>
@@ -128,7 +122,7 @@
     <!-- Tabs -->
     <div class="tab-buttons">
       <button class="tab-btn active" data-tab="playlists">📁 Playlists</button>
-      <button class="tab-btn" data-tab="live">🔴 Live</button>
+      <button class="tab-btn" data-tab="important">⭐ Important</button>
       <button class="tab-btn" data-tab="users">👥 Users</button>
     </div>
 
@@ -158,30 +152,27 @@
       <div class="entry-list" id="adminList"><div class="empty-state">Loading...</div></div>
     </div>
 
-    <!-- Live Tab -->
-    <div id="tab-live" class="tab-content">
-      <div class="section-title">🔴 Live Stream Configuration</div>
+    <!-- Important Tab -->
+    <div id="tab-important" class="tab-content">
+      <div class="section-title">⭐ Important Section</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
-        Add any recorded video link. It will play in the "Live" tab on user website.
+        Add important classes that will appear at the top of user website.
       </p>
       
       <div class="flex-row">
-        <input type="text" id="liveTitle" placeholder="Live Title" value="Live Class" />
+        <input type="text" id="importantTitle" placeholder="Class Title" />
       </div>
       <div class="flex-row">
-        <input type="text" id="liveLink" placeholder="Video URL (HLS / MP4)" />
+        <input type="text" id="importantLink" placeholder="Video URL (HLS / MP4)" />
       </div>
       <div class="flex-row">
-        <button class="btn btn-success" id="saveLiveBtn">💾 Save Live</button>
-        <button class="btn btn-danger" id="stopLiveBtn">⏹️ Remove Live</button>
+        <button class="btn btn-success" id="saveImportantBtn">💾 Save Important</button>
       </div>
-      <div id="liveFeedback" class="toast-msg"></div>
+      <div id="importantFeedback" class="toast-msg"></div>
       
-      <div class="section-title" style="margin-top:16px;">📋 Current Live Stream</div>
-      <div id="liveStatusDisplay" style="background:#f8faff;padding:12px 16px;border-radius:12px;border:1px solid #e6edf6;margin-top:8px;">
-        <div><strong>Title:</strong> <span id="currentLiveTitle">Not set</span></div>
-        <div><strong>URL:</strong> <span id="currentLiveLink">Not set</span></div>
-        <div><strong>Status:</strong> <span id="currentLiveStatus" style="color:#856404;">⏸️ Inactive</span></div>
+      <div class="section-title" style="margin-top:16px;">📋 All Important Classes</div>
+      <div id="importantList" class="entry-list">
+        <div class="empty-state">Loading...</div>
       </div>
     </div>
 
@@ -295,6 +286,7 @@
     const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
     let playlists = [];
     let users = [];
+    let importantItems = [];
     let isAuthenticated = false;
 
     // ----- Tabs -----
@@ -306,7 +298,7 @@
             document.getElementById('tab-' + this.dataset.tab).classList.add('active');
             if (this.dataset.tab === 'users') loadUsers();
             if (this.dataset.tab === 'playlists') loadPlaylists();
-            if (this.dataset.tab === 'live') loadLiveStatus();
+            if (this.dataset.tab === 'important') loadImportant();
         });
     });
 
@@ -350,7 +342,7 @@
                 errorEl.textContent = '';
                 loadPlaylists();
                 loadUsers();
-                loadLiveStatus();
+                loadImportant();
                 showFeedback('✅ Welcome ' + data.admin.username, 'success', 'playlistFeedback');
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Invalid credentials');
@@ -363,74 +355,86 @@
         }
     }
 
-    // ==================== LIVE STREAM ====================
-    async function loadLiveStatus() {
+    // ==================== IMPORTANT SECTION ====================
+    async function loadImportant() {
         try {
-            const data = await apiCall('/live');
+            const data = await apiCall('/important');
             if (data.success) {
-                document.getElementById('currentLiveTitle').textContent = data.title || 'Not set';
-                document.getElementById('currentLiveLink').textContent = data.link || 'Not set';
-                const statusEl = document.getElementById('currentLiveStatus');
-                if (data.link) {
-                    statusEl.textContent = '🔴 Live';
-                    statusEl.style.color = '#ff0044';
-                    statusEl.className = 'live-status-active';
-                } else {
-                    statusEl.textContent = '⏸️ Inactive';
-                    statusEl.style.color = '#856404';
-                    statusEl.className = '';
-                }
-                document.getElementById('liveTitle').value = data.title || 'Live Class';
-                document.getElementById('liveLink').value = data.link || '';
+                importantItems = data.items || [];
+                renderImportantList();
+                showFeedback('✅ Important items loaded', 'success', 'importantFeedback');
             }
         } catch (error) {
-            console.error('Load live status error:', error);
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'importantFeedback');
         }
     }
 
-    async function saveLiveStream() {
-        const title = document.getElementById('liveTitle').value.trim();
-        const link = document.getElementById('liveLink').value.trim();
+    async function saveImportant() {
+        const title = document.getElementById('importantTitle').value.trim();
+        const link = document.getElementById('importantLink').value.trim();
 
         if (!title || !link) {
-            showFeedback('⚠️ Please fill both Title and URL', 'error', 'liveFeedback');
+            showFeedback('⚠️ Please fill both Title and URL', 'error', 'importantFeedback');
             return;
         }
 
         try {
-            const data = await apiCall('/live', {
+            const data = await apiCall('/important', {
                 method: 'POST',
                 body: JSON.stringify({ title, link })
             });
 
             if (data.success) {
-                showFeedback('✅ Live stream saved successfully!', 'success', 'liveFeedback');
-                loadLiveStatus();
+                document.getElementById('importantTitle').value = '';
+                document.getElementById('importantLink').value = '';
+                showFeedback('✅ Important class saved!', 'success', 'importantFeedback');
+                loadImportant();
             } else {
-                showFeedback('❌ Failed to save: ' + data.error, 'error', 'liveFeedback');
+                showFeedback('❌ Failed to save: ' + data.error, 'error', 'importantFeedback');
             }
         } catch (error) {
-            showFeedback('❌ Error: ' + error.message, 'error', 'liveFeedback');
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
         }
     }
 
-    async function stopLiveStream() {
-        if (!confirm('Are you sure you want to remove the live stream?')) return;
-
+    async function deleteImportant(id) {
+        if (!confirm('Delete this important class?')) return;
         try {
-            const data = await apiCall('/live', {
-                method: 'DELETE'
+            const data = await apiCall('/important', {
+                method: 'DELETE',
+                body: JSON.stringify({ id })
             });
-
             if (data.success) {
-                showFeedback('✅ Live stream removed!', 'success', 'liveFeedback');
-                loadLiveStatus();
+                showFeedback('🗑️ Deleted', 'success', 'importantFeedback');
+                loadImportant();
             } else {
-                showFeedback('❌ Failed to remove: ' + data.error, 'error', 'liveFeedback');
+                showFeedback('❌ Failed to delete', 'error', 'importantFeedback');
             }
         } catch (error) {
-            showFeedback('❌ Error: ' + error.message, 'error', 'liveFeedback');
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
         }
+    }
+
+    function renderImportantList() {
+        const list = document.getElementById('importantList');
+        if (!importantItems.length) {
+            list.innerHTML = `<div class="empty-state">No important classes added yet</div>`;
+            return;
+        }
+        let html = '';
+        importantItems.forEach(item => {
+            html += `
+                <div class="entry-item important-item">
+                    <div class="info">
+                        <span class="name">⭐ ${item.title}</span>
+                        <span class="sub">${item.link}</span>
+                    </div>
+                    <button class="del-btn" onclick="window.deleteImportant('${item.id}')">✕</button>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteImportant = deleteImportant;
     }
 
     // ==================== LOAD PLAYLISTS ====================
@@ -442,7 +446,7 @@
                 renderAdminList();
                 updatePlaylistSelect();
                 updateApiStatus('connected');
-                showFeedback('✅ Playlists loaded from database', 'success', 'playlistFeedback');
+                showFeedback('✅ Playlists loaded', 'success', 'playlistFeedback');
             }
         } catch (error) {
             showFeedback('❌ Failed to load: ' + error.message, 'error', 'playlistFeedback');
@@ -464,7 +468,7 @@
             });
             if (data.success) {
                 document.getElementById('newPlaylistName').value = '';
-                showFeedback('✅ Playlist added to database', 'success', 'playlistFeedback');
+                showFeedback('✅ Playlist added', 'success', 'playlistFeedback');
                 loadPlaylists();
             }
         } catch (error) {
@@ -489,30 +493,11 @@
             if (data.success) {
                 document.getElementById('chapterName').value = '';
                 document.getElementById('chapterLink').value = '';
-                showFeedback('✅ Chapter added to database', 'success', 'chapterFeedback');
+                showFeedback('✅ Chapter added', 'success', 'chapterFeedback');
                 loadPlaylists();
             }
         } catch (error) {
             showFeedback('❌ Failed: ' + error.message, 'error', 'chapterFeedback');
-        }
-    }
-
-    // ==================== TOGGLE HIGHLIGHT ====================
-    async function toggleHighlight(playlistId, chapterId) {
-        try {
-            const data = await apiCall('/playlists/chapter/highlight', {
-                method: 'POST',
-                body: JSON.stringify({ playlistId, chapterId })
-            });
-            
-            if (data.success) {
-                showFeedback(data.message, 'success', 'playlistFeedback');
-                loadPlaylists();
-            } else {
-                showFeedback('❌ ' + data.error, 'error', 'playlistFeedback');
-            }
-        } catch (error) {
-            showFeedback('❌ Network error: ' + error.message, 'error', 'playlistFeedback');
         }
     }
 
@@ -525,7 +510,7 @@
                 body: JSON.stringify({ playlistId })
             });
             loadPlaylists();
-            showFeedback('🗑️ Deleted from database', 'success', 'playlistFeedback');
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
         } catch (error) {
             showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
         }
@@ -540,7 +525,7 @@
                 body: JSON.stringify({ playlistId, chapterId })
             });
             loadPlaylists();
-            showFeedback('🗑️ Deleted from database', 'success', 'playlistFeedback');
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
         } catch (error) {
             showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
         }
@@ -555,7 +540,7 @@
                 renderUserList();
                 updateUserSelect();
                 updateApiStatus('connected');
-                showFeedback('✅ Users loaded from database', 'success', 'userFeedback');
+                showFeedback('✅ Users loaded', 'success', 'userFeedback');
             }
         } catch (error) {
             showFeedback('❌ Failed to load users: ' + error.message, 'error', 'userFeedback');
@@ -577,7 +562,7 @@
             });
             if (data.success) {
                 document.getElementById('newUserEmail').value = '';
-                showFeedback('✅ User added to database. Key: ' + data.key, 'success', 'userFeedback');
+                showFeedback('✅ User added. Key: ' + data.key, 'success', 'userFeedback');
                 loadUsers();
             } else {
                 showFeedback('❌ ' + data.error, 'error', 'userFeedback');
@@ -596,7 +581,7 @@
                 body: JSON.stringify({ userId })
             });
             loadUsers();
-            showFeedback('🗑️ User deleted from database', 'success', 'userFeedback');
+            showFeedback('🗑️ User deleted', 'success', 'userFeedback');
         } catch (error) {
             showFeedback('❌ Failed to delete', 'error', 'userFeedback');
         }
@@ -605,18 +590,13 @@
     // ==================== RESET USER ====================
     window.resetUser = async function(userId) {
         if (!confirm('⚠️ Are you sure you want to reset this user?')) return;
-        
         try {
-            const response = await fetch(API_BASE + '/admin/reset-user', {
+            const data = await apiCall('/admin/reset-user', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId })
             });
-            
-            const data = await response.json();
-            
             if (data.success) {
-                showFeedback('✅ User reset successfully!', 'success', 'userFeedback');
+                showFeedback('✅ User reset!', 'success', 'userFeedback');
                 loadUsers();
             } else {
                 showFeedback('❌ Failed to reset', 'error', 'userFeedback');
@@ -658,11 +638,10 @@
             showFeedback('⚠️ No key to copy', 'error', 'keyFeedback');
             return;
         }
-        
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(keyText)
                 .then(() => {
-                    showFeedback('✅ Key copied to clipboard!', 'success', 'keyFeedback');
+                    showFeedback('✅ Key copied!', 'success', 'keyFeedback');
                     document.getElementById('copyKeyBtn').textContent = '✅ Copied!';
                     setTimeout(() => {
                         document.getElementById('copyKeyBtn').textContent = '📋 Copy';
@@ -733,23 +712,13 @@
             `;
             if (playlist.chapters?.length) {
                 playlist.chapters.forEach(chapter => {
-                    const isHighlighted = chapter.is_highlighted === 1;
                     html += `
-                        <div class="entry-item" style="${isHighlighted ? 'background:#fef9e7;border-left:4px solid #f7971e;' : ''}">
+                        <div class="entry-item" style="padding-left:32px;">
                             <div class="info">
-                                <span class="name">
-                                    ${chapter.name}
-                                    ${isHighlighted ? '<span class="highlight-badge">⭐ Highlighted</span>' : ''}
-                                </span>
+                                <span class="name">${chapter.name}</span>
                                 <span class="sub">${chapter.link}</span>
                             </div>
-                            <div class="actions">
-                                <button class="btn-highlight ${isHighlighted ? 'active' : ''}" 
-                                        onclick="window.toggleHighlight('${playlist.id}', '${chapter.id}')">
-                                    ${isHighlighted ? '★ Highlighted' : '☆ Highlight'}
-                                </button>
-                                <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
-                            </div>
+                            <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
                         </div>
                     `;
                 });
@@ -758,8 +727,6 @@
             }
         });
         list.innerHTML = html;
-        
-        window.toggleHighlight = toggleHighlight;
     }
 
     function renderUserList() {
@@ -835,11 +802,9 @@
         const usernameInput = document.getElementById('adminUsername');
 
         unlockBtn.addEventListener('click', adminLogin);
-        
         pwdInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') adminLogin();
         });
-        
         usernameInput.addEventListener('keydown', function(e) {
             if (e.key === 'Enter') {
                 pwdInput.focus();
@@ -872,19 +837,18 @@
     document.getElementById('refreshBtn').addEventListener('click', () => {
         loadPlaylists();
         loadUsers();
-        loadLiveStatus();
+        loadImportant();
         showFeedback('🔄 Refreshed', 'info', 'playlistFeedback');
     });
 
-    document.getElementById('saveLiveBtn').addEventListener('click', saveLiveStream);
-    document.getElementById('stopLiveBtn').addEventListener('click', stopLiveStream);
+    document.getElementById('saveImportantBtn').addEventListener('click', saveImportant);
+    document.getElementById('importantTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
+    document.getElementById('importantLink').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
 
     document.getElementById('newPlaylistName').addEventListener('keydown', e => { if (e.key === 'Enter') addPlaylist(); });
     document.getElementById('chapterName').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
-    document.getElementById('liveTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveLiveStream(); });
-    document.getElementById('liveLink').addEventListener('keydown', e => { if (e.key === 'Enter') saveLiveStream(); });
 
     setupAuth();
     console.log('✅ Admin panel loaded');
