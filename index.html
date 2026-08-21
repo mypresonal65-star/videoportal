@@ -19,13 +19,16 @@
       .chapter-number { font-size: 0.9rem; min-width: 60px; }
       .chapter-name { font-size: 0.95rem; }
       .play-btn { padding: 6px 16px; font-size: 0.8rem; }
-      .playlist-btn { padding: 8px 16px; font-size: 0.85rem; }
       .login-container { padding: 20px; margin: 20px auto; }
       .user-info { font-size: 0.75rem; gap: 8px; }
       .session-timer { font-size: 0.65rem; padding: 3px 8px; }
       .status-bar { font-size: 0.7rem; padding: 6px 12px; }
       .search-container { flex-direction: column; }
       .search-container input { width: 100%; }
+      .duration-bar { flex-wrap: wrap; gap: 6px; }
+      .duration-bar .value { font-size: 14px; min-width: 80px; }
+      .controls-bar { flex-direction: column; }
+      .btn { width: 100%; justify-content: center; padding: 10px 20px; font-size: 14px; }
     }
 
     @media (max-width: 480px) {
@@ -34,6 +37,7 @@
       .chapter-item { flex-direction: column; align-items: stretch; gap: 8px; }
       .chapter-number { min-width: auto; }
       .play-btn { width: 100%; text-align: center; }
+      .duration-bar .value { font-size: 12px; min-width: 70px; }
     }
 
     .header { border-bottom: 1px solid #e8edf6; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
@@ -52,12 +56,12 @@
     
     /* ===== IMPORTANT SECTION ===== */
     .important-section {
-      background: linear-gradient(135deg, #fff8e1, #fff3cd);
+      background: linear-gradient(135deg, #0d1117, #161b22);
       border: 2px solid #f7971e;
       border-radius: 20px;
       padding: 20px;
       margin-bottom: 24px;
-      box-shadow: 0 4px 20px rgba(247, 151, 30, 0.15);
+      box-shadow: 0 4px 30px rgba(247, 151, 30, 0.15);
       position: relative;
     }
     .important-section::before {
@@ -76,16 +80,16 @@
     .important-section .title {
       font-size: 1.2rem;
       font-weight: 700;
-      color: #0b1a33;
+      color: #ffffff;
       margin-top: 4px;
       margin-bottom: 12px;
     }
     .important-item {
-      background: white;
+      background: rgba(255,255,255,0.05);
       border-radius: 16px;
       padding: 14px 18px;
       margin-bottom: 10px;
-      border: 1px solid #e6edf6;
+      border: 1px solid #2a2a4e;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -95,7 +99,7 @@
     .important-item:last-child { margin-bottom: 0; }
     .important-item .name {
       font-weight: 600;
-      color: #0b1a33;
+      color: #ffffff;
       font-size: 1rem;
     }
     .important-play-btn {
@@ -118,6 +122,90 @@
       padding: 20px 0;
       text-align: center;
       font-style: italic;
+    }
+
+    /* ===== DURATION BAR ===== */
+    .duration-bar {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      background: rgba(18, 18, 30, 0.6);
+      border-radius: 12px;
+      border: 1px solid #2a2a4e;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .duration-bar .label {
+      color: #a0a0b8;
+      font-size: 14px;
+    }
+    .duration-bar .value {
+      font-weight: 700;
+      color: #f7971e;
+      font-family: 'Courier New', monospace;
+      font-size: 18px;
+      letter-spacing: 2px;
+      min-width: 100px;
+      text-align: center;
+    }
+    .duration-bar .live-icon {
+      color: #ff0044;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+
+    /* ===== LIVE REFRESH BUTTON ===== */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(18, 18, 30, 0.6);
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 1px solid #2a2a4e;
+      margin-bottom: 16px;
+    }
+    .btn {
+      padding: 12px 36px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-live {
+      background: linear-gradient(135deg, #ff0044, #cc0033);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255, 0, 68, 0.3);
+      transition: 0.3s;
+    }
+    .btn-live:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 30px rgba(255, 0, 68, 0.5);
+    }
+    .btn-live .pulse-ring {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse-ring 1.5s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
     }
     
     .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
@@ -183,9 +271,64 @@
     .video-js .vjs-big-play-button:hover {
       background: rgba(11, 26, 51, 1) !important;
     }
+    
+    /* Hijack notification */
+    .hijack-notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #b33a3a;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-weight: 600;
+      z-index: 9999;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: none;
+      text-align: center;
+      max-width: 90%;
+    }
+    .hijack-notification.show {
+      display: block;
+      animation: slideDown 0.5s ease;
+    }
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Important player wrapper inside important section */
+    .important-item .player-wrapper {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      min-height: 200px;
+    }
+    .important-item .player-wrapper video {
+      width: 100%;
+      display: block;
+      aspect-ratio: 16/9;
+    }
+    .important-item .player-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 200px;
+      aspect-ratio: 16/9;
+      border: none;
+      border-radius: 12px;
+    }
   </style>
 </head>
 <body>
+
+<!-- Hijack Notification -->
+<div id="hijackNotification" class="hijack-notification">
+  ⚠️ You have been logged out because you logged in from another device.
+</div>
+
 <div class="app">
   <div class="header">
     <h1>📽️ Video Portal</h1>
@@ -239,9 +382,24 @@
       <div id="sessionTimer" class="session-timer">⏰ 72:00:00</div>
     </div>
     
-    <!-- Important Section -->
+    <!-- Important Section with Duration Bar & Live Refresh -->
     <div id="importantSection" class="important-section">
       <div class="title" id="importantTitle">⭐ Live Classes</div>
+      
+      <!-- ===== DURATION BAR ===== -->
+      <div class="duration-bar">
+        <span class="live-icon">●</span>
+        <span class="label">⏱️ Lecture Duration:</span>
+        <span class="value" id="durationDisplay">00:00:00</span>
+      </div>
+
+      <!-- ===== LIVE REFRESH BUTTON ===== -->
+      <div class="controls-bar">
+        <button class="btn btn-live" onclick="loadLiveStream()">
+          <span class="pulse-ring"></span> LIVE REFRESH
+        </button>
+      </div>
+      
       <div id="importantItems">
         <div class="empty-important">Loading Live classes...</div>
       </div>
@@ -309,7 +467,7 @@
 })();
 
 // ========================================================================
-//  MAIN APP
+//  MAIN APP WITH DURATION & LIVE REFRESH
 // ========================================================================
 (function() {
     const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
@@ -324,10 +482,18 @@
     let googleAccessToken = null;
     let resetCheckInterval = null;
     let timerStartTime = Date.now();
+    let sessionValidationInterval = null;
+    let isHijacked = false;
+    
+    // ============================================================
+    // 🔥 LECTURE DURATION - GLOBAL VARIABLES
+    // ============================================================
+    let currentPlayer = null;
+    let currentPlayerId = null;
 
     // ==================== SESSION MANAGEMENT ====================
     function generateSessionId() {
-        return 'sid_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8);
+        return 'sid_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 8) + '_' + Math.random().toString(36).substring(2, 6);
     }
 
     function saveSession(user, key, sessionId) {
@@ -335,7 +501,8 @@
             user: user,
             key: key,
             sessionId: sessionId || generateSessionId(),
-            loginTime: Date.now()
+            loginTime: Date.now(),
+            device: getDeviceInfo()
         };
         localStorage.setItem(SESSION_KEY, JSON.stringify(session));
         return session;
@@ -351,40 +518,89 @@
 
     function clearSession() {
         localStorage.removeItem(SESSION_KEY);
+        if (sessionValidationInterval) {
+            clearInterval(sessionValidationInterval);
+            sessionValidationInterval = null;
+        }
     }
 
-    // ==================== AUTO LOGOUT ====================
+    function getDeviceInfo() {
+        const ua = navigator.userAgent;
+        let device = 'Desktop';
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
+            device = 'Mobile';
+        }
+        return device + ' - ' + (navigator.platform || 'Unknown');
+    }
+
+    // ==================== SESSION VALIDATION WITH HIJACK DETECTION ====================
     async function validateSession() {
         const session = getSession();
-        if (!session) return false;
+        if (!session) {
+            handleSessionExpired();
+            return false;
+        }
+        
         try {
             const response = await fetch(API_BASE + '/session/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     sessionId: session.sessionId,
-                    email: session.user.email
+                    email: session.user.email,
+                    device: session.device || 'Unknown'
                 })
             });
+            
             const data = await response.json();
-            if (!data.valid) {
+            
+            if (data.hijacked || data.autoLogout) {
+                isHijacked = true;
                 clearSession();
                 localStorage.removeItem(GOOGLE_SESSION_KEY);
-                alert('⚠️ You have been logged out because you logged in from another device.');
+                showHijackNotification();
                 logout();
                 return false;
             }
+            
+            if (!data.valid) {
+                clearSession();
+                localStorage.removeItem(GOOGLE_SESSION_KEY);
+                logout();
+                return false;
+            }
+            
             return true;
+            
         } catch (error) {
             return true;
         }
     }
 
-    setInterval(function() {
+    function showHijackNotification() {
+        const el = document.getElementById('hijackNotification');
+        el.classList.add('show');
+        setTimeout(() => {
+            el.classList.remove('show');
+        }, 5000);
+    }
+
+    function handleSessionExpired() {
         if (document.getElementById('videoContent').style.display !== 'none') {
-            validateSession();
+            logout();
         }
-    }, 15000);
+    }
+
+    function startSessionValidation() {
+        if (sessionValidationInterval) {
+            clearInterval(sessionValidationInterval);
+        }
+        sessionValidationInterval = setInterval(() => {
+            if (document.getElementById('videoContent').style.display !== 'none' && !isHijacked) {
+                validateSession();
+            }
+        }, 8000);
+    }
 
     // ==================== KEY GENERATION ====================
     async function generateKey() {
@@ -526,13 +742,17 @@
         }
 
         try {
+            const sessionId = generateSessionId();
+            const device = getDeviceInfo();
+            
             const response = await fetch(API_BASE + '/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     email, 
                     key, 
-                    sessionId: getSession()?.sessionId || generateSessionId() 
+                    sessionId: sessionId,
+                    device: device
                 })
             });
 
@@ -541,13 +761,18 @@
             if (data.success) {
                 currentUser = data.user;
                 successEl.textContent = '✅ Login successful! Loading videos...';
-                const sessionId = data.sessionId || generateSessionId();
                 saveSession(data.user, key, sessionId);
+                isHijacked = false;
                 showVideoContent();
                 fetchPlaylists();
                 fetchImportantSection();
+                startSessionValidation();
+                document.getElementById('hijackNotification').classList.remove('show');
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Login failed');
+                if (data.error && data.error.includes('already logged in')) {
+                    errorEl.textContent = '❌ You are already logged in on another device.';
+                }
             }
         } catch (error) {
             errorEl.textContent = '❌ Connection error: ' + error.message;
@@ -572,10 +797,15 @@
             }
         }
         clearSession();
+        if (sessionValidationInterval) {
+            clearInterval(sessionValidationInterval);
+            sessionValidationInterval = null;
+        }
         localStorage.removeItem(GOOGLE_SESSION_KEY);
         currentUser = null;
         googleUser = null;
         googleAccessToken = null;
+        isHijacked = false;
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
         document.getElementById('userInfo').innerHTML = '';
@@ -588,6 +818,9 @@
             clearInterval(resetCheckInterval);
             resetCheckInterval = null;
         }
+        // Reset duration display
+        document.getElementById('durationDisplay').textContent = '00:00:00';
+        // Dispose players
         for (let key in window) {
             if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
                 try { window[key].dispose(); } catch(e) {}
@@ -661,6 +894,89 @@
         startResetTimer();
     }
 
+    // ============================================================
+    // 🔥 LECTURE DURATION - SETUP FUNCTION
+    // ============================================================
+    function setupDurationTracking(player, playerId) {
+        // Clear previous tracking
+        if (currentPlayer && currentPlayer !== player) {
+            try { currentPlayer.off('timeupdate'); } catch(e) {}
+            try { currentPlayer.off('ended'); } catch(e) {}
+            try { currentPlayer.off('loadstart'); } catch(e) {}
+        }
+        
+        currentPlayer = player;
+        currentPlayerId = playerId;
+        const durationDisplay = document.getElementById('durationDisplay');
+
+        // Update duration on timeupdate
+        player.on('timeupdate', function() {
+            const currentTime = player.currentTime();
+            if (currentTime && !isNaN(currentTime) && currentTime > 0) {
+                const hours = Math.floor(currentTime / 3600);
+                const minutes = Math.floor((currentTime % 3600) / 60);
+                const seconds = Math.floor(currentTime % 60);
+                durationDisplay.textContent = 
+                    String(hours).padStart(2, '0') + ':' + 
+                    String(minutes).padStart(2, '0') + ':' + 
+                    String(seconds).padStart(2, '0');
+            }
+        });
+
+        player.on('ended', function() {
+            durationDisplay.textContent = '00:00:00';
+        });
+
+        player.on('loadstart', function() {
+            durationDisplay.textContent = '00:00:00';
+        });
+        
+        // Also reset when player is disposed
+        player.on('dispose', function() {
+            durationDisplay.textContent = '00:00:00';
+            if (currentPlayer === player) {
+                currentPlayer = null;
+                currentPlayerId = null;
+            }
+        });
+    }
+
+    // ============================================================
+    // 🎬 LOAD LIVE STREAM (LIVE REFRESH)
+    // ============================================================
+    window.loadLiveStream = function() {
+        // Find the first important item's play button
+        const firstImportantItem = document.querySelector('.important-item');
+        if (!firstImportantItem) {
+            showToast('⚠️ No live stream available', 'error');
+            return;
+        }
+        
+        const playBtn = firstImportantItem.querySelector('.important-play-btn');
+        if (!playBtn) {
+            showToast('⚠️ No play button found', 'error');
+            return;
+        }
+        
+        // Trigger click on play button
+        playBtn.click();
+        showToast('🔄 Live stream refreshed!', 'success');
+    };
+
+    // Toast notification helper
+    function showToast(message, type = 'info') {
+        const statusBar = document.getElementById('statusBar');
+        if (statusBar) {
+            statusBar.textContent = message;
+            statusBar.style.background = type === 'error' ? '#fee' : type === 'success' ? '#e6f5e6' : '#fff3cd';
+            statusBar.style.color = type === 'error' ? '#b33a3a' : type === 'success' ? '#1a5d3c' : '#856404';
+            setTimeout(() => {
+                statusBar.style.background = '#f0f4fb';
+                statusBar.style.color = '#4c637f';
+            }, 3000);
+        }
+    }
+
     // ==================== FETCH IMPORTANT SECTION ====================
     async function fetchImportantSection() {
         const container = document.getElementById('importantItems');
@@ -671,7 +987,6 @@
                 let html = '';
                 data.items.forEach(item => {
                     const playerId = `important-${item.id}`;
-                    const isYouTube = item.link && (item.link.includes('youtube.com') || item.link.includes('youtu.be'));
                     html += `
                         <div class="important-item">
                             <span class="name">${item.title}</span>
@@ -715,9 +1030,15 @@
                         delete window[`hls_${playerId}`];
                     }
                     if (window[`player_${playerId}`]) {
-                        try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                        try { 
+                            window[`player_${playerId}`].off('timeupdate');
+                            window[`player_${playerId}`].off('ended');
+                            window[`player_${playerId}`].off('loadstart');
+                            window[`player_${playerId}`].dispose(); 
+                        } catch(e) {}
                         delete window[`player_${playerId}`];
                     }
+                    document.getElementById('durationDisplay').textContent = '00:00:00';
                     return;
                 }
                 
@@ -728,13 +1049,22 @@
                     delete window[`hls_${playerId}`];
                 }
                 if (window[`player_${playerId}`]) {
-                    try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                    try { 
+                        window[`player_${playerId}`].off('timeupdate');
+                        window[`player_${playerId}`].off('ended');
+                        window[`player_${playerId}`].off('loadstart');
+                        window[`player_${playerId}`].dispose(); 
+                    } catch(e) {}
                     delete window[`player_${playerId}`];
                 }
 
                 const videoEl = document.getElementById(playerId);
                 if (!videoEl) return;
 
+                // Reset duration
+                document.getElementById('durationDisplay').textContent = '00:00:00';
+
+                // YouTube Support
                 if (link && (link.includes('youtube.com') || link.includes('youtu.be'))) {
                     const videoId = extractYouTubeId(link);
                     if (videoId) {
@@ -756,6 +1086,7 @@
                     }
                 }
 
+                // HLS Support
                 if (link && link.includes('.m3u8') && Hls.isSupported()) {
                     const videoEl2 = document.createElement('video');
                     videoEl2.id = playerId;
@@ -805,10 +1136,14 @@
                     });
                     window[`player_${playerId}`] = player;
                     
+                    // ===== SETUP DURATION TRACKING =====
+                    setupDurationTracking(player, playerId);
+                    
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
 
+                // MP4 Support
                 if (link && (link.includes('.mp4') || link.includes('.webm'))) {
                     const videoEl2 = document.createElement('video');
                     videoEl2.id = playerId;
@@ -833,6 +1168,9 @@
                     window[`player_${playerId}`] = player;
                     player.src({ src: link, type: 'video/mp4' });
                     player.play();
+                    
+                    // ===== SETUP DURATION TRACKING =====
+                    setupDurationTracking(player, playerId);
                     
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
@@ -979,7 +1317,12 @@
                         delete window[`hls_${playerId}`];
                     }
                     if (window[`player_${playerId}`]) {
-                        try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                        try { 
+                            window[`player_${playerId}`].off('timeupdate');
+                            window[`player_${playerId}`].off('ended');
+                            window[`player_${playerId}`].off('loadstart');
+                            window[`player_${playerId}`].dispose(); 
+                        } catch(e) {}
                         delete window[`player_${playerId}`];
                     }
                     return;
@@ -990,7 +1333,12 @@
                     delete window[`hls_${playerId}`];
                 }
                 if (window[`player_${playerId}`]) {
-                    try { window[`player_${playerId}`].dispose(); } catch(e) {}
+                    try { 
+                        window[`player_${playerId}`].off('timeupdate');
+                        window[`player_${playerId}`].off('ended');
+                        window[`player_${playerId}`].off('loadstart');
+                        window[`player_${playerId}`].dispose(); 
+                    } catch(e) {}
                     delete window[`player_${playerId}`];
                 }
                 if (link && (link.includes('youtube.com') || link.includes('youtu.be'))) {
@@ -1143,6 +1491,7 @@
             showVideoContent();
             fetchPlaylists();
             fetchImportantSection();
+            startSessionValidation();
             return true;
         }
         const session = getSession();
@@ -1151,6 +1500,7 @@
             showVideoContent();
             fetchPlaylists();
             fetchImportantSection();
+            startSessionValidation();
             return true;
         }
         return false;
@@ -1181,6 +1531,7 @@
     // ==================== DISPOSE PLAYERS ====================
     window.addEventListener('beforeunload', function() {
         if (resetCheckInterval) clearInterval(resetCheckInterval);
+        if (sessionValidationInterval) clearInterval(sessionValidationInterval);
         for (let key in window) {
             if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
                 try { window[key].dispose(); } catch(e) {}
@@ -1200,7 +1551,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Important Section added');
+    console.log('✅ Video Portal loaded - Duration & Live Refresh added');
 })();
 </script>
 </body>
