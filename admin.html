@@ -132,8 +132,9 @@
     <!-- Tabs -->
     <div class="tab-buttons">
       <button class="tab-btn active" data-tab="playlists">📁 Playlists</button>
-      <button class="tab-btn" data-tab="important">⭐ Live </button>
+      <button class="tab-btn" data-tab="important">⭐ Live</button>
       <button class="tab-btn" data-tab="users">👥 Users</button>
+      <button class="tab-btn" data-tab="allowed-emails">📧 Allowed Emails</button>
     </div>
 
     <!-- Playlists Tab -->
@@ -208,6 +209,24 @@
 
       <div class="section-title">👥 All Users & Keys</div>
       <div class="entry-list" id="userList"><div class="empty-state">Loading...</div></div>
+    </div>
+
+    <!-- Allowed Emails Tab (NEW) -->
+    <div id="tab-allowed-emails" class="tab-content">
+      <div class="section-title">📧 Allowed Emails (No Key Required)</div>
+      <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
+        These users can login <strong>without</strong> access key. Just email is enough.
+      </p>
+      
+      <div style="display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+        <input type="email" id="allowedEmailInput" placeholder="Enter email" style="flex:2;" />
+        <button class="btn btn-success" id="addAllowedEmailBtn" style="flex:1;">➕ Add</button>
+      </div>
+      
+      <div id="allowedEmailsList" class="entry-list">
+        <div class="empty-state">No allowed emails</div>
+      </div>
+      <div id="allowedEmailFeedback" class="toast-msg"></div>
     </div>
     
     <div style="margin-top:20px; border-top:1px solid #e8edf6; padding-top:18px;">
@@ -297,6 +316,7 @@
     let playlists = [];
     let users = [];
     let importantItems = [];
+    let allowedEmails = [];
     let isAuthenticated = false;
 
     // ----- Tabs -----
@@ -305,10 +325,12 @@
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             this.classList.add('active');
-            document.getElementById('tab-' + this.dataset.tab).classList.add('active');
-            if (this.dataset.tab === 'users') loadUsers();
-            if (this.dataset.tab === 'playlists') loadPlaylists();
-            if (this.dataset.tab === 'important') loadImportant();
+            const tabId = this.dataset.tab;
+            document.getElementById('tab-' + tabId).classList.add('active');
+            if (tabId === 'users') { loadUsers(); }
+            else if (tabId === 'playlists') { loadPlaylists(); }
+            else if (tabId === 'important') { loadImportant(); }
+            else if (tabId === 'allowed-emails') { loadAllowedEmails(); }
         });
     });
 
@@ -353,6 +375,7 @@
                 loadPlaylists();
                 loadUsers();
                 loadImportant();
+                loadAllowedEmails();
                 showFeedback('✅ Welcome ' + data.admin.username, 'success', 'playlistFeedback');
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Invalid credentials');
@@ -363,6 +386,85 @@
         } catch (error) {
             errorEl.textContent = '❌ Connection error: ' + error.message;
         }
+    }
+
+    // ==================== ALLOWED EMAILS MANAGEMENT (NEW) ====================
+    async function loadAllowedEmails() {
+        try {
+            const data = await apiCall('/allowed-emails');
+            if (data.success) {
+                allowedEmails = data.emails || [];
+                renderAllowedEmailsList();
+                showFeedback('✅ Allowed emails loaded', 'success', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function addAllowedEmail() {
+        const email = document.getElementById('allowedEmailInput').value.trim();
+        if (!email) {
+            showFeedback('⚠️ Enter email', 'error', 'allowedEmailFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                document.getElementById('allowedEmailInput').value = '';
+                loadAllowedEmails();
+                showFeedback('✅ Email added: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ ' + data.error, 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function deleteAllowedEmail(email) {
+        if (!confirm(`Remove ${email}?`)) return;
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'DELETE',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                loadAllowedEmails();
+                showFeedback('✅ Removed: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ Failed to remove', 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    function renderAllowedEmailsList() {
+        const list = document.getElementById('allowedEmailsList');
+        if (!allowedEmails.length) {
+            list.innerHTML = `<div class="empty-state">No allowed emails added</div>`;
+            return;
+        }
+        let html = '';
+        allowedEmails.forEach(item => {
+            html += `
+                <div class="entry-item">
+                    <div class="info">
+                        <span class="name">📧 ${item.email}</span>
+                        <span class="sub">Added: ${new Date(item.created_at).toLocaleString()}</span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="del-btn" onclick="window.deleteAllowedEmail('${item.email}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteAllowedEmail = deleteAllowedEmail;
     }
 
     // ==================== IMPORTANT SECTION ====================
@@ -878,6 +980,7 @@
     window.viewKeys = viewKeys;
     window.toggleImportantVisibility = toggleImportantVisibility;
     window.deleteImportant = deleteImportant;
+    window.deleteAllowedEmail = deleteAllowedEmail;
 
     // ==================== EVENT LISTENERS ====================
     document.getElementById('addPlaylistBtn').addEventListener('click', addPlaylist);
@@ -888,6 +991,7 @@
         loadPlaylists();
         loadUsers();
         loadImportant();
+        loadAllowedEmails();
         showFeedback('🔄 Refreshed', 'info', 'playlistFeedback');
     });
 
@@ -899,6 +1003,12 @@
     document.getElementById('chapterName').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
+
+    // Allowed Emails event listeners
+    document.getElementById('addAllowedEmailBtn').addEventListener('click', addAllowedEmail);
+    document.getElementById('allowedEmailInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addAllowedEmail();
+    });
 
     setupAuth();
     console.log('✅ Admin panel loaded');
