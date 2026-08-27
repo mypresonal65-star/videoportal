@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Video Portal</title>
   
-  <!-- ===== VIDEO.JS 7.20.3 LIBRARIES ===== -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
   <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
@@ -19,67 +18,33 @@
       .app { padding: 16px; border-radius: 20px; }
       .header h1 { font-size: 1.3rem; }
       .chapter-item { padding: 12px 16px; gap: 10px; }
-      .chapter-number { font-size: 0.9rem; min-width: 60px; }
-      .chapter-name { font-size: 0.95rem; }
       .play-btn { padding: 6px 16px; font-size: 0.8rem; }
       .login-container { padding: 20px; margin: 20px auto; }
       .user-info { font-size: 0.75rem; gap: 8px; }
       .session-timer { font-size: 0.65rem; padding: 3px 8px; }
       .status-bar { font-size: 0.7rem; padding: 6px 12px; }
-      .search-container { flex-direction: column; }
-      .search-container input { width: 100%; }
+      .section-tabs { gap: 6px; overflow-x: auto; flex-wrap: nowrap; }
+      .section-tab { padding: 8px 16px; font-size: 0.8rem; white-space: nowrap; }
+      .section-selector { flex-direction: column; }
       .duration-bar { flex-wrap: wrap; gap: 6px; }
-      .duration-bar .value { font-size: 14px; min-width: 80px; }
-      .video-js .vjs-control-bar { 
-        height: 44px !important; 
-        padding: 0 8px !important; 
-        margin: 0 4px 8px 4px !important;
-        border-radius: 30px !important;
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-      }
+      .video-js .vjs-control-bar { height: 44px !important; padding: 0 8px !important; margin: 0 4px 8px 4px !important; border-radius: 30px !important; display: flex !important; visibility: visible !important; opacity: 1 !important; }
       .video-js .vjs-current-time, .video-js .vjs-duration { font-size: 0.65rem !important; }
       .speed-select-wrap select { font-size: 0.6rem; padding: 3px 18px 3px 8px; min-width: 48px; height: 22px !important; }
       .video-js .vjs-play-control { font-size: 1.2em !important; width: 32px !important; }
       .video-js .vjs-fullscreen-control { font-size: 1.2em !important; width: 32px !important; }
-      .video-js .vjs-mute-control { width: 28px !important; font-size: 1em !important; }
-      .video-js .vjs-progress-control { min-width: 50px !important; }
-      .video-js .vjs-volume-panel { display: none !important; }
-      .section-tabs { flex-wrap: nowrap !important; overflow-x: auto !important; gap: 4px !important; }
-      .section-tab { padding: 6px 12px !important; font-size: 0.7rem !important; white-space: nowrap !important; }
     }
 
     @media (max-width: 480px) {
       .app { padding: 12px; border-radius: 16px; }
       .header h1 { font-size: 1.1rem; }
       .chapter-item { flex-direction: column; align-items: stretch; gap: 8px; }
-      .chapter-number { min-width: auto; }
       .play-btn { width: 100%; text-align: center; }
+      .section-tab { padding: 6px 12px; font-size: 0.7rem; }
       .duration-bar .value { font-size: 12px; min-width: 70px; }
-      .video-js .vjs-control-bar { 
-        height: 38px !important; 
-        padding: 0 6px !important; 
-        margin: 0 2px 6px 2px !important;
-        border-radius: 20px !important;
-      }
-      .video-js .vjs-current-time, .video-js .vjs-duration { font-size: 0.5rem !important; }
-      .speed-select-wrap select { font-size: 0.45rem; padding: 2px 14px 2px 6px; min-width: 38px; height: 18px !important; }
-      .video-js .vjs-play-control { font-size: 1em !important; width: 26px !important; }
-      .video-js .vjs-fullscreen-control { font-size: 1em !important; width: 26px !important; }
-      .video-js .vjs-progress-control { min-width: 30px !important; }
-      .section-tab { padding: 4px 8px !important; font-size: 0.6rem !important; }
     }
 
-    .video-js .vjs-control-bar {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-    .video-js.vjs-user-inactive .vjs-control-bar {
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
+    .video-js .vjs-control-bar { display: flex !important; visibility: visible !important; opacity: 1 !important; }
+    .video-js.vjs-user-inactive .vjs-control-bar { visibility: visible !important; opacity: 1 !important; }
     .video-js .vjs-remaining-time { display: none !important; }
     .video-js .vjs-time-divider { display: none !important; }
 
@@ -97,6 +62,7 @@
     .key-gen-section h3 { font-size: 1rem; color: #0b1a33; margin-bottom: 8px; }
     .key-gen-section .info { font-size: 0.8rem; color: #6a7c94; margin-bottom: 12px; }
     
+    /* ===== IMPORTANT SECTION ===== */
     .important-section {
       background: linear-gradient(135deg, #0d1117, #161b22);
       border: 2px solid #f7971e;
@@ -107,11 +73,7 @@
       position: relative;
       transition: all 0.3s ease;
     }
-    .important-section.hidden-section {
-      opacity: 0.5;
-      border-color: #4a4a6a;
-      background: linear-gradient(135deg, #1a1a2e, #22223a);
-    }
+    .important-section.hidden-section { opacity: 0.5; border-color: #4a4a6a; background: linear-gradient(135deg, #1a1a2e, #22223a); }
     .important-section::before {
       content: "⭐ Live Class";
       position: absolute;
@@ -126,21 +88,9 @@
       letter-spacing: 1px;
       transition: all 0.3s ease;
     }
-    .important-section.hidden-section::before {
-      background: #6a7c94;
-      content: "⛔ Live Class (Hidden)";
-    }
-    .important-section .title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      transition: all 0.3s ease;
-    }
-    .important-section.hidden-section .title {
-      color: #6a7c94;
-    }
+    .important-section.hidden-section::before { background: #6a7c94; content: "⛔ Live Class (Hidden)"; }
+    .important-section .title { font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-top: 4px; margin-bottom: 12px; transition: all 0.3s ease; }
+    .important-section.hidden-section .title { color: #6a7c94; }
     
     .important-item {
       background: rgba(255,255,255,0.05);
@@ -155,10 +105,7 @@
       gap: 12px;
       transition: all 0.3s ease;
     }
-    .important-section.hidden-section .important-item {
-      opacity: 0.4;
-      pointer-events: none;
-    }
+    .important-section.hidden-section .important-item { opacity: 0.4; pointer-events: none; }
     .important-item:last-child { margin-bottom: 0; }
     .important-item .name { font-weight: 600; color: #ffffff; font-size: 1rem; }
     .important-play-btn {
@@ -191,43 +138,154 @@
     }
     .important-section.hidden-section .duration-bar { opacity: 0.3; pointer-events: none; }
     .duration-bar .label { color: #a0a0b8; font-size: 14px; }
-    .duration-bar .value {
-      font-weight: 700;
-      color: #f7971e;
-      font-family: 'Courier New', monospace;
-      font-size: 18px;
-      letter-spacing: 2px;
-      min-width: 100px;
-      text-align: center;
-    }
+    .duration-bar .value { font-weight: 700; color: #f7971e; font-family: 'Courier New', monospace; font-size: 18px; letter-spacing: 2px; min-width: 100px; text-align: center; }
     .duration-bar .live-icon { color: #ff0044; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-    
-    /* ===== ORIGINAL PLAYLIST SELECTOR — Recorded Section ke ANDAR ===== */
-    .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
-    .playlist-selector select { padding: 10px 20px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; color: #1a2b4c; font-weight: 500; cursor: pointer; flex: 1; min-width: 150px; }
+    .duration-bar.hidden { display: none !important; }
+
+    /* ===== SECTION TABS ===== */
+    .section-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 8px 12px;
+      background: #f8faff;
+      border-radius: 20px;
+      overflow-x: auto;
+      flex-wrap: wrap;
+      border: 1px solid #e6edf6;
+    }
+    .section-tab {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 40px;
+      background: transparent;
+      color: #4c637f;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+    .section-tab:hover { background: #eef3fa; color: #0b1a33; }
+    .section-tab.active {
+      background: #0b1a33;
+      color: white;
+    }
+    .section-tab .count {
+      background: rgba(255,255,255,0.2);
+      padding: 2px 10px;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      margin-left: 6px;
+    }
+    .section-tab.active .count { background: rgba(255,255,255,0.2); }
+
+    .section-content { display: none; }
+    .section-content.active { display: block; }
+
+    .playlist-selector {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #f8faff;
+      border-radius: 20px;
+      align-items: center;
+    }
+    .playlist-selector select {
+      padding: 10px 20px;
+      border: 2px solid #d9e1ec;
+      border-radius: 40px;
+      background: white;
+      color: #1a2b4c;
+      font-weight: 500;
+      cursor: pointer;
+      flex: 1;
+      min-width: 150px;
+    }
     .playlist-selector select:focus { border-color: #1a2b4c; outline: none; }
     
-    .search-container { display: flex; gap: 8px; flex: 2; min-width: 200px; flex-wrap: wrap; }
-    .search-container input { padding: 10px 18px; border: 2px solid #d9e1ec; border-radius: 40px; font-size: 0.9rem; flex: 1; min-width: 120px; background: white; }
+    .search-container {
+      display: flex;
+      gap: 8px;
+      flex: 2;
+      min-width: 200px;
+      flex-wrap: wrap;
+    }
+    .search-container input {
+      padding: 10px 18px;
+      border: 2px solid #d9e1ec;
+      border-radius: 40px;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 120px;
+      background: white;
+    }
     .search-container input:focus { border-color: #1a2b4c; outline: none; }
-    .search-container button { padding: 10px 20px; border: none; border-radius: 40px; color: white; font-weight: 500; cursor: pointer; transition: 0.15s; }
+    .search-container button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 40px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.15s;
+    }
     .search-btn { background: #1a2b4c; }
     .search-btn:hover { background: #2f4370; }
     .clear-btn { background: #6a7c94; }
     .clear-btn:hover { background: #5a6a80; }
     
-    .chapter-item { background: #fafdff; border-radius: 20px; padding: 16px 22px; margin-bottom: 14px; border: 1px solid #e6edf6; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .chapter-item {
+      background: #fafdff;
+      border-radius: 20px;
+      padding: 16px 22px;
+      margin-bottom: 14px;
+      border: 1px solid #e6edf6;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
     .chapter-item:hover { border-color: #c8d4e4; }
     .chapter-number { font-weight: 700; color: #1a2b4c; font-size: 1.1rem; min-width: 80px; }
     .chapter-name { font-weight: 600; font-size: 1.1rem; color: #0b1a33; flex: 1; }
-    .play-btn { background: #0b1a33; color: white; border: none; border-radius: 40px; padding: 8px 24px; font-weight: 500; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .play-btn {
+      background: #0b1a33;
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 8px 24px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: 0.15s;
+    }
     .play-btn:hover { background: #1f3457; }
-    .player-wrapper { width: 100%; margin-top: 12px; border-radius: 16px; overflow: hidden; background: #000; min-height: 200px; }
+    .player-wrapper {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      min-height: 200px;
+    }
     .player-wrapper iframe { width: 100%; height: 100%; min-height: 200px; aspect-ratio: 16/9; border: none; }
-    
+    .player-wrapper-professional {
+      width: 100%;
+      margin-top: 12px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #0b0e14;
+      position: relative;
+    }
+    .player-wrapper-professional video { width: 100%; display: block; aspect-ratio: 16/9; }
+    .player-wrapper-professional iframe { width: 100%; height: 100%; min-height: 200px; aspect-ratio: 16/9; border: none; border-radius: 12px; }
+
     .empty-state { color: #6a7c94; padding: 40px 0; text-align: center; font-style: italic; }
-    .playlist-title { font-size: 1.4rem; font-weight: 600; color: #0b1a33; margin-bottom: 16px; }
+    .section-title { font-size: 1.4rem; font-weight: 600; color: #0b1a33; margin-bottom: 16px; }
     .status-bar { font-size: 0.8rem; padding: 8px 16px; border-radius: 40px; display: inline-block; margin-bottom: 16px; background: #f0f4fb; color: #4c637f; }
     .user-info { font-size: 0.85rem; color: #4c637f; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
     .user-info .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
@@ -278,144 +336,10 @@
     .hijack-notification.show { display: block; animation: slideDown 0.5s ease; }
     @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-50px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
 
-    .duration-bar.hidden { display: none !important; }
-    .key-limit-info { font-size: 0.75rem; color: #6a7c94; margin-top: 6px; }
-    .key-limit-info strong { color: #0b1a33; }
-
-    .player-wrapper-professional {
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #0b0e14;
-      position: relative;
-    }
-
-    .video-js {
-      width: 100% !important;
-      height: auto !important;
-      aspect-ratio: 16/9 !important;
-      background: #0b0e14 !important;
-    }
-
-    .video-js .vjs-control-bar {
-      background: rgba(10, 14, 22, 0.85) !important;
-      backdrop-filter: blur(14px) !important;
-      border-radius: 60px !important;
-      margin: 0 12px 16px 12px !important;
-      padding: 0 16px !important;
-      height: 56px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
-      border: none !important;
-      gap: 4px;
-    }
-
-    .video-js .vjs-control { color: #f0f4ff !important; opacity: 0.9; display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; flex-shrink: 0 !important; }
-    .video-js .vjs-control:hover { opacity: 1; color: #fff !important; }
-    .video-js .vjs-play-control { font-size: 1.5em !important; width: 40px !important; }
-    .video-js .vjs-time-control { font-size: 0.85rem !important; padding: 0 4px !important; color: #bcc8e6 !important; }
-    .video-js .vjs-remaining-time { display: none !important; }
-    .video-js .vjs-time-divider { display: none !important; }
-    .video-js .vjs-progress-control { flex: 3 1 auto !important; min-width: 80px !important; height: 100% !important; display: flex !important; align-items: center !important; padding: 0 8px !important; }
-    .video-js .vjs-progress-control .vjs-progress-holder { background: rgba(255, 255, 255, 0.12) !important; border-radius: 20px !important; height: 6px !important; }
-    .video-js .vjs-progress-control .vjs-play-progress { background: #6c8cff !important; border-radius: 20px !important; }
-    .video-js .vjs-progress-control .vjs-play-progress::before { display: none !important; }
-    .video-js .vjs-progress-control .vjs-load-progress { background: rgba(255, 255, 255, 0.15) !important; border-radius: 20px !important; }
-    .video-js .vjs-live-control { display: none !important; }
-    .video-js .vjs-volume-panel { display: flex !important; align-items: center !important; height: 100% !important; flex-shrink: 0 !important; }
-    .video-js .vjs-mute-control { width: 36px !important; }
-    .video-js .vjs-volume-bar { background: rgba(255, 255, 255, 0.2) !important; }
-    .video-js .vjs-volume-level { background: #6c8cff !important; }
-    .speed-select-wrap { display: flex !important; align-items: center !important; height: 100% !important; flex-shrink: 0 !important; }
-    .speed-select-wrap select {
-      background: rgba(20, 28, 44, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 40px;
-      padding: 5px 28px 5px 14px;
-      color: #d3defa;
-      font-weight: 500;
-      font-size: 0.8rem;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0b4e0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 10px;
-      min-width: 68px;
-      height: 32px !important;
-    }
-    .speed-select-wrap select:hover { background-color: rgba(40, 52, 80, 0.7); border-color: rgba(108, 140, 255, 0.3); }
-    .speed-select-wrap select option { background: #1e2638; color: #eaf0ff; }
-    .video-js .vjs-fullscreen-control { display: flex !important; font-size: 1.4em !important; width: 40px !important; }
-    .video-js .vjs-picture-in-picture-control, .video-js .vjs-captions-button, .video-js .vjs-seek-button, .video-js .vjs-seek-to-live-control { display: none !important; }
-    .video-js .vjs-big-play-button { display: none !important; }
-
-    .important-item .player-wrapper-professional {
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #000;
-      min-height: 200px;
-    }
-    .important-item .player-wrapper-professional video { width: 100%; display: block; aspect-ratio: 16/9; }
-    .important-item .player-wrapper-professional iframe { width: 100%; height: 100%; min-height: 200px; aspect-ratio: 16/9; border: none; border-radius: 12px; }
-
     .loading-spinner-pos { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5; display: none; }
     .loading-spinner-pos.show { display: block; }
     .loading-spinner-pos .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.08); border-top-color: #f7971e; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ===== SECTION TABS ===== */
-    .section-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      padding: 4px 0;
-      flex-wrap: wrap;
-      border-bottom: 2px solid #eef2f6;
-    }
-    .section-tab {
-      padding: 10px 22px;
-      border: 2px solid transparent;
-      border-radius: 40px;
-      background: #f0f4fb;
-      color: #4c637f;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.85rem;
-    }
-    .section-tab:hover {
-      background: #e6edf6;
-      color: #0b1a33;
-    }
-    .section-tab.active {
-      border-color: #0b1a33;
-      background: #0b1a33;
-      color: white;
-    }
-    .section-tab .count {
-      background: rgba(255,255,255,0.2);
-      padding: 0 8px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      margin-left: 6px;
-    }
-    .section-tab.active .count {
-      background: rgba(255,255,255,0.2);
-    }
-
-    .section-content {
-      display: none;
-    }
-    .section-content.active {
-      display: block;
-    }
   </style>
 </head>
 <body>
@@ -445,7 +369,7 @@
     <div class="key-gen-section">
       <h3>🔑 Generate New Access Key</h3>
       <p class="info">Enter your registered email to generate a new key</p>
-      <div style="background: #f0f4fb; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.75rem; color: #4c637f;">
+      <div style="background:#f0f4fb;padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:0.75rem;color:#4c637f;">
         ⏱️ Valid for <strong>1 hour</strong> only · 📊 <strong>4 keys</strong> per day limit
       </div>
       <input type="email" id="genKeyEmail" placeholder="Enter your registered email" style="margin-bottom:8px;" />
@@ -468,15 +392,17 @@
 
   <!-- Video Content -->
   <div id="videoContent" style="display: none;">
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
       <div id="statusBar" class="status-bar">🔄 Loading videos...</div>
       <div id="sessionTimer" class="session-timer">⏰ 72:00:00</div>
     </div>
     
-    <!-- ===== IMPORTANT SECTION ===== -->
+    <!-- Important Section -->
     <div id="importantSection" class="important-section">
       <div class="title" id="importantTitle">⭐ Live Classes</div>
-      <div id="importantItems"><div class="empty-important">Loading Live classes...</div></div>
+      <div id="importantItems">
+        <div class="empty-important">Loading Live classes...</div>
+      </div>
       <div class="duration-bar" id="durationBar">
         <span class="live-icon">●</span>
         <span class="label">⏱️ Lecture Completed:</span>
@@ -484,98 +410,14 @@
       </div>
     </div>
     
-    <!-- ===== SECTION TABS ===== -->
+    <!-- ===== SECTIONS TABS ===== -->
     <div class="section-tabs" id="sectionTabs">
-      <button class="section-tab active" data-section="recorded">📼 Recorded <span class="count" id="count-recorded">0</span></button>
-      <button class="section-tab" data-section="quant">🔢 Quant <span class="count" id="count-quant">0</span></button>
-      <button class="section-tab" data-section="reasoning">🧠 Reasoning <span class="count" id="count-reasoning">0</span></button>
-      <button class="section-tab" data-section="computer">💻 Computer <span class="count" id="count-computer">0</span></button>
-      <button class="section-tab" data-section="english">📖 English <span class="count" id="count-english">0</span></button>
+      <!-- Tabs will be dynamically generated -->
     </div>
-
-    <!-- ===== RECORDED SECTION ===== -->
-    <div class="section-content active" data-section="recorded">
-      <div class="playlist-selector">
-        <select class="section-playlist" data-section="recorded">
-          <option value="">Select a playlist...</option>
-        </select>
-        <div class="search-container">
-          <input type="text" class="section-search" data-section="recorded" placeholder="🔍 Search playlists..." />
-          <button class="search-btn section-search-btn" data-section="recorded">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="recorded">Clear</button>
-        </div>
-      </div>
-      <div class="chapters-container" data-section="recorded">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
-    </div>
-
-    <!-- ===== QUANT SECTION ===== -->
-    <div class="section-content" data-section="quant">
-      <div class="playlist-selector">
-        <select class="section-playlist" data-section="quant">
-          <option value="">Select a playlist...</option>
-        </select>
-        <div class="search-container">
-          <input type="text" class="section-search" data-section="quant" placeholder="🔍 Search playlists..." />
-          <button class="search-btn section-search-btn" data-section="quant">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="quant">Clear</button>
-        </div>
-      </div>
-      <div class="chapters-container" data-section="quant">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
-    </div>
-
-    <!-- ===== REASONING SECTION ===== -->
-    <div class="section-content" data-section="reasoning">
-      <div class="playlist-selector">
-        <select class="section-playlist" data-section="reasoning">
-          <option value="">Select a playlist...</option>
-        </select>
-        <div class="search-container">
-          <input type="text" class="section-search" data-section="reasoning" placeholder="🔍 Search playlists..." />
-          <button class="search-btn section-search-btn" data-section="reasoning">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="reasoning">Clear</button>
-        </div>
-      </div>
-      <div class="chapters-container" data-section="reasoning">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
-    </div>
-
-    <!-- ===== COMPUTER SECTION ===== -->
-    <div class="section-content" data-section="computer">
-      <div class="playlist-selector">
-        <select class="section-playlist" data-section="computer">
-          <option value="">Select a playlist...</option>
-        </select>
-        <div class="search-container">
-          <input type="text" class="section-search" data-section="computer" placeholder="🔍 Search playlists..." />
-          <button class="search-btn section-search-btn" data-section="computer">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="computer">Clear</button>
-        </div>
-      </div>
-      <div class="chapters-container" data-section="computer">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
-    </div>
-
-    <!-- ===== ENGLISH SECTION ===== -->
-    <div class="section-content" data-section="english">
-      <div class="playlist-selector">
-        <select class="section-playlist" data-section="english">
-          <option value="">Select a playlist...</option>
-        </select>
-        <div class="search-container">
-          <input type="text" class="section-search" data-section="english" placeholder="🔍 Search playlists..." />
-          <button class="search-btn section-search-btn" data-section="english">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="english">Clear</button>
-        </div>
-      </div>
-      <div class="chapters-container" data-section="english">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+    
+    <!-- ===== SECTION CONTENT ===== -->
+    <div id="sectionsContainer">
+      <!-- Content will be dynamically generated -->
     </div>
   </div>
   
@@ -601,11 +443,7 @@
             const widthThreshold = window.outerWidth - window.innerWidth > threshold;
             const heightThreshold = window.outerHeight - window.innerHeight > threshold;
             if (widthThreshold || heightThreshold) {
-                if (!devToolsDetected) {
-                    devToolsDetected = true;
-                    console.clear();
-                    setTimeout(function() { window.location.href = 'https://www.google.com'; }, 100);
-                }
+                if (!devToolsDetected) { devToolsDetected = true; console.clear(); setTimeout(function() { window.location.href = 'https://www.google.com'; }, 100); }
             } else { devToolsDetected = false; }
         }
         setInterval(detectDevTools, 100);
@@ -630,6 +468,13 @@
     const GOOGLE_SESSION_KEY = 'google_session';
     const RESET_DURATION = 3 * 24 * 60 * 60 * 1000;
 
+    // ===== SECTION NAMES =====
+    const SECTION_NAMES = ['Reasoning', 'Quant', 'Computer', 'English'];
+    const SECTION_ICONS = { 'Reasoning': '🧠', 'Quant': '📊', 'Computer': '💻', 'English': '📖' };
+
+    let allSectionData = {}; // { sectionName: { playlists: [...], chapters: [...] } }
+    let currentSection = 'Reasoning';
+    let currentPlaylistId = null;
     let currentUser = null;
     let googleUser = null;
     let googleAccessToken = null;
@@ -637,13 +482,9 @@
     let timerStartTime = Date.now();
     let sessionValidationInterval = null;
     let isHijacked = false;
+    let isImportantHidden = false;
     let activePlayer = null;
     let activePlayerId = null;
-
-    // SECTIONS: Recorded + Quant + Reasoning + Computer + English
-    const SECTIONS = ['recorded', 'quant', 'reasoning', 'computer', 'english'];
-    let sectionData = {};
-    let currentSection = 'recorded';
 
     // ==================== SESSION MANAGEMENT ====================
     function generateSessionId() {
@@ -651,63 +492,38 @@
     }
 
     function saveSession(user, key, sessionId) {
-        const session = {
-            user: user,
-            key: key,
-            sessionId: sessionId || generateSessionId(),
-            loginTime: Date.now(),
-            device: getDeviceInfo()
-        };
+        const session = { user: user, key: key, sessionId: sessionId || generateSessionId(), loginTime: Date.now(), device: getDeviceInfo() };
         localStorage.setItem(SESSION_KEY, JSON.stringify(session));
         return session;
     }
 
     function getSession() {
-        try {
-            const data = localStorage.getItem(SESSION_KEY);
-            if (!data) return null;
-            return JSON.parse(data);
-        } catch (e) { return null; }
+        try { const data = localStorage.getItem(SESSION_KEY); if (!data) return null; return JSON.parse(data); } catch (e) { return null; }
     }
 
     function clearSession() {
         localStorage.removeItem(SESSION_KEY);
-        if (sessionValidationInterval) {
-            clearInterval(sessionValidationInterval);
-            sessionValidationInterval = null;
-        }
+        if (sessionValidationInterval) { clearInterval(sessionValidationInterval); sessionValidationInterval = null; }
     }
 
     function getDeviceInfo() {
         const ua = navigator.userAgent;
         let device = 'Desktop';
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) {
-            device = 'Mobile';
-        }
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua)) { device = 'Mobile'; }
         return device + ' - ' + (navigator.platform || 'Unknown');
     }
 
     // ==================== SESSION VALIDATION ====================
     async function validateSession() {
         const session = getSession();
-        if (!session) {
-            handleSessionExpired();
-            return false;
-        }
-        
+        if (!session) { handleSessionExpired(); return false; }
         try {
             const response = await fetch(API_BASE + '/session/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    sessionId: session.sessionId,
-                    email: session.user.email,
-                    device: session.device || 'Unknown'
-                })
+                body: JSON.stringify({ sessionId: session.sessionId, email: session.user.email, device: session.device || 'Unknown' })
             });
-            
             const data = await response.json();
-            
             if (data.hijacked || data.autoLogout) {
                 isHijacked = true;
                 clearSession();
@@ -716,39 +532,23 @@
                 logout();
                 return false;
             }
-            
-            if (!data.valid) {
-                clearSession();
-                localStorage.removeItem(GOOGLE_SESSION_KEY);
-                logout();
-                return false;
-            }
-            
+            if (!data.valid) { clearSession(); localStorage.removeItem(GOOGLE_SESSION_KEY); logout(); return false; }
             return true;
-            
-        } catch (error) {
-            return true;
-        }
+        } catch (error) { return true; }
     }
 
     function showHijackNotification() {
         const el = document.getElementById('hijackNotification');
         el.classList.add('show');
-        setTimeout(() => {
-            el.classList.remove('show');
-        }, 5000);
+        setTimeout(() => { el.classList.remove('show'); }, 5000);
     }
 
     function handleSessionExpired() {
-        if (document.getElementById('videoContent').style.display !== 'none') {
-            logout();
-        }
+        if (document.getElementById('videoContent').style.display !== 'none') { logout(); }
     }
 
     function startSessionValidation() {
-        if (sessionValidationInterval) {
-            clearInterval(sessionValidationInterval);
-        }
+        if (sessionValidationInterval) { clearInterval(sessionValidationInterval); }
         sessionValidationInterval = setInterval(() => {
             if (document.getElementById('videoContent').style.display !== 'none' && !isHijacked) {
                 validateSession();
@@ -760,53 +560,24 @@
     async function generateKey() {
         const email = document.getElementById('genKeyEmail').value.trim();
         const statusEl = document.getElementById('genKeyStatus');
-
-        if (!email) {
-            statusEl.textContent = '⚠️ Please enter your email.';
-            statusEl.className = 'key-gen-status error';
-            return;
-        }
-
-        statusEl.textContent = '⏳ Checking...';
-        statusEl.className = 'key-gen-status info';
-
+        if (!email) { statusEl.textContent = '⚠️ Please enter your email.'; statusEl.className = 'key-gen-status error'; return; }
+        statusEl.textContent = '⏳ Checking...'; statusEl.className = 'key-gen-status info';
         try {
             const response = await fetch(API_BASE + '/key/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
-
             const data = await response.json();
-
             if (data.success) {
-                statusEl.innerHTML = `
-                    ✅ Key generated: <strong>${data.key}</strong><br>
-                    <span style="font-size:0.8rem;color:#1a7a3a;">
-                        ⏱️ Valid for <strong>1 hour</strong> only<br>
-                        📊 <strong>${data.remaining_today || '3'}</strong> more key(s) left today
-                    </span>
-                `;
+                statusEl.innerHTML = `✅ Key generated: <strong>${data.key}</strong><br><span style="font-size:0.8rem;color:#1a7a3a;">⏱️ Valid for <strong>1 hour</strong> only<br>📊 <strong>${data.remaining_today || '3'}</strong> more key(s) left today</span>`;
                 statusEl.className = 'key-gen-status success';
-
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(data.key);
-                }
+                if (navigator.clipboard) { navigator.clipboard.writeText(data.key); }
             } else {
                 if (data.limit_reached) {
-                    statusEl.innerHTML = `
-                        ❌ ${data.error}<br>
-                        <span style="font-size:0.8rem;color:#856404;">
-                            ⏳ Wait until tomorrow to generate more keys.
-                        </span>
-                    `;
+                    statusEl.innerHTML = `❌ ${data.error}<br><span style="font-size:0.8rem;color:#856404;">⏳ Wait until tomorrow to generate more keys.</span>`;
                 } else if (data.wait_time) {
-                    statusEl.innerHTML = `
-                        ⏳ ${data.error}<br>
-                        <span style="font-size:0.8rem;color:#856404;">
-                            Please wait <strong>${data.wait_time}</strong> more minute(s).
-                        </span>
-                    `;
+                    statusEl.innerHTML = `⏳ ${data.error}<br><span style="font-size:0.8rem;color:#856404;">Please wait <strong>${data.wait_time}</strong> more minute(s).</span>`;
                 } else {
                     statusEl.textContent = '❌ ' + (data.error || 'Failed to generate key');
                 }
@@ -818,7 +589,7 @@
         }
     }
 
-    // ==================== TOKEN DETECTION ====================
+    // ==================== AUTO DETECT TOKEN ====================
     (function() {
         const hash = window.location.hash;
         if (hash && hash.includes('access_token')) {
@@ -827,25 +598,14 @@
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split('.')[1]));
-                    googleUser = {
-                        email: payload.email,
-                        name: payload.name,
-                        picture: payload.picture,
-                        id: payload.sub
-                    };
+                    googleUser = { email: payload.email, name: payload.name, picture: payload.picture, id: payload.sub };
                     googleAccessToken = token;
-                    localStorage.setItem(GOOGLE_SESSION_KEY, JSON.stringify({
-                        user: googleUser,
-                        accessToken: googleAccessToken,
-                        loginTime: Date.now()
-                    }));
+                    localStorage.setItem(GOOGLE_SESSION_KEY, JSON.stringify({ user: googleUser, accessToken: googleAccessToken, loginTime: Date.now() }));
                     document.getElementById('loginSuccess').textContent = '✅ Google Sign-In successful!';
                     showVideoContent();
-                    loadAllSections();
+                    fetchAllSections();
                     fetchImportantSection();
-                } catch(e) {
-                    console.error('Token decode error:', e);
-                }
+                } catch(e) { console.error('Token decode error:', e); }
             }
         }
     })();
@@ -855,10 +615,7 @@
             const data = localStorage.getItem(GOOGLE_SESSION_KEY);
             if (!data) return false;
             const session = JSON.parse(data);
-            if (Date.now() - session.loginTime > 7 * 24 * 60 * 60 * 1000) {
-                localStorage.removeItem(GOOGLE_SESSION_KEY);
-                return false;
-            }
+            if (Date.now() - session.loginTime > 7 * 24 * 60 * 60 * 1000) { localStorage.removeItem(GOOGLE_SESSION_KEY); return false; }
             googleUser = session.user;
             googleAccessToken = session.accessToken;
             return true;
@@ -869,12 +626,8 @@
     function startResetTimer() {
         if (resetCheckInterval) clearInterval(resetCheckInterval);
         const savedStart = localStorage.getItem('timer_start');
-        if (savedStart) {
-            timerStartTime = parseInt(savedStart);
-        } else {
-            timerStartTime = Date.now();
-            localStorage.setItem('timer_start', timerStartTime.toString());
-        }
+        if (savedStart) { timerStartTime = parseInt(savedStart); }
+        else { timerStartTime = Date.now(); localStorage.setItem('timer_start', timerStartTime.toString()); }
         resetCheckInterval = setInterval(() => {
             const elapsed = Date.now() - timerStartTime;
             const timeLeft = Math.max(0, RESET_DURATION - elapsed);
@@ -884,13 +637,9 @@
                 const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
                 const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
                 timerEl.textContent = `⏰ ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                if (timeLeft < 60 * 60 * 1000) {
-                    timerEl.className = 'session-timer danger';
-                } else if (timeLeft < 3 * 60 * 60 * 1000) {
-                    timerEl.className = 'session-timer warning';
-                } else {
-                    timerEl.className = 'session-timer';
-                }
+                if (timeLeft < 60 * 60 * 1000) { timerEl.className = 'session-timer danger'; }
+                else if (timeLeft < 3 * 60 * 60 * 1000) { timerEl.className = 'session-timer warning'; }
+                else { timerEl.className = 'session-timer'; }
             }
             if (timeLeft <= 0) {
                 localStorage.removeItem('timer_start');
@@ -898,10 +647,7 @@
                 localStorage.removeItem(GOOGLE_SESSION_KEY);
                 if (document.getElementById('videoContent').style.display !== 'none') {
                     document.getElementById('resetBanner').style.display = 'block';
-                    setTimeout(() => {
-                        document.getElementById('resetBanner').style.display = 'none';
-                        logout();
-                    }, 3000);
+                    setTimeout(() => { document.getElementById('resetBanner').style.display = 'none'; logout(); }, 3000);
                 }
             }
         }, 1000);
@@ -913,39 +659,24 @@
         const key = document.getElementById('loginKey').value.trim();
         const errorEl = document.getElementById('loginError');
         const successEl = document.getElementById('loginSuccess');
-
-        errorEl.textContent = '';
-        successEl.textContent = '';
-
-        if (!email) {
-            errorEl.textContent = '⚠️ Please enter your email';
-            return;
-        }
-
+        errorEl.textContent = ''; successEl.textContent = '';
+        if (!email) { errorEl.textContent = '⚠️ Please enter your email'; return; }
         try {
             const sessionId = generateSessionId();
             const device = getDeviceInfo();
-            
             const response = await fetch(API_BASE + '/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    email, 
-                    key: key || '',
-                    sessionId: sessionId,
-                    device: device
-                })
+                body: JSON.stringify({ email, key: key || '', sessionId: sessionId, device: device })
             });
-
             const data = await response.json();
-
             if (data.success) {
                 currentUser = data.user;
                 successEl.textContent = '✅ Login successful! Loading videos...';
                 saveSession(data.user, key, sessionId);
                 isHijacked = false;
                 showVideoContent();
-                loadAllSections();
+                fetchAllSections();
                 fetchImportantSection();
                 startSessionValidation();
                 document.getElementById('hijackNotification').classList.remove('show');
@@ -968,25 +699,14 @@
                 await fetch(API_BASE + '/auth/logout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        sessionId: session.sessionId,
-                        email: session.user.email
-                    })
+                    body: JSON.stringify({ sessionId: session.sessionId, email: session.user.email })
                 });
-            } catch(e) {
-                console.error('Logout error:', e);
-            }
+            } catch(e) { console.error('Logout error:', e); }
         }
         clearSession();
-        if (sessionValidationInterval) {
-            clearInterval(sessionValidationInterval);
-            sessionValidationInterval = null;
-        }
+        if (sessionValidationInterval) { clearInterval(sessionValidationInterval); sessionValidationInterval = null; }
         localStorage.removeItem(GOOGLE_SESSION_KEY);
-        currentUser = null;
-        googleUser = null;
-        googleAccessToken = null;
-        isHijacked = false;
+        currentUser = null; googleUser = null; googleAccessToken = null; isHijacked = false;
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
         document.getElementById('userInfo').innerHTML = '';
@@ -995,10 +715,7 @@
         document.getElementById('loginError').textContent = '';
         document.getElementById('loginSuccess').textContent = '';
         document.getElementById('resetBanner').style.display = 'none';
-        if (resetCheckInterval) {
-            clearInterval(resetCheckInterval);
-            resetCheckInterval = null;
-        }
+        if (resetCheckInterval) { clearInterval(resetCheckInterval); resetCheckInterval = null; }
         document.getElementById('durationDisplay').textContent = '00:00:00';
         disposePlayer();
         for (let key in window) {
@@ -1014,14 +731,8 @@
     // ==================== PLAYER FUNCTIONS ====================
     function disposePlayer() {
         if (activePlayer) {
-            try { 
-                activePlayer.off('timeupdate');
-                activePlayer.off('ended');
-                activePlayer.off('loadstart');
-                activePlayer.dispose(); 
-            } catch(e) {}
-            activePlayer = null;
-            activePlayerId = null;
+            try { activePlayer.off('timeupdate'); activePlayer.off('ended'); activePlayer.off('loadstart'); activePlayer.dispose(); } catch(e) {}
+            activePlayer = null; activePlayerId = null;
         }
     }
 
@@ -1030,9 +741,7 @@
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = Math.floor(seconds % 60);
-        if (h > 0) {
-            return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-        }
+        if (h > 0) { return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0'); }
         return m + ':' + String(s).padStart(2, '0');
     }
 
@@ -1061,7 +770,6 @@
     // ==================== INIT PROFESSIONAL PLAYER ====================
     function initProfessionalPlayer(wrapper, link, playerId) {
         disposePlayer();
-        
         const loadingSpinner = wrapper.querySelector('.loading-spinner-pos');
         if (loadingSpinner) loadingSpinner.classList.add('show');
 
@@ -1072,18 +780,8 @@
             const videoId = extractYouTubeId(link);
             if (videoId) {
                 let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&controls=0&showinfo=0&iv_load_policy=3`;
-                if (googleUser) {
-                    embedUrl += `&origin=${window.location.origin}`;
-                }
-                wrapper.innerHTML = `
-                    <iframe 
-                        src="${embedUrl}"
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen
-                        style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"
-                    ></iframe>
-                `;
+                if (googleUser) { embedUrl += `&origin=${window.location.origin}`; }
+                wrapper.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"></iframe>`;
                 if (loadingSpinner) loadingSpinner.classList.remove('show');
                 showToast('🎬 YouTube video loaded', 'info');
                 return;
@@ -1091,12 +789,7 @@
         }
 
         wrapper.innerHTML = `
-            <video id="professional-player-${playerId}" 
-                   class="video-js vjs-default-skin" 
-                   controls 
-                   preload="auto" 
-                   playsinline
-                   style="width:100%;height:100%;aspect-ratio:16/9;">
+            <video id="professional-player-${playerId}" class="video-js vjs-default-skin" controls preload="auto" playsinline style="width:100%;height:100%;aspect-ratio:16/9;">
                 <source src="${link}" type="${isHLS ? 'application/x-mpegURL' : 'video/mp4'}">
                 <p class="vjs-no-js">Please enable JavaScript to view this player.</p>
             </video>
@@ -1106,52 +799,25 @@
         if (!videoElement) return;
 
         const player = videojs(videoElement, {
-            controls: true,
-            autoplay: true,
-            responsive: true,
-            liveui: false,
-            userActions: {
-                hotkeys: true,
-                seek: 10
-            },
-            html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    overrideNative: true,
-                }
-            },
-            controlBar: {
-                children: [
-                    'playToggle',
-                    'currentTimeDisplay',
-                    'durationDisplay',
-                    'progressControl',
-                    'volumePanel',
-                    'fullscreenToggle'
-                ]
-            }
+            controls: true, autoplay: true, responsive: true, liveui: false,
+            userActions: { hotkeys: true, seek: 10 },
+            html5: { hls: { enableLowInitialPlaylist: true, overrideNative: true } },
+            controlBar: { children: ['playToggle', 'currentTimeDisplay', 'durationDisplay', 'progressControl', 'volumePanel', 'fullscreenToggle'] }
         });
 
-        activePlayer = player;
-        activePlayerId = playerId;
+        activePlayer = player; activePlayerId = playerId;
 
         player.on('loadedmetadata', function() {
             const duration = player.duration();
-            if (!isFinite(duration) || duration === 0 || duration === Infinity) {
-                player.addClass('vjs-live');
-            } else {
-                player.removeClass('vjs-live');
-            }
+            if (!isFinite(duration) || duration === 0 || duration === Infinity) { player.addClass('vjs-live'); }
+            else { player.removeClass('vjs-live'); }
             if (loadingSpinner) loadingSpinner.classList.remove('show');
         });
 
         player.on('durationchange', function() {
             const duration = player.duration();
-            if (!isFinite(duration) || duration === 0 || duration === Infinity) {
-                player.addClass('vjs-live');
-            } else {
-                player.removeClass('vjs-live');
-            }
+            if (!isFinite(duration) || duration === 0 || duration === Infinity) { player.addClass('vjs-live'); }
+            else { player.removeClass('vjs-live'); }
         });
 
         player.on('timeupdate', function() {
@@ -1161,15 +827,11 @@
                 const minutes = Math.floor((currentTime % 3600) / 60);
                 const seconds = Math.floor(currentTime % 60);
                 document.getElementById('durationDisplay').textContent = 
-                    String(hours).padStart(2, '0') + ':' + 
-                    String(minutes).padStart(2, '0') + ':' + 
-                    String(seconds).padStart(2, '0');
+                    String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
             }
         });
 
-        player.on('ended', function() {
-            document.getElementById('durationDisplay').textContent = '00:00:00';
-        });
+        player.on('ended', function() { document.getElementById('durationDisplay').textContent = '00:00:00'; });
 
         player.ready(function() {
             const progressControl = player.controlBar.progressControl;
@@ -1194,46 +856,34 @@
             const speeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
             speeds.forEach(s => {
                 const opt = document.createElement('option');
-                opt.value = s;
-                opt.textContent = s + '×';
+                opt.value = s; opt.textContent = s + '×';
                 if (s === 1.0) opt.selected = true;
                 speedSelect.appendChild(opt);
             });
-
             const wrapper2 = document.createElement('div');
             wrapper2.className = 'speed-select-wrap';
             wrapper2.appendChild(speedSelect);
-
             const controlBar = player.controlBar.el();
             const volumePanel = controlBar.querySelector('.vjs-volume-panel');
-            if (volumePanel) {
-                volumePanel.parentNode.insertBefore(wrapper2, volumePanel.nextSibling);
-            } else {
-                controlBar.appendChild(wrapper2);
-            }
+            if (volumePanel) { volumePanel.parentNode.insertBefore(wrapper2, volumePanel.nextSibling); }
+            else { controlBar.appendChild(wrapper2); }
 
             speedSelect.addEventListener('change', function() {
                 const val = parseFloat(this.value);
-                if (!isNaN(val) && val > 0) {
-                    player.playbackRate(val);
-                    showToast('⚡ Speed: ' + val + 'x', 'success');
-                }
+                if (!isNaN(val) && val > 0) { player.playbackRate(val); showToast('⚡ Speed: ' + val + 'x', 'success'); }
             });
-
             player.playbackRate(1.0);
         });
 
         document.addEventListener('keydown', function(e) {
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
             if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-            
             const isLive = player.hasClass('vjs-live');
             if (isLive && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
                 e.preventDefault();
                 showToast('⛔ LIVE stream mein forward/backward disabled', 'error');
                 return;
             }
-            
             if (e.key === 'ArrowRight') {
                 e.preventDefault();
                 const current = player.currentTime() || 0;
@@ -1272,23 +922,9 @@
         const isGoogleLoggedIn = !!googleUser;
         let googleStatus = '';
         if (isGoogleLoggedIn) {
-            googleStatus = `
-                <div style="background:#e6f5e6;color:#1a5d3c;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;margin-bottom:6px;">
-                    ✅ Your Google account is logged in: <strong>${googleUser.email}</strong>
-                </div>
-            `;
+            googleStatus = `<div style="background:#e6f5e6;color:#1a5d3c;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;margin-bottom:6px;">✅ Your Google account is logged in: <strong>${googleUser.email}</strong></div>`;
         } else {
-            googleStatus = `
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
-                    <span style="background:#fff3cd;color:#856404;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;">
-                        ⚠️ Google not connected for YouTube Private Videos
-                    </span>
-                    <button onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});" 
-                            style="background:#1a2b4c;color:white;border:none;padding:4px 16px;border-radius:40px;cursor:pointer;font-size:0.75rem;">
-                        🔑 Sign in
-                    </button>
-                </div>
-            `;
+            googleStatus = `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;"><span style="background:#fff3cd;color:#856404;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;">⚠️ Google not connected for YouTube Private Videos</span><button onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});" style="background:#1a2b4c;color:white;border:none;padding:4px 16px;border-radius:40px;cursor:pointer;font-size:0.75rem;">🔑 Sign in</button></div>`;
         }
         document.getElementById('userInfo').innerHTML = `
             <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;">
@@ -1303,30 +939,17 @@
         const statusBar = document.getElementById('statusBar');
         if (statusBar) {
             if (isGoogleLoggedIn) {
-                statusBar.innerHTML = `
-                    ✅ <strong>Google Connected:</strong> ${googleUser.email}
-                    <span style="margin-left:12px;font-size:0.75rem;background:#e6f5e6;color:#1a5d3c;padding:2px 10px;border-radius:40px;">Verified</span>
-                `;
-                statusBar.style.background = '#e6f5e6';
-                statusBar.style.color = '#1a5d3c';
+                statusBar.innerHTML = `✅ <strong>Google Connected:</strong> ${googleUser.email}<span style="margin-left:12px;font-size:0.75rem;background:#e6f5e6;color:#1a5d3c;padding:2px 10px;border-radius:40px;">Verified</span>`;
+                statusBar.style.background = '#e6f5e6'; statusBar.style.color = '#1a5d3c';
             } else {
-                statusBar.innerHTML = `
-                    ⚠️ <strong>Google Not Connected:</strong> 
-                    <span style="color:#1a2b4c;">Please </span>
-                    <a href="#" onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});return false;" 
-                       style="color:#1a2b4c;font-weight:600;text-decoration:underline;cursor:pointer;">
-                        sign in
-                    </a>
-                    <span style="color:#1a2b4c;"> to watch private YouTube videos.</span>
-                `;
-                statusBar.style.background = '#fff3cd';
-                statusBar.style.color = '#856404';
+                statusBar.innerHTML = `⚠️ <strong>Google Not Connected:</strong> <span style="color:#1a2b4c;">Please </span><a href="#" onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});return false;" style="color:#1a2b4c;font-weight:600;text-decoration:underline;cursor:pointer;">sign in</a><span style="color:#1a2b4c;"> to watch private YouTube videos.</span>`;
+                statusBar.style.background = '#fff3cd'; statusBar.style.color = '#856404';
             }
         }
         startResetTimer();
     }
 
-    // ==================== FETCH IMPORTANT ====================
+    // ==================== FETCH IMPORTANT SECTION ====================
     async function fetchImportantSection() {
         const container = document.getElementById('importantItems');
         try {
@@ -1336,29 +959,29 @@
                 let html = '';
                 data.items.forEach(item => {
                     const playerId = `important-${item.id}`;
+                    const isVisible = item.is_visible !== 0;
+                    if (!isVisible) { isImportantHidden = true; }
                     html += `
-                        <div class="important-item" data-id="${item.id}" data-player-id="${playerId}">
+                        <div class="important-item" data-id="${item.id}" data-visible="${isVisible}" data-player-id="${playerId}">
                             <span class="name">${item.title}</span>
-                            <button class="important-play-btn" 
-                                    data-player-id="${playerId}" 
-                                    data-link="${item.link}" 
-                                    data-title="${item.title}">
-                                ▶ Play
-                            </button>
+                            <button class="important-play-btn" data-player-id="${playerId}" data-link="${item.link}" data-title="${item.title}">▶ Play</button>
                             <div class="player-wrapper-professional" id="wrapper-${playerId}" style="display: none;">
-                                <div class="loading-spinner-pos" id="spinner-${playerId}">
-                                    <div class="spinner"></div>
-                                </div>
+                                <div class="loading-spinner-pos" id="spinner-${playerId}"><div class="spinner"></div></div>
                             </div>
                         </div>
                     `;
                 });
                 container.innerHTML = html;
+                const section = document.getElementById('importantSection');
+                if (isImportantHidden) { section.classList.add('hidden-section'); document.getElementById('durationBar').classList.add('hidden'); }
+                else { section.classList.remove('hidden-section'); document.getElementById('durationBar').classList.remove('hidden'); }
                 attachImportantPlayEvents();
             } else {
                 container.innerHTML = `<div class="empty-important">No Live classes available</div>`;
+                document.getElementById('durationBar').classList.add('hidden');
             }
         } catch (error) {
+            console.error('Error fetching important section:', error);
             container.innerHTML = `<div class="empty-important">⚠️ Failed to load Live classes</div>`;
         }
     }
@@ -1369,6 +992,9 @@
                 const playerId = this.dataset.playerId;
                 const link = this.dataset.link;
                 const wrapper = document.getElementById(`wrapper-${playerId}`);
+                const parentItem = this.closest('.important-item');
+                const isVisible = parentItem?.dataset?.visible === 'true';
+                if (!isVisible) { showToast('⛔ This class is currently hidden by admin', 'error'); return; }
                 if (!wrapper) return;
                 if (wrapper.style.display === 'block' && wrapper.children.length > 0) {
                     wrapper.style.display = 'none';
@@ -1384,83 +1010,234 @@
         });
     }
 
-    // ==================== LOAD ALL SECTIONS ====================
-    async function loadAllSections() {
-        for (const section of SECTIONS) {
-            await loadSectionPlaylists(section);
-        }
-        updateSectionCounts();
-    }
-
-    async function loadSectionPlaylists(section) {
+    // ==================== FETCH ALL SECTIONS ====================
+    async function fetchAllSections() {
         try {
-            const response = await fetch(API_BASE + '/playlists/' + section);
+            const statusBar = document.getElementById('statusBar');
+            statusBar.textContent = '🔄 Loading sections...';
+            
+            const response = await fetch(API_BASE + '/sections');
             const data = await response.json();
+            
             if (data.success) {
-                sectionData[section] = data.playlists || [];
-                const select = document.querySelector(`.section-playlist[data-section="${section}"]`);
-                if (select) {
-                    select.innerHTML = '<option value="">Select a playlist...</option>';
-                    sectionData[section].forEach(playlist => {
-                        const option = document.createElement('option');
-                        option.value = playlist.id;
-                        option.textContent = playlist.name + (playlist.chapters ? ' (' + playlist.chapters.length + ')' : '');
-                        select.appendChild(option);
-                    });
-                    if (sectionData[section].length > 0) {
-                        select.value = sectionData[section][0].id;
-                        renderChapters(section);
-                    } else {
-                        document.querySelector(`.chapters-container[data-section="${section}"]`).innerHTML = `<div class="empty-state">No playlists available</div>`;
+                allSectionData = data.sections || {};
+                // Ensure all sections exist
+                SECTION_NAMES.forEach(name => {
+                    if (!allSectionData[name]) {
+                        allSectionData[name] = { playlists: [] };
                     }
-                }
-                updateSectionCounts();
+                });
+                renderSections();
+                statusBar.textContent = '✅ All sections loaded';
+            } else {
+                statusBar.textContent = '❌ Failed to load sections';
             }
         } catch (error) {
-            console.error('Error loading section:', section, error);
+            console.error('Error fetching sections:', error);
+            document.getElementById('statusBar').textContent = '❌ Failed to load sections';
         }
     }
 
-    function updateSectionCounts() {
-        SECTIONS.forEach(section => {
-            const countEl = document.getElementById('count-' + section);
-            if (countEl) {
-                const data = sectionData[section] || [];
-                let total = 0;
-                data.forEach(p => { if (p.chapters) total += p.chapters.length; });
-                countEl.textContent = total;
-            }
+    // ==================== RENDER SECTIONS ====================
+    function renderSections() {
+        const tabsContainer = document.getElementById('sectionTabs');
+        const contentContainer = document.getElementById('sectionsContainer');
+        
+        // Build tabs
+        let tabsHtml = '';
+        SECTION_NAMES.forEach(name => {
+            const icon = SECTION_ICONS[name] || '📁';
+            const count = allSectionData[name]?.playlists?.length || 0;
+            const activeClass = name === currentSection ? 'active' : '';
+            tabsHtml += `<button class="section-tab ${activeClass}" data-section="${name}">${icon} ${name} <span class="count">${count}</span></button>`;
         });
+        tabsContainer.innerHTML = tabsHtml;
+        
+        // Build content
+        let contentHtml = '';
+        SECTION_NAMES.forEach(name => {
+            const activeClass = name === currentSection ? 'active' : '';
+            const sectionData = allSectionData[name] || { playlists: [] };
+            contentHtml += `
+                <div class="section-content ${activeClass}" data-section="${name}">
+                    ${renderSectionContent(name, sectionData)}
+                </div>
+            `;
+        });
+        contentContainer.innerHTML = contentHtml;
+        
+        // Attach tab events
+        document.querySelectorAll('.section-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const section = this.dataset.section;
+                switchSection(section);
+            });
+        });
+        
+        // Attach playlist change events
+        document.querySelectorAll('.playlist-selector select').forEach(select => {
+            select.addEventListener('change', function() {
+                const section = this.dataset.section;
+                const playlistId = this.value;
+                if (playlistId) {
+                    renderChapters(section, playlistId);
+                } else {
+                    const container = document.getElementById(`chapters-${section}`);
+                    if (container) container.innerHTML = `<div class="empty-state">Select a playlist from the dropdown</div>`;
+                }
+            });
+        });
+        
+        // Attach search events
+        document.querySelectorAll('.search-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.dataset.section;
+                searchPlaylistsInSection(section);
+            });
+        });
+        document.querySelectorAll('.clear-search-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const section = this.dataset.section;
+                clearSearchInSection(section);
+            });
+        });
+        document.querySelectorAll('.search-input').forEach(input => {
+            input.addEventListener('keyup', function(e) {
+                const section = this.dataset.section;
+                if (e.key === 'Enter') searchPlaylistsInSection(section);
+                if (e.key === 'Escape') clearSearchInSection(section);
+            });
+        });
+        
+        // Auto-select first playlist
+        const firstSection = SECTION_NAMES[0];
+        const firstSelect = document.querySelector(`.playlist-selector select[data-section="${firstSection}"]`);
+        if (firstSelect && firstSelect.options.length > 1) {
+            firstSelect.value = firstSelect.options[1].value;
+            renderChapters(firstSection, firstSelect.value);
+        }
+    }
+
+    // ==================== RENDER SECTION CONTENT ====================
+    function renderSectionContent(sectionName, sectionData) {
+        const playlists = sectionData.playlists || [];
+        let html = `
+            <div class="playlist-selector">
+                <select data-section="${sectionName}">
+                    <option value="">Select a playlist...</option>
+                    ${playlists.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                </select>
+                <div class="search-container">
+                    <input type="text" class="search-input" data-section="${sectionName}" placeholder="🔍 Search playlists..." />
+                    <button class="search-btn" data-section="${sectionName}">Search</button>
+                    <button class="clear-search-btn" data-section="${sectionName}">Clear</button>
+                </div>
+            </div>
+            <div id="chapters-${sectionName}">
+                <div class="empty-state">Select a playlist to view chapters</div>
+            </div>
+        `;
+        return html;
+    }
+
+    // ==================== SWITCH SECTION ====================
+    function switchSection(sectionName) {
+        currentSection = sectionName;
+        
+        // Update tabs
+        document.querySelectorAll('.section-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.section === sectionName);
+        });
+        
+        // Update content
+        document.querySelectorAll('.section-content').forEach(content => {
+            content.classList.toggle('active', content.dataset.section === sectionName);
+        });
+        
+        // Auto-select first playlist in this section
+        const select = document.querySelector(`.playlist-selector select[data-section="${sectionName}"]`);
+        if (select && select.options.length > 1) {
+            const currentVal = select.value;
+            if (!currentVal || currentVal === '') {
+                select.value = select.options[1].value;
+                renderChapters(sectionName, select.value);
+            } else {
+                renderChapters(sectionName, currentVal);
+            }
+        }
+    }
+
+    // ==================== SEARCH IN SECTION ====================
+    function searchPlaylistsInSection(sectionName) {
+        const select = document.querySelector(`.playlist-selector select[data-section="${sectionName}"]`);
+        const searchInput = document.querySelector(`.search-input[data-section="${sectionName}"]`);
+        const searchTerm = searchInput?.value?.trim().toLowerCase() || '';
+        
+        const sectionData = allSectionData[sectionName];
+        if (!sectionData) return;
+        
+        const filteredPlaylists = sectionData.playlists.filter(p => p.name.toLowerCase().includes(searchTerm));
+        
+        // Update dropdown
+        select.innerHTML = '<option value="">Select a playlist...</option>';
+        filteredPlaylists.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = p.name;
+            select.appendChild(option);
+        });
+        
+        if (filteredPlaylists.length > 0) {
+            select.value = filteredPlaylists[0].id;
+            renderChapters(sectionName, filteredPlaylists[0].id);
+        } else {
+            const container = document.getElementById(`chapters-${sectionName}`);
+            if (container) container.innerHTML = `<div class="empty-state">🔍 No playlists found matching "${searchTerm}"</div>`;
+        }
+    }
+
+    function clearSearchInSection(sectionName) {
+        const searchInput = document.querySelector(`.search-input[data-section="${sectionName}"]`);
+        if (searchInput) searchInput.value = '';
+        
+        const sectionData = allSectionData[sectionName];
+        if (!sectionData) return;
+        
+        const select = document.querySelector(`.playlist-selector select[data-section="${sectionName}"]`);
+        select.innerHTML = '<option value="">Select a playlist...</option>';
+        sectionData.playlists.forEach(p => {
+            const option = document.createElement('option');
+            option.value = p.id;
+            option.textContent = p.name;
+            select.appendChild(option);
+        });
+        
+        if (sectionData.playlists.length > 0) {
+            select.value = sectionData.playlists[0].id;
+            renderChapters(sectionName, sectionData.playlists[0].id);
+        } else {
+            const container = document.getElementById(`chapters-${sectionName}`);
+            if (container) container.innerHTML = `<div class="empty-state">No playlists available</div>`;
+        }
     }
 
     // ==================== RENDER CHAPTERS ====================
-    function renderChapters(section) {
-        const container = document.querySelector(`.chapters-container[data-section="${section}"]`);
-        const select = document.querySelector(`.section-playlist[data-section="${section}"]`);
-        const searchInput = document.querySelector(`.section-search[data-section="${section}"]`);
-        if (!container || !select) return;
-        const playlistId = select.value;
-        const searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
-        if (!playlistId) {
-            container.innerHTML = `<div class="empty-state">Select a playlist from the dropdown</div>`;
+    function renderChapters(sectionName, playlistId) {
+        const container = document.getElementById(`chapters-${sectionName}`);
+        const sectionData = allSectionData[sectionName];
+        if (!sectionData) { container.innerHTML = `<div class="empty-state">Section not found</div>`; return; }
+        
+        const playlist = sectionData.playlists.find(p => p.id === playlistId);
+        if (!playlist) { container.innerHTML = `<div class="empty-state">Playlist not found</div>`; return; }
+        
+        if (!playlist.chapters || playlist.chapters.length === 0) {
+            container.innerHTML = `<div class="empty-state">No chapters in this playlist</div>`;
             return;
         }
-        const playlist = (sectionData[section] || []).find(p => p.id === playlistId);
-        if (!playlist) {
-            container.innerHTML = `<div class="empty-state">Playlist not found</div>`;
-            return;
-        }
-        let chapters = playlist.chapters || [];
-        if (searchTerm !== '') {
-            chapters = chapters.filter(ch => ch.name.toLowerCase().includes(searchTerm));
-        }
-        if (chapters.length === 0) {
-            container.innerHTML = `<div class="empty-state">${searchTerm !== '' ? '🔍 No chapters found matching "' + searchTerm + '"' : 'No chapters in this playlist'}</div>`;
-            return;
-        }
-        let html = `<div class="playlist-title">📚 ${playlist.name}</div>`;
-        chapters.forEach((chapter, index) => {
-            const playerId = `player-${section}-${chapter.id || 'ch_' + Date.now()}`;
+        
+        let html = `<div class="section-title">📚 ${playlist.name}</div>`;
+        playlist.chapters.forEach((chapter, index) => {
+            const playerId = `player-${chapter.id || 'ch_' + Date.now() + '_' + index}`;
             let badge = '';
             if (chapter.link && (chapter.link.includes('youtube.com') || chapter.link.includes('youtu.be'))) {
                 badge = `<span class="video-type-badge youtube">🎬 YouTube</span>`;
@@ -1471,7 +1248,7 @@
             }
             html += `
                 <div class="chapter-item">
-                    <span class="chapter-number">${chapter.chapter_number || (index + 1)}</span>
+                    <span class="chapter-number">Lecture ${index + 1}</span>
                     <span class="chapter-name">${chapter.name}</span>
                     ${badge}
                     <button class="play-btn" data-player-id="${playerId}" data-link="${chapter.link}">▶ Play</button>
@@ -1480,80 +1257,45 @@
             `;
         });
         container.innerHTML = html;
-        attachPlayEvents();
+        attachChapterPlayEvents();
     }
 
-    // ==================== SEARCH ====================
-    function searchSection(section) {
-        renderChapters(section);
-    }
-
-    function clearSearchSection(section) {
-        const searchInput = document.querySelector(`.section-search[data-section="${section}"]`);
-        if (searchInput) searchInput.value = '';
-        renderChapters(section);
-    }
-
-    // ==================== ATTACH PLAY EVENTS ====================
-    function attachPlayEvents() {
-        document.querySelectorAll('.play-btn').forEach(btn => {
+    // ==================== ATTACH CHAPTER PLAY EVENTS ====================
+    function attachChapterPlayEvents() {
+        document.querySelectorAll('.chapter-item .play-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const playerId = this.dataset.playerId;
                 const link = this.dataset.link;
                 const wrapper = document.getElementById(`wrapper-${playerId}`);
                 if (!wrapper) return;
+                
                 if (wrapper.style.display === 'block') {
                     wrapper.style.display = 'none';
                     wrapper.innerHTML = '';
-                    if (window[`hls_${playerId}`]) {
-                        try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-                        delete window[`hls_${playerId}`];
-                    }
-                    if (window[`player_${playerId}`]) {
-                        try { 
-                            window[`player_${playerId}`].off('timeupdate');
-                            window[`player_${playerId}`].off('ended');
-                            window[`player_${playerId}`].off('loadstart');
-                            window[`player_${playerId}`].dispose(); 
-                        } catch(e) {}
-                        delete window[`player_${playerId}`];
-                    }
+                    if (window[`hls_${playerId}`]) { try { window[`hls_${playerId}`].destroy(); } catch(e) {} delete window[`hls_${playerId}`]; }
+                    if (window[`player_${playerId}`]) { try { window[`player_${playerId}`].off('timeupdate'); window[`player_${playerId}`].off('ended'); window[`player_${playerId}`].off('loadstart'); window[`player_${playerId}`].dispose(); } catch(e) {} delete window[`player_${playerId}`]; }
                     return;
                 }
+                
                 wrapper.style.display = 'block';
-                if (window[`hls_${playerId}`]) {
-                    try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-                    delete window[`hls_${playerId}`];
-                }
-                if (window[`player_${playerId}`]) {
-                    try { 
-                        window[`player_${playerId}`].off('timeupdate');
-                        window[`player_${playerId}`].off('ended');
-                        window[`player_${playerId}`].off('loadstart');
-                        window[`player_${playerId}`].dispose(); 
-                    } catch(e) {}
-                    delete window[`player_${playerId}`];
-                }
+                
+                // Dispose any existing player
+                if (window[`hls_${playerId}`]) { try { window[`hls_${playerId}`].destroy(); } catch(e) {} delete window[`hls_${playerId}`]; }
+                if (window[`player_${playerId}`]) { try { window[`player_${playerId}`].off('timeupdate'); window[`player_${playerId}`].off('ended'); window[`player_${playerId}`].off('loadstart'); window[`player_${playerId}`].dispose(); } catch(e) {} delete window[`player_${playerId}`]; }
+                
+                // YouTube
                 if (link && (link.includes('youtube.com') || link.includes('youtu.be'))) {
                     const videoId = extractYouTubeId(link);
                     if (videoId) {
                         let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-                        if (googleUser) {
-                            embedUrl += `&origin=${window.location.origin}`;
-                        }
-                        wrapper.innerHTML = `
-                            <iframe 
-                                src="${embedUrl}"
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"
-                            ></iframe>
-                        `;
+                        if (googleUser) { embedUrl += `&origin=${window.location.origin}`; }
+                        wrapper.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"></iframe>`;
                         wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         return;
                     }
                 }
+                
+                // HLS
                 if (link && link.includes('.m3u8') && Hls.isSupported()) {
                     const videoEl = document.createElement('video');
                     videoEl.id = playerId;
@@ -1565,6 +1307,7 @@
                     videoEl.style.aspectRatio = '16/9';
                     wrapper.innerHTML = '';
                     wrapper.appendChild(videoEl);
+                    
                     const hls = new Hls({
                         enableWorker: true,
                         lowLatencyMode: true,
@@ -1587,18 +1330,18 @@
                         }
                     });
                     window[`hls_${playerId}`] = hls;
+                    
                     const player = videojs(videoEl, {
                         controls: true,
                         fluid: true,
-                        html5: {
-                            nativeAudioTracks: false,
-                            nativeVideoTracks: false,
-                        }
+                        html5: { nativeAudioTracks: false, nativeVideoTracks: false }
                     });
                     window[`player_${playerId}`] = player;
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
+                
+                // MP4
                 if (link && (link.includes('.mp4') || link.includes('.webm'))) {
                     const videoEl = document.createElement('video');
                     videoEl.id = playerId;
@@ -1610,14 +1353,12 @@
                     videoEl.style.aspectRatio = '16/9';
                     wrapper.innerHTML = '';
                     wrapper.appendChild(videoEl);
+                    
                     const player = videojs(videoEl, {
                         autoplay: true,
                         controls: true,
                         fluid: true,
-                        html5: {
-                            nativeAudioTracks: false,
-                            nativeVideoTracks: false,
-                        }
+                        html5: { nativeAudioTracks: false, nativeVideoTracks: false }
                     });
                     window[`player_${playerId}`] = player;
                     player.src({ src: link, type: 'video/mp4' });
@@ -1625,53 +1366,38 @@
                     wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     return;
                 }
-                wrapper.innerHTML = `
-                    <div style="padding:40px;text-align:center;color:#b33a3a;background:#0d1117;border-radius:12px;">
-                        ⚠️ Unsupported video format.<br>
-                        <small style="color:#6a7c94;">Supported: YouTube, HLS (.m3u8), MP4</small>
-                    </div>
-                `;
+                
+                wrapper.innerHTML = `<div style="padding:40px;text-align:center;color:#b33a3a;background:#0d1117;border-radius:12px;">⚠️ Unsupported video format.<br><small style="color:#6a7c94;">Supported: YouTube, HLS (.m3u8), MP4</small></div>`;
                 wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
         });
     }
 
+    // ==================== FALLBACK HLS PLAYER ====================
     function tryFallbackHLSPlayer(videoEl, link, playerId) {
-        if (window[`hls_${playerId}`]) {
-            try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-            delete window[`hls_${playerId}`];
-        }
+        if (window[`hls_${playerId}`]) { try { window[`hls_${playerId}`].destroy(); } catch(e) {} delete window[`hls_${playerId}`]; }
         const player = videojs(videoEl, {
             autoplay: true,
             controls: true,
             fluid: true,
             html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    smoothQualityChange: true,
-                    overrideNative: true,
-                },
+                hls: { enableLowInitialPlaylist: true, smoothQualityChange: true, overrideNative: true },
                 nativeAudioTracks: false,
-                nativeVideoTracks: false,
+                nativeVideoTracks: false
             }
         });
         window[`player_${playerId}`] = player;
-        if (link && link.includes('.m3u8')) {
-            player.src({ src: link, type: 'application/x-mpegURL' });
-        } else if (link) {
-            player.src({ src: link, type: 'video/mp4' });
-        }
+        if (link && link.includes('.m3u8')) { player.src({ src: link, type: 'application/x-mpegURL' }); }
+        else if (link) { player.src({ src: link, type: 'video/mp4' }); }
         player.play();
     }
 
     // ==================== CHECK SESSION ====================
     function checkExistingSession() {
-        if (!localStorage.getItem('timer_start')) {
-            localStorage.setItem('timer_start', Date.now().toString());
-        }
+        if (!localStorage.getItem('timer_start')) { localStorage.setItem('timer_start', Date.now().toString()); }
         if (checkGoogleSession()) {
             showVideoContent();
-            loadAllSections();
+            fetchAllSections();
             fetchImportantSection();
             startSessionValidation();
             return true;
@@ -1680,7 +1406,7 @@
         if (session && session.user) {
             currentUser = session.user;
             showVideoContent();
-            loadAllSections();
+            fetchAllSections();
             fetchImportantSection();
             startSessionValidation();
             return true;
@@ -1695,48 +1421,7 @@
     document.getElementById('genKeyBtn').addEventListener('click', generateKey);
     document.getElementById('genKeyEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') generateKey(); });
 
-    // Section tabs
-    document.querySelectorAll('.section-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.section-content').forEach(c => c.classList.remove('active'));
-            this.classList.add('active');
-            const section = this.dataset.section;
-            currentSection = section;
-            document.querySelector(`.section-content[data-section="${section}"]`).classList.add('active');
-            renderChapters(section);
-        });
-    });
-
-    // Section playlist change
-    document.querySelectorAll('.section-playlist').forEach(select => {
-        select.addEventListener('change', function() {
-            const section = this.dataset.section;
-            renderChapters(section);
-        });
-    });
-
-    // Section search
-    document.querySelectorAll('.section-search-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const section = this.dataset.section;
-            searchSection(section);
-        });
-    });
-    document.querySelectorAll('.section-clear-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const section = this.dataset.section;
-            clearSearchSection(section);
-        });
-    });
-    document.querySelectorAll('.section-search').forEach(input => {
-        input.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') searchSection(input.dataset.section);
-            if (e.key === 'Escape') clearSearchSection(input.dataset.section);
-        });
-    });
-
-    // ==================== DISPOSE ====================
+    // ==================== DISPOSE PLAYERS ====================
     window.addEventListener('beforeunload', function() {
         if (resetCheckInterval) clearInterval(resetCheckInterval);
         if (sessionValidationInterval) clearInterval(sessionValidationInterval);
@@ -1760,7 +1445,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Recorded + Quant + Reasoning + Computer + English');
+    console.log('✅ Video Portal loaded with Sections');
 })();
 </script>
 </body>
