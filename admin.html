@@ -162,7 +162,7 @@
       </p>
       <div class="flex-row">
         <select id="chapterSectionFilter" style="flex:1; min-width:150px;">
-          <option value="recorded">🎥 Recorded</option>
+          <option value="recorded">📐 Math</option>
           <option value="reasoning">🧠 Reasoning</option>
           <option value="quant">🔢 Quant</option>
           <option value="computer">💻 Computer</option>
@@ -341,13 +341,13 @@
 
     // 🔥 NEW: Sections (Recorded, Reasoning, Quant, Computer, English)
     const SECTION_LABELS = {
-        recorded: '🎥 Recorded',
+        recorded: '📐 Math',
         reasoning: '🧠 Reasoning',
         quant: '🔢 Quant',
         computer: '💻 Computer',
         english: '📖 English'
     };
-    const SECTION_ORDER = ['recorded', 'reasoning', 'quant', 'computer', 'english'];
+    const SECTION_ORDER = ['Math', 'reasoning', 'quant', 'computer', 'english'];
 
     // ----- Tabs -----
     document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -631,7 +631,7 @@
     // ==================== ADD PLAYLIST ====================
     async function addPlaylist() {
         const name = document.getElementById('newPlaylistName').value.trim();
-        const section = document.getElementById('newPlaylistSection').value || 'recorded';
+        const section = document.getElementById('newPlaylistSection').value || 'Math';
         if (!name) {
             showFeedback('⚠️ Enter playlist name', 'error', 'playlistFeedback');
             return;
@@ -882,7 +882,7 @@
         }
         let html = '';
         SECTION_ORDER.forEach(sectionKey => {
-            const sectionPlaylists = playlists.filter(p => (p.section || 'recorded') === sectionKey);
+            const sectionPlaylists = playlists.filter(p => (p.section || 'math') === sectionKey);
             if (!sectionPlaylists.length) return;
             html += `<div class="section-title" style="margin-top:16px;">${SECTION_LABELS[sectionKey] || sectionKey}</div>`;
             sectionPlaylists.forEach(playlist => {
@@ -946,10 +946,10 @@
     function updatePlaylistSelect() {
         const select = document.getElementById('playlistSelect');
         const sectionFilterEl = document.getElementById('chapterSectionFilter');
-        const sectionFilter = sectionFilterEl ? sectionFilterEl.value : 'recorded';
+        const sectionFilter = sectionFilterEl ? sectionFilterEl.value : 'math';
         select.innerHTML = '<option value="">Select playlist</option>';
         playlists
-            .filter(p => (p.section || 'recorded') === sectionFilter)
+            .filter(p => (p.section || 'math') === sectionFilter)
             .forEach(p => {
                 select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
             });
