@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Video Portal</title>
+  <title>Video Portal – Pro Learning</title>
   
   <!-- ===== VIDEO.JS 7.20.3 LIBRARIES ===== -->
   <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
@@ -11,9 +11,57 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/videojs-contrib-hls/5.15.0/videojs-contrib-hls.min.js"></script>
   
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-    body { background: #f0f4fb; min-height: 100vh; display: flex; justify-content: center; padding: 30px 16px; }
-    .app { max-width: 1100px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); padding: 28px 30px; }
+    /* ============================================================
+       THEME VARIABLES & BASE
+       ============================================================ */
+    :root {
+      --bg-body: #f0f4fb;
+      --bg-card: #ffffff;
+      --bg-alt: #f8faff;
+      --bg-hover: #fafdff;
+      --text-main: #0b1a33;
+      --text-sub: #4c637f;
+      --text-muted: #6a7c94;
+      --border-color: #e6edf6;
+      --border-focus: #1a2b4c;
+      --primary: #1a2b4c;
+      --primary-hover: #2f4370;
+      --accent: #f7971e;
+      --success-bg: #e6f5e6;
+      --success-text: #1a5d3c;
+      --danger-bg: #fee;
+      --danger-text: #b33a3a;
+      --warning-bg: #fff3cd;
+      --warning-text: #856404;
+      --card-shadow: 0 20px 50px rgba(0,0,0,0.04);
+    }
+
+    /* 🌙 DARK MODE THEME */
+    [data-theme="dark"] {
+      --bg-body: #0a0e17;
+      --bg-card: #121826;
+      --bg-alt: #182234;
+      --bg-hover: #1f2b42;
+      --text-main: #f0f4fc;
+      --text-sub: #9ab0cf;
+      --text-muted: #7187a6;
+      --border-color: #233148;
+      --border-focus: #4e73df;
+      --primary: #4e73df;
+      --primary-hover: #375ac2;
+      --accent: #f7971e;
+      --success-bg: rgba(26, 93, 60, 0.25);
+      --success-text: #4ade80;
+      --danger-bg: rgba(179, 58, 58, 0.25);
+      --danger-text: #f87171;
+      --warning-bg: rgba(133, 100, 4, 0.25);
+      --warning-text: #fbbf24;
+      --card-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease; }
+    body { background: var(--bg-body); min-height: 100vh; display: flex; justify-content: center; padding: 30px 16px; color: var(--text-main); }
+    .app { max-width: 1100px; width: 100%; background: var(--bg-card); border-radius: 36px; box-shadow: var(--card-shadow); padding: 28px 30px; border: 1px solid var(--border-color); }
     
     @media (max-width: 768px) {
       .app { padding: 16px; border-radius: 20px; }
@@ -30,7 +78,6 @@
       .search-container input { width: 100%; }
       .duration-bar { flex-wrap: wrap; gap: 6px; }
       .duration-bar .value { font-size: 14px; min-width: 80px; }
-      /* 🔥 MOBILE CONTROLS FIX */
       .video-js .vjs-control-bar { 
         height: 44px !important; 
         padding: 0 8px !important; 
@@ -47,6 +94,7 @@
       .video-js .vjs-mute-control { width: 28px !important; font-size: 1em !important; }
       .video-js .vjs-progress-control { min-width: 50px !important; }
       .video-js .vjs-volume-panel { display: none !important; }
+      .live-schedule-banner { flex-direction: column; align-items: flex-start; }
     }
 
     @media (max-width: 480px) {
@@ -69,37 +117,52 @@
       .video-js .vjs-progress-control { min-width: 30px !important; }
     }
 
-    /* 🔥 FIX: Controls always visible on mobile */
-    .video-js .vjs-control-bar {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-    .video-js.vjs-user-inactive .vjs-control-bar {
-      visibility: visible !important;
-      opacity: 1 !important;
-    }
-    .video-js .vjs-remaining-time {
-      display: none !important;
-    }
-    .video-js .vjs-time-divider {
-      display: none !important;
-    }
+    /* Controls always visible on mobile */
+    .video-js .vjs-control-bar { display: flex !important; visibility: visible !important; opacity: 1 !important; }
+    .video-js.vjs-user-inactive .vjs-control-bar { visibility: visible !important; opacity: 1 !important; }
+    .video-js .vjs-remaining-time, .video-js .vjs-time-divider { display: none !important; }
 
-    .header { border-bottom: 1px solid #e8edf6; padding-bottom: 18px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-    .header h1 { font-weight: 600; font-size: 1.9rem; color: #0b1a33; }
+    /* Header */
+    .header { border-bottom: 1px solid var(--border-color); padding-bottom: 18px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-weight: 700; font-size: 1.8rem; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
     
-    .login-container { max-width: 450px; margin: 40px auto; padding: 30px; background: #f8faff; border-radius: 24px; border: 1px solid #e6edf6; text-align: center; }
-    .login-container h2 { margin-bottom: 20px; color: #0b1a33; }
-    .login-container p { color: #4c637f; margin-bottom: 16px; }
-    .login-container .error { color: #b33a3a; font-size: 0.9rem; margin-top: 12px; }
-    .login-container input { width: 100%; padding: 12px 16px; border: 1px solid #d9e1ec; border-radius: 16px; font-size: 0.95rem; margin-bottom: 12px; }
-    .login-container button { width: 100%; padding: 12px; background: #0b1a33; color: white; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; }
+    /* 🌙 Theme Toggle Button */
+    .theme-toggle-btn { background: var(--bg-alt); border: 1px solid var(--border-color); color: var(--text-main); padding: 8px 14px; border-radius: 40px; cursor: pointer; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .theme-toggle-btn:hover { border-color: var(--primary); }
+
+    /* 📢 Live Schedule Banner */
+    .live-schedule-banner {
+      background: linear-gradient(135deg, rgba(247,151,30,0.12), rgba(78,115,223,0.12));
+      border: 1px solid rgba(247,151,30,0.3);
+      border-radius: 20px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .live-schedule-info { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+    .live-pulse-dot { width: 10px; height: 10px; background: #ff0044; border-radius: 50%; animation: pulse 1.5s infinite; }
+    .telegram-btn { background: #0088cc; color: white; border: none; border-radius: 40px; padding: 6px 16px; font-size: 0.8rem; font-weight: 600; text-decoration: none; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .telegram-btn:hover { background: #0077b5; }
+
+    /* Login Form */
+    .login-container { max-width: 450px; margin: 40px auto; padding: 30px; background: var(--bg-alt); border-radius: 24px; border: 1px solid var(--border-color); text-align: center; }
+    .login-container h2 { margin-bottom: 20px; color: var(--text-main); }
+    .login-container p { color: var(--text-sub); margin-bottom: 16px; }
+    .login-container .error { color: var(--danger-text); font-size: 0.9rem; margin-top: 12px; }
+    .login-container input { width: 100%; padding: 12px 16px; border: 1px solid var(--border-color); border-radius: 16px; font-size: 0.95rem; margin-bottom: 12px; background: var(--bg-card); color: var(--text-main); }
+    .login-container button { width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 16px; font-weight: 600; cursor: pointer; }
+    .login-container button:hover { background: var(--primary-hover); }
     
-    .key-gen-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid #e8edf6; }
-    .key-gen-section h3 { font-size: 1rem; color: #0b1a33; margin-bottom: 8px; }
-    .key-gen-section .info { font-size: 0.8rem; color: #6a7c94; margin-bottom: 12px; }
+    .key-gen-section { margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--border-color); }
+    .key-gen-section h3 { font-size: 1rem; color: var(--text-main); margin-bottom: 8px; }
+    .key-gen-section .info { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px; }
     
+    /* Live Section */
     .important-section {
       background: linear-gradient(135deg, #0d1117, #161b22);
       border: 2px solid #f7971e;
@@ -110,11 +173,7 @@
       position: relative;
       transition: all 0.3s ease;
     }
-    .important-section.hidden-section {
-      opacity: 0.5;
-      border-color: #4a4a6a;
-      background: linear-gradient(135deg, #1a1a2e, #22223a);
-    }
+    .important-section.hidden-section { opacity: 0.5; border-color: #4a4a6a; background: linear-gradient(135deg, #1a1a2e, #22223a); }
     .important-section::before {
       content: "⭐ Live Class";
       position: absolute;
@@ -127,23 +186,10 @@
       font-size: 0.7rem;
       font-weight: 700;
       letter-spacing: 1px;
-      transition: all 0.3s ease;
     }
-    .important-section.hidden-section::before {
-      background: #6a7c94;
-      content: "⛔ Live Class (Hidden)";
-    }
-    .important-section .title {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      transition: all 0.3s ease;
-    }
-    .important-section.hidden-section .title {
-      color: #6a7c94;
-    }
+    .important-section.hidden-section::before { background: #6a7c94; content: "⛔ Live Class (Hidden)"; }
+    .important-section .title { font-size: 1.2rem; font-weight: 700; color: #ffffff; margin-top: 4px; margin-bottom: 12px; }
+    .important-section.hidden-section .title { color: #6a7c94; }
     
     .important-item {
       background: rgba(255,255,255,0.05);
@@ -156,393 +202,162 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      transition: all 0.3s ease;
     }
-    .important-section.hidden-section .important-item {
-      opacity: 0.4;
-      pointer-events: none;
-    }
+    .important-section.hidden-section .important-item { opacity: 0.4; pointer-events: none; }
     .important-item:last-child { margin-bottom: 0; }
-    .important-item .name {
-      font-weight: 600;
-      color: #ffffff;
-      font-size: 1rem;
-    }
-    .important-play-btn {
-      background: #f7971e;
-      color: white;
-      border: none;
-      border-radius: 40px;
-      padding: 6px 20px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.15s;
-    }
-    .important-play-btn:hover {
-      background: #e08a0b;
-      transform: scale(1.02);
-    }
-    .important-section.hidden-section .important-play-btn {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    .empty-important {
-      color: #6a7c94;
-      padding: 20px 0;
-      text-align: center;
-      font-style: italic;
-    }
+    .important-item .name { font-weight: 600; color: #ffffff; font-size: 1rem; }
+    .important-play-btn { background: #f7971e; color: white; border: none; border-radius: 40px; padding: 6px 20px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.15s; }
+    .important-play-btn:hover { background: #e08a0b; transform: scale(1.02); }
+    .empty-important { color: #6a7c94; padding: 20px 0; text-align: center; font-style: italic; }
 
-    .duration-bar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 16px;
-      background: rgba(18, 18, 30, 0.6);
-      border-radius: 12px;
-      border: 1px solid #2a2a4e;
-      margin-top: 12px;
-      flex-wrap: wrap;
-      transition: all 0.3s ease;
-    }
-    .important-section.hidden-section .duration-bar {
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    .duration-bar .label {
-      color: #a0a0b8;
-      font-size: 14px;
-    }
-    .duration-bar .value {
-      font-weight: 700;
-      color: #f7971e;
-      font-family: 'Courier New', monospace;
-      font-size: 18px;
-      letter-spacing: 2px;
-      min-width: 100px;
-      text-align: center;
-    }
-    .duration-bar .live-icon {
-      color: #ff0044;
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.3; }
-      100% { opacity: 1; }
-    }
+    .duration-bar { display: flex; justify-content: center; align-items: center; gap: 12px; padding: 10px 16px; background: rgba(18, 18, 30, 0.6); border-radius: 12px; border: 1px solid #2a2a4e; margin-top: 12px; flex-wrap: wrap; }
+    .duration-bar .label { color: #a0a0b8; font-size: 14px; }
+    .duration-bar .value { font-weight: 700; color: #f7971e; font-family: 'Courier New', monospace; font-size: 18px; letter-spacing: 2px; min-width: 100px; text-align: center; }
+    .duration-bar .live-icon { color: #ff0044; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     
-    .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
-    .playlist-selector select { padding: 10px 20px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; color: #1a2b4c; font-weight: 500; cursor: pointer; flex: 1; min-width: 150px; }
-    .playlist-selector select:focus { border-color: #1a2b4c; outline: none; }
+    /* Playlist Controls */
+    .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: var(--bg-alt); border-radius: 20px; align-items: center; border: 1px solid var(--border-color); }
+    .playlist-selector select { padding: 10px 20px; border: 2px solid var(--border-color); border-radius: 40px; background: var(--bg-card); color: var(--text-main); font-weight: 500; cursor: pointer; flex: 1; min-width: 150px; }
+    .playlist-selector select:focus { border-color: var(--border-focus); outline: none; }
     
     .search-container { display: flex; gap: 8px; flex: 2; min-width: 200px; flex-wrap: wrap; }
-    .search-container input { padding: 10px 18px; border: 2px solid #d9e1ec; border-radius: 40px; font-size: 0.9rem; flex: 1; min-width: 120px; background: white; }
-    .search-container input:focus { border-color: #1a2b4c; outline: none; }
+    .search-container input { padding: 10px 18px; border: 2px solid var(--border-color); border-radius: 40px; font-size: 0.9rem; flex: 1; min-width: 120px; background: var(--bg-card); color: var(--text-main); }
+    .search-container input:focus { border-color: var(--border-focus); outline: none; }
     .search-container button { padding: 10px 20px; border: none; border-radius: 40px; color: white; font-weight: 500; cursor: pointer; transition: 0.15s; }
-    .search-btn { background: #1a2b4c; }
-    .search-btn:hover { background: #2f4370; }
-    .clear-btn { background: #6a7c94; }
-    .clear-btn:hover { background: #5a6a80; }
+    .search-btn { background: var(--primary); }
+    .search-btn:hover { background: var(--primary-hover); }
+    .clear-btn { background: var(--text-muted); }
+    .clear-btn:hover { opacity: 0.85; }
+
+    /* 📊 Progress Bar for Course */
+    .course-progress-wrap {
+      background: var(--bg-alt);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 12px 18px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .progress-header { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 600; color: var(--text-sub); }
+    .progress-bar-bg { width: 100%; height: 8px; background: var(--border-color); border-radius: 10px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #10b981, #059669); border-radius: 10px; width: 0%; transition: width 0.4s ease; }
     
-    .chapter-item { background: #fafdff; border-radius: 20px; padding: 16px 22px; margin-bottom: 14px; border: 1px solid #e6edf6; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-    .chapter-item:hover { border-color: #c8d4e4; }
-    .chapter-number { font-weight: 700; color: #1a2b4c; font-size: 1.1rem; min-width: 80px; }
-    .chapter-name { font-weight: 600; font-size: 1.1rem; color: #0b1a33; flex: 1; }
-    .play-btn { background: #0b1a33; color: white; border: none; border-radius: 40px; padding: 8px 24px; font-weight: 500; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
-    .play-btn:hover { background: #1f3457; }
-    .player-wrapper { width: 100%; margin-top: 12px; border-radius: 16px; overflow: hidden; background: #000; min-height: 200px; }
+    /* Chapters & Items */
+    .chapter-item { background: var(--bg-hover); border-radius: 20px; padding: 14px 20px; margin-bottom: 12px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: relative; }
+    .chapter-item:hover { border-color: var(--border-focus); }
+    .chapter-item.is-watched { border-left: 4px solid #10b981; }
+    .chapter-number { font-weight: 700; color: var(--primary); font-size: 1rem; min-width: 75px; }
+    .chapter-name { font-weight: 600; font-size: 1.05rem; color: var(--text-main); flex: 1; }
+    
+    /* Actions on Chapter */
+    .chapter-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .btn-star { background: none; border: 1px solid var(--border-color); color: #f59e0b; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; }
+    .btn-star.starred { background: #fef3c7; border-color: #f59e0b; }
+    .btn-watch-toggle { background: none; border: 1px solid var(--border-color); color: var(--text-muted); border-radius: 40px; padding: 5px 12px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .btn-watch-toggle.watched { background: var(--success-bg); color: var(--success-text); border-color: var(--success-text); }
+    .play-btn { background: var(--primary); color: white; border: none; border-radius: 40px; padding: 8px 22px; font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: 0.15s; }
+    .play-btn:hover { background: var(--primary-hover); transform: scale(1.02); }
+    
+    .player-wrapper { width: 100%; margin-top: 12px; border-radius: 16px; overflow: hidden; background: #000; min-height: 200px; position: relative; }
     .player-wrapper iframe { width: 100%; height: 100%; min-height: 200px; aspect-ratio: 16/9; border: none; }
     
-    .empty-state { color: #6a7c94; padding: 40px 0; text-align: center; font-style: italic; }
-    .playlist-title { font-size: 1.4rem; font-weight: 600; color: #0b1a33; margin-bottom: 16px; }
+    /* 🎬 Floating Picture-in-Picture Mini Player */
+    .player-wrapper.mini-player-active {
+      position: fixed !important;
+      bottom: 20px !important;
+      right: 20px !important;
+      width: 340px !important;
+      min-height: unset !important;
+      aspect-ratio: 16/9 !important;
+      z-index: 99999 !important;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+      border: 2px solid var(--accent) !important;
+      border-radius: 16px !important;
+      animation: popIn 0.3s ease !important;
+    }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    /* 🔥 NEW: Recorded + Subject Sections as TABS */
-    .content-section-title { font-size: 1.25rem; font-weight: 700; color: #0b1a33; margin: 28px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e8edf6; display: flex; align-items: center; gap: 8px; }
+    .empty-state { color: var(--text-muted); padding: 40px 0; text-align: center; font-style: italic; }
+    .playlist-title { font-size: 1.3rem; font-weight: 700; color: var(--text-main); margin-bottom: 14px; }
+
+    /* Section Tabs */
+    .content-section-title { font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin: 24px 0 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); display: flex; align-items: center; gap: 8px; }
     .section-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0 20px; }
-    .section-tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 40px; border: 2px solid #d9e1ec; background: #ffffff; color: #1a2b4c; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
-    .section-tab-btn:hover { border-color: #1a2b4c; }
-    .section-tab-btn.active { background: #0b1a33; border-color: #0b1a33; color: #ffffff; }
-    .section-tab-btn .tab-count { background: #eef3fa; color: #4c637f; font-size: 0.75rem; font-weight: 700; padding: 2px 9px; border-radius: 40px; min-width: 18px; text-align: center; }
-    .section-tab-btn.active .tab-count { background: rgba(255,255,255,0.18); color: #ffffff; }
+    .section-tab-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 40px; border: 2px solid var(--border-color); background: var(--bg-card); color: var(--text-main); font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: 0.15s; }
+    .section-tab-btn:hover { border-color: var(--border-focus); }
+    .section-tab-btn.active { background: var(--primary); border-color: var(--primary); color: #ffffff; }
+    .section-tab-btn .tab-count { background: var(--bg-alt); color: var(--text-sub); font-size: 0.75rem; font-weight: 700; padding: 2px 9px; border-radius: 40px; min-width: 18px; text-align: center; }
+    .section-tab-btn.active .tab-count { background: rgba(255,255,255,0.22); color: #ffffff; }
     .section-panel { display: none; }
     .section-panel.active { display: block; }
     @media (max-width: 700px) { .section-tabs { gap: 8px; } .section-tab-btn { padding: 8px 14px; font-size: 0.85rem; } }
-    .status-bar { font-size: 0.8rem; padding: 8px 16px; border-radius: 40px; display: inline-block; margin-bottom: 16px; background: #f0f4fb; color: #4c637f; }
-    .user-info { font-size: 0.85rem; color: #4c637f; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
+    
+    .status-bar { font-size: 0.8rem; padding: 8px 16px; border-radius: 40px; display: inline-block; margin-bottom: 16px; background: var(--bg-alt); color: var(--text-sub); }
+    .user-info { font-size: 0.85rem; color: var(--text-sub); display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
     .user-info .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .logout-btn { background: none; border: 1px solid #d9e1ec; padding: 4px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
-    .logout-btn:hover { background: #fee; border-color: #b33a3a; }
-    .session-timer { font-size: 0.75rem; padding: 4px 12px; border-radius: 40px; background: #e6f5e6; color: #1a5d3c; }
-    .session-timer.warning { background: #fff3cd; color: #856404; }
-    .session-timer.danger { background: #fee; color: #b33a3a; }
+    .logout-btn { background: none; border: 1px solid var(--border-color); padding: 4px 16px; border-radius: 40px; cursor: pointer; font-size: 0.8rem; color: var(--text-main); }
+    .logout-btn:hover { background: var(--danger-bg); border-color: var(--danger-text); color: var(--danger-text); }
+    .session-timer { font-size: 0.75rem; padding: 4px 12px; border-radius: 40px; background: var(--success-bg); color: var(--success-text); }
+    .session-timer.warning { background: var(--warning-bg); color: var(--warning-text); }
+    .session-timer.danger { background: var(--danger-bg); color: var(--danger-text); }
     
-    .footer-note { color: #7c8aa0; font-size: 0.8rem; text-align: center; margin-top: 30px; border-top: 1px solid #eef2f6; padding-top: 22px; }
-    .reset-banner { background: #fff3cd; color: #856404; padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; text-align: center; margin-bottom: 16px; display: none; }
+    .footer-note { color: var(--text-muted); font-size: 0.8rem; text-align: center; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 22px; }
+    .reset-banner { background: var(--warning-bg); color: var(--warning-text); padding: 8px 16px; border-radius: 40px; font-size: 0.8rem; text-align: center; margin-bottom: 16px; display: none; }
     
-    .video-type-badge { font-size: 0.6rem; padding: 2px 10px; border-radius: 40px; background: #eef3fa; color: #4c637f; }
-    .video-type-badge.youtube { background: #ff000020; color: #ff0000; }
-    .video-type-badge.hls { background: #1a7a3a20; color: #1a7a3a; }
-    .video-type-badge.mp4 { background: #1a2b4c20; color: #1a2b4c; }
+    .video-type-badge { font-size: 0.65rem; padding: 3px 10px; border-radius: 40px; background: var(--bg-alt); color: var(--text-sub); font-weight: 600; }
+    .video-type-badge.youtube { background: rgba(255, 0, 0, 0.12); color: #ff3333; }
+    .video-type-badge.hls { background: rgba(26, 122, 58, 0.12); color: #10b981; }
+    .video-type-badge.mp4 { background: rgba(78, 115, 223, 0.12); color: #4e73df; }
     
-    .separator { display: flex; align-items: center; text-align: center; margin: 16px 0; color: #8b949e; font-size: 0.85rem; }
-    .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid #d9e1ec; }
+    .separator { display: flex; align-items: center; text-align: center; margin: 16px 0; color: var(--text-muted); font-size: 0.85rem; }
+    .separator::before, .separator::after { content: ''; flex: 1; border-bottom: 1px solid var(--border-color); }
     .separator::before { margin-right: 16px; }
     .separator::after { margin-left: 16px; }
     
-    .google-status-badge { display: inline-block; padding: 4px 14px; border-radius: 40px; font-size: 0.75rem; font-weight: 500; }
-    .google-status-badge.connected { background: #e6f5e6; color: #1a5d3c; }
-    .google-status-badge.disconnected { background: #fff3cd; color: #856404; }
-    
     .key-gen-status { font-size: 0.9rem; margin-top: 6px; }
-    .key-gen-status.success { color: #1a7a3a; }
-    .key-gen-status.error { color: #b33a3a; }
-    .key-gen-status.info { color: #856404; }
+    .key-gen-status.success { color: var(--success-text); }
+    .key-gen-status.error { color: var(--danger-text); }
+    .key-gen-status.info { color: var(--warning-text); }
     
     .hijack-notification {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: #b33a3a;
+      background: var(--danger-text);
       color: white;
       padding: 16px 32px;
       border-radius: 16px;
       font-weight: 600;
-      z-index: 9999;
+      z-index: 99999;
       box-shadow: 0 10px 40px rgba(0,0,0,0.3);
       display: none;
       text-align: center;
       max-width: 90%;
     }
-    .hijack-notification.show {
-      display: block;
-      animation: slideDown 0.5s ease;
-    }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateX(-50%) translateY(-50px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
+    .hijack-notification.show { display: block; animation: slideDown 0.5s ease; }
+    @keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-50px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+    .duration-bar.hidden { display: none !important; }
 
-    .duration-bar.hidden {
-      display: none !important;
-    }
-
-    .key-limit-info {
-      font-size: 0.75rem;
-      color: #6a7c94;
-      margin-top: 6px;
-    }
-    .key-limit-info strong {
-      color: #0b1a33;
-    }
-
-    /* ============================================================
-       VIDEO.JS 7.20.3 CUSTOM STYLES
-       ============================================================ */
-    .player-wrapper-professional {
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #0b0e14;
-      position: relative;
-    }
-
-    .video-js {
-      width: 100% !important;
-      height: auto !important;
-      aspect-ratio: 16/9 !important;
-      background: #0b0e14 !important;
-    }
-
-    .video-js .vjs-control-bar {
-      background: rgba(10, 14, 22, 0.85) !important;
-      backdrop-filter: blur(14px) !important;
-      border-radius: 60px !important;
-      margin: 0 12px 16px 12px !important;
-      padding: 0 16px !important;
-      height: 56px !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: space-between !important;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important;
-      border: none !important;
-      gap: 4px;
-    }
-
-    .video-js .vjs-control {
-      color: #f0f4ff !important;
-      opacity: 0.9;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-      height: 100% !important;
-      flex-shrink: 0 !important;
-    }
-
-    .video-js .vjs-control:hover {
-      opacity: 1;
-      color: #fff !important;
-    }
-
-    .video-js .vjs-play-control {
-      font-size: 1.5em !important;
-      width: 40px !important;
-    }
-
-    .video-js .vjs-time-control {
-      font-size: 0.85rem !important;
-      padding: 0 4px !important;
-      color: #bcc8e6 !important;
-    }
-    .video-js .vjs-remaining-time {
-      display: none !important;
-    }
-    .video-js .vjs-time-divider {
-      display: none !important;
-    }
-
-    .video-js .vjs-progress-control {
-      flex: 3 1 auto !important;
-      min-width: 80px !important;
-      height: 100% !important;
-      display: flex !important;
-      align-items: center !important;
-      padding: 0 8px !important;
-    }
-    .video-js .vjs-progress-control .vjs-progress-holder {
-      background: rgba(255, 255, 255, 0.12) !important;
-      border-radius: 20px !important;
-      height: 6px !important;
-    }
-    .video-js .vjs-progress-control .vjs-play-progress {
-      background: #6c8cff !important;
-      border-radius: 20px !important;
-    }
-    .video-js .vjs-progress-control .vjs-play-progress::before {
-      display: none !important;
-    }
-    .video-js .vjs-progress-control .vjs-load-progress {
-      background: rgba(255, 255, 255, 0.15) !important;
-      border-radius: 20px !important;
-    }
-
-    .video-js .vjs-live-control {
-      display: none !important;
-    }
-
-    .video-js .vjs-volume-panel {
-      display: flex !important;
-      align-items: center !important;
-      height: 100% !important;
-      flex-shrink: 0 !important;
-    }
-    .video-js .vjs-mute-control {
-      width: 36px !important;
-    }
-    .video-js .vjs-volume-bar {
-      background: rgba(255, 255, 255, 0.2) !important;
-    }
-    .video-js .vjs-volume-level {
-      background: #6c8cff !important;
-    }
-
-    .speed-select-wrap {
-      display: flex !important;
-      align-items: center !important;
-      height: 100% !important;
-      flex-shrink: 0 !important;
-    }
-    .speed-select-wrap select {
-      background: rgba(20, 28, 44, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 40px;
-      padding: 5px 28px 5px 14px;
-      color: #d3defa;
-      font-weight: 500;
-      font-size: 0.8rem;
-      cursor: pointer;
-      outline: none;
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0b4e0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 10px;
-      min-width: 68px;
-      height: 32px !important;
-    }
-    .speed-select-wrap select:hover {
-      background-color: rgba(40, 52, 80, 0.7);
-      border-color: rgba(108, 140, 255, 0.3);
-    }
-    .speed-select-wrap select option {
-      background: #1e2638;
-      color: #eaf0ff;
-    }
-
-    .video-js .vjs-fullscreen-control {
-      display: flex !important;
-      font-size: 1.4em !important;
-      width: 40px !important;
-    }
-
-    .video-js .vjs-picture-in-picture-control,
-    .video-js .vjs-captions-button,
-    .video-js .vjs-seek-button,
-    .video-js .vjs-seek-to-live-control {
-      display: none !important;
-    }
-    .video-js .vjs-big-play-button {
-      display: none !important;
-    }
-
-    .important-item .player-wrapper-professional {
-      width: 100%;
-      margin-top: 12px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #000;
-      min-height: 200px;
-    }
-    .important-item .player-wrapper-professional video {
-      width: 100%;
-      display: block;
-      aspect-ratio: 16/9;
-    }
-    .important-item .player-wrapper-professional iframe {
-      width: 100%;
-      height: 100%;
-      min-height: 200px;
-      aspect-ratio: 16/9;
-      border: none;
-      border-radius: 12px;
-    }
-
-    .loading-spinner-pos {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 5;
-      display: none;
-    }
-    .loading-spinner-pos.show {
-      display: block;
-    }
-    .loading-spinner-pos .spinner {
-      width: 40px;
-      height: 40px;
-      border: 3px solid rgba(255,255,255,0.08);
-      border-top-color: #f7971e;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    /* Video.js styles */
+    .player-wrapper-professional { width: 100%; margin-top: 12px; border-radius: 16px; overflow: hidden; background: #0b0e14; position: relative; }
+    .video-js { width: 100% !important; height: auto !important; aspect-ratio: 16/9 !important; background: #0b0e14 !important; }
+    .video-js .vjs-control-bar { background: rgba(10, 14, 22, 0.85) !important; backdrop-filter: blur(14px) !important; border-radius: 60px !important; margin: 0 12px 16px 12px !important; padding: 0 16px !important; height: 56px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6) !important; border: none !important; gap: 4px; }
+    .video-js .vjs-control { color: #f0f4ff !important; opacity: 0.9; display: flex !important; align-items: center !important; justify-content: center !important; height: 100% !important; flex-shrink: 0 !important; }
+    .video-js .vjs-control:hover { opacity: 1; color: #fff !important; }
+    .video-js .vjs-play-control { font-size: 1.5em !important; width: 40px !important; }
+    .video-js .vjs-time-control { font-size: 0.85rem !important; padding: 0 4px !important; color: #bcc8e6 !important; }
+    .video-js .vjs-progress-control { flex: 3 1 auto !important; min-width: 80px !important; height: 100% !important; display: flex !important; align-items: center !important; padding: 0 8px !important; }
+    .video-js .vjs-progress-control .vjs-progress-holder { background: rgba(255, 255, 255, 0.12) !important; border-radius: 20px !important; height: 6px !important; }
+    .video-js .vjs-progress-control .vjs-play-progress { background: #6c8cff !important; border-radius: 20px !important; }
+    .video-js .vjs-progress-control .vjs-play-progress::before { display: none !important; }
+    .video-js .vjs-volume-panel { display: flex !important; align-items: center !important; height: 100% !important; flex-shrink: 0 !important; }
+    .speed-select-wrap select { background: rgba(20, 28, 44, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 40px; padding: 5px 28px 5px 14px; color: #d3defa; font-weight: 500; font-size: 0.8rem; cursor: pointer; outline: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a0b4e0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; background-size: 10px; min-width: 68px; height: 32px !important; }
+    .video-js .vjs-fullscreen-control { display: flex !important; font-size: 1.4em !important; width: 40px !important; }
+    .video-js .vjs-big-play-button { display: none !important; }
   </style>
 </head>
 <body>
@@ -552,9 +367,27 @@
 </div>
 
 <div class="app">
+  <!-- Header -->
   <div class="header">
     <h1>📽️ Video Portal</h1>
+    <div class="header-actions">
+      <!-- 🌙 Dark / Light Mode Switcher -->
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Switch Theme">
+        <span id="themeIcon">🌙</span> <span id="themeText">Dark</span>
+      </button>
+    </div>
     <div id="userInfo" class="user-info"></div>
+  </div>
+
+  <!-- 📢 Live Schedule & Telegram Announcement Banner (Feature 5) -->
+  <div class="live-schedule-banner" id="liveScheduleBanner">
+    <div class="live-schedule-info">
+      <div class="live-pulse-dot"></div>
+      <span id="scheduleText">📢 Daily Live Classes & Doubts at 7:00 PM</span>
+    </div>
+    <a href="https://t.me/g6803" target="_blank" class="telegram-btn">
+      ✈️ Join Telegram @g6803
+    </a>
   </div>
   
   <div id="resetBanner" class="reset-banner">🔄 Session expired after 3 days. Please login again.</div>
@@ -567,14 +400,14 @@
     <input type="text" id="loginKey" placeholder="Enter your access key" />
     <button id="loginBtn">Login</button>
     <div id="loginError" class="error"></div>
-    <div id="loginSuccess" style="color:#1a7a3a;font-size:0.9rem;margin-top:8px;"></div>
+    <div id="loginSuccess" style="color:var(--success-text);font-size:0.9rem;margin-top:8px;"></div>
     
     <!-- Key Generate Section -->
     <div class="key-gen-section">
       <h3>🔑 Generate New Access Key</h3>
       <p class="info">Enter your registered email to generate a new key</p>
-      <div style="background: #f0f4fb; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.75rem; color: #4c637f;">
-        ⏱️ Valid for <strong>1 hour</strong> only · 📊 <strong>4 keys</strong> per day limit
+      <div style="background: var(--bg-card); padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.75rem; color: var(--text-sub); border: 1px solid var(--border-color);">
+        ⏱️ Valid for <strong>48 Hours</strong> · 📊 <strong>4 keys</strong> per day limit
       </div>
       <input type="email" id="genKeyEmail" placeholder="Enter your registered email" style="margin-bottom:8px;" />
       <button id="genKeyBtn" style="background:#2d7a9b;width:100%;">🔄 Generate Key</button>
@@ -584,17 +417,17 @@
     <div class="separator">OR</div>
     
     <!-- Google Sign-In Option -->
-    <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e8edf6;">
-      <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:8px;">
+    <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border-color);">
+      <p style="color:var(--text-sub);font-size:0.85rem;margin-bottom:8px;">
         🎬 <strong>YouTube Private Videos</strong>
       </p>
-      <p style="color:#8b949e;font-size:0.75rem;margin-bottom:12px;">
+      <p style="color:var(--text-muted);font-size:0.75rem;margin-bottom:12px;">
         Sign in with Google to watch private YouTube videos.
       </p>
       
-      <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=853267104713-46mrftcdeva7a8di4bdq6i6br29bd3vn.apps.googleusercontent.com&redirect_uri=https://prev-live-classes-azio.onrender.com&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent"
+      <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=853267104713-46mrftcdeva7a8di4bdq6i6br29bd3vn.apps.googleusercontent.com&redirect_uri=https://professional-dashboard-k8ok.onrender.com/api/auth/youtube/callback&response_type=token&scope=https://www.googleapis.com/auth/youtube.readonly&prompt=consent"
          target="_blank"
-         style="display:inline-block;background:#1a2b4c;color:white;padding:12px 28px;border-radius:40px;text-decoration:none;font-weight:500;margin:8px 0;width:100%;text-align:center;">
+         style="display:inline-block;background:var(--primary);color:white;padding:12px 28px;border-radius:40px;text-decoration:none;font-weight:500;margin:8px 0;width:100%;text-align:center;">
         🔑 Sign in with Google
       </a>
     </div>
@@ -607,7 +440,7 @@
       <div id="sessionTimer" class="session-timer">⏰ 72:00:00</div>
     </div>
     
-    <!-- Important Section -->
+    <!-- Important / Live Section -->
     <div id="importantSection" class="important-section">
       <div class="title" id="importantTitle">⭐ Live Classes</div>
       
@@ -623,111 +456,109 @@
       </div>
     </div>
     
-    <!-- 🔥 NEW: Section Tabs (Recorded, Reasoning, Quant, Computer, English) -->
-    <div class="content-section-title">📚 Classes</div>
+    <!-- Section Tabs (Math, Reasoning, Quant, Computer, English + ⭐ Starred) -->
+    <div class="content-section-title">📚 Course Classes</div>
     <div class="section-tabs" id="sectionTabs">
       <button class="section-tab-btn active" data-section="recorded">📐 Math <span class="tab-count" id="tabCount-recorded">0</span></button>
       <button class="section-tab-btn" data-section="reasoning">🧠 Reasoning <span class="tab-count" id="tabCount-reasoning">0</span></button>
       <button class="section-tab-btn" data-section="quant">🔢 Quant <span class="tab-count" id="tabCount-quant">0</span></button>
       <button class="section-tab-btn" data-section="computer">💻 Computer <span class="tab-count" id="tabCount-computer">0</span></button>
       <button class="section-tab-btn" data-section="english">📖 English <span class="tab-count" id="tabCount-english">0</span></button>
+      <!-- ⭐ Favorites Tab (Feature 6) -->
+      <button class="section-tab-btn" data-section="starred" style="border-color:#f59e0b;">⭐ Starred <span class="tab-count" id="tabCount-starred">0</span></button>
     </div>
 
-    <!-- Recorded Panel -->
+    <!-- 📊 Course Progress Bar (Feature 2) -->
+    <div class="course-progress-wrap" id="courseProgressWrap">
+      <div class="progress-header">
+        <span>📖 Course Completion Status</span>
+        <span id="progressPercentText">0% Completed (0/0)</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+    </div>
+
+    <!-- Math Panel -->
     <div class="section-panel active" id="sectionPanel-recorded">
       <div class="playlist-selector">
         <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown-recorded" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
+          <select id="playlistDropdown-recorded"><option value="">Select a playlist...</option></select>
           <div class="search-container">
-            <input type="text" id="searchInput-recorded" placeholder="🔍 Search playlists..." />
+            <input type="text" id="searchInput-recorded" placeholder="🔍 Search in Math..." />
             <button class="search-btn" id="searchBtn-recorded">Search</button>
             <button class="clear-btn" id="clearSearchBtn-recorded">Clear</button>
           </div>
         </div>
       </div>
-      <div id="chaptersContainer-recorded">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+      <div id="chaptersContainer-recorded"><div class="empty-state">Select a playlist to view chapters</div></div>
     </div>
 
     <!-- Reasoning Panel -->
     <div class="section-panel" id="sectionPanel-reasoning">
       <div class="playlist-selector">
         <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown-reasoning" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
+          <select id="playlistDropdown-reasoning"><option value="">Select a playlist...</option></select>
           <div class="search-container">
-            <input type="text" id="searchInput-reasoning" placeholder="🔍 Search playlists..." />
+            <input type="text" id="searchInput-reasoning" placeholder="🔍 Search in Reasoning..." />
             <button class="search-btn" id="searchBtn-reasoning">Search</button>
             <button class="clear-btn" id="clearSearchBtn-reasoning">Clear</button>
           </div>
         </div>
       </div>
-      <div id="chaptersContainer-reasoning">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+      <div id="chaptersContainer-reasoning"><div class="empty-state">Select a playlist to view chapters</div></div>
     </div>
 
     <!-- Quant Panel -->
     <div class="section-panel" id="sectionPanel-quant">
       <div class="playlist-selector">
         <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown-quant" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
+          <select id="playlistDropdown-quant"><option value="">Select a playlist...</option></select>
           <div class="search-container">
-            <input type="text" id="searchInput-quant" placeholder="🔍 Search playlists..." />
+            <input type="text" id="searchInput-quant" placeholder="🔍 Search in Quant..." />
             <button class="search-btn" id="searchBtn-quant">Search</button>
             <button class="clear-btn" id="clearSearchBtn-quant">Clear</button>
           </div>
         </div>
       </div>
-      <div id="chaptersContainer-quant">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+      <div id="chaptersContainer-quant"><div class="empty-state">Select a playlist to view chapters</div></div>
     </div>
 
     <!-- Computer Panel -->
     <div class="section-panel" id="sectionPanel-computer">
       <div class="playlist-selector">
         <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown-computer" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
+          <select id="playlistDropdown-computer"><option value="">Select a playlist...</option></select>
           <div class="search-container">
-            <input type="text" id="searchInput-computer" placeholder="🔍 Search playlists..." />
+            <input type="text" id="searchInput-computer" placeholder="🔍 Search in Computer..." />
             <button class="search-btn" id="searchBtn-computer">Search</button>
             <button class="clear-btn" id="clearSearchBtn-computer">Clear</button>
           </div>
         </div>
       </div>
-      <div id="chaptersContainer-computer">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+      <div id="chaptersContainer-computer"><div class="empty-state">Select a playlist to view chapters</div></div>
     </div>
 
     <!-- English Panel -->
     <div class="section-panel" id="sectionPanel-english">
       <div class="playlist-selector">
         <div style="display:flex; gap:12px; flex-wrap:wrap; width:100%; align-items:center;">
-          <select id="playlistDropdown-english" style="flex:2; min-width:150px; padding:10px 20px; border:2px solid #d9e1ec; border-radius:40px; background:white; color:#1a2b4c; font-weight:500; cursor:pointer;">
-            <option value="">Select a playlist...</option>
-          </select>
+          <select id="playlistDropdown-english"><option value="">Select a playlist...</option></select>
           <div class="search-container">
-            <input type="text" id="searchInput-english" placeholder="🔍 Search playlists..." />
+            <input type="text" id="searchInput-english" placeholder="🔍 Search in English..." />
             <button class="search-btn" id="searchBtn-english">Search</button>
             <button class="clear-btn" id="clearSearchBtn-english">Clear</button>
           </div>
         </div>
       </div>
-      <div id="chaptersContainer-english">
-        <div class="empty-state">Select a playlist to view chapters</div>
-      </div>
+      <div id="chaptersContainer-english"><div class="empty-state">Select a playlist to view chapters</div></div>
     </div>
-    <!-- END Section Tabs -->
+
+    <!-- ⭐ Starred / Bookmarked Panel (Feature 6) -->
+    <div class="section-panel" id="sectionPanel-starred">
+      <div class="playlist-title">⭐ Your Starred / Bookmarked Lectures</div>
+      <div id="chaptersContainer-starred"><div class="empty-state">No starred lectures yet. Click ⭐ on any lecture to bookmark it!</div></div>
+    </div>
 
   </div>
   
@@ -780,13 +611,18 @@
     const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
     const SESSION_KEY = 'video_portal_session';
     const GOOGLE_SESSION_KEY = 'google_session';
+    const WATCHED_KEY = 'video_portal_watched_chapters';
+    const STARRED_KEY = 'video_portal_starred_chapters';
+    const THEME_KEY = 'video_portal_theme';
     const RESET_DURATION = 3 * 24 * 60 * 60 * 1000;
 
-    // 🔥 NEW: Section-wise state (Recorded, Reasoning, Quant, Computer, English)
     const SECTIONS = ['recorded', 'reasoning', 'quant', 'computer', 'english'];
     let sectionPlaylists = { recorded: [], reasoning: [], quant: [], computer: [], english: [] };
     let sectionCurrentPlaylistId = { recorded: null, reasoning: null, quant: null, computer: null, english: null };
-    // Backward-compatible aliases (some legacy code paths may reference these)
+    let allChaptersFlat = []; // For progress & bookmarks
+    let watchedList = JSON.parse(localStorage.getItem(WATCHED_KEY) || '[]');
+    let starredList = JSON.parse(localStorage.getItem(STARRED_KEY) || '[]');
+
     let playlists = [];
     let currentPlaylistId = null;
     let currentUser = null;
@@ -800,6 +636,132 @@
     
     let activePlayer = null;
     let activePlayerId = null;
+    let activePlayerWrapper = null;
+
+    // ==================== 🌙 THEME SWITCHER (Feature 7) ====================
+    function initTheme() {
+        const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+        setTheme(savedTheme);
+
+        document.getElementById('themeToggleBtn').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+    }
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(THEME_KEY, theme);
+        const icon = document.getElementById('themeIcon');
+        const text = document.getElementById('themeText');
+        if (theme === 'dark') {
+            icon.textContent = '☀️';
+            text.textContent = 'Light';
+        } else {
+            icon.textContent = '🌙';
+            text.textContent = 'Dark';
+        }
+    }
+
+    // ==================== 📊 WATCHED & PROGRESS (Feature 2) ====================
+    window.toggleWatched = function(chapterId, e) {
+        if (e) e.stopPropagation();
+        const idx = watchedList.indexOf(chapterId);
+        if (idx > -1) {
+            watchedList.splice(idx, 1);
+        } else {
+            watchedList.push(chapterId);
+        }
+        localStorage.setItem(WATCHED_KEY, JSON.stringify(watchedList));
+        updateProgressUI();
+        // Re-render active section
+        const activeTab = document.querySelector('.section-tab-btn.active')?.dataset?.section || 'recorded';
+        if (activeTab === 'starred') renderStarredList();
+        else renderSectionPlaylists(activeTab);
+    };
+
+    function updateProgressUI() {
+        if (!allChaptersFlat.length) return;
+        const total = allChaptersFlat.length;
+        const watched = allChaptersFlat.filter(ch => watchedList.includes(ch.id)).length;
+        const percent = Math.round((watched / total) * 100) || 0;
+
+        const textEl = document.getElementById('progressPercentText');
+        const barFill = document.getElementById('progressBarFill');
+        if (textEl) textEl.textContent = `${percent}% Completed (${watched}/${total} Classes)`;
+        if (barFill) barFill.style.width = percent + '%';
+    }
+
+    // ==================== ⭐ STAR / BOOKMARK (Feature 6) ====================
+    window.toggleStar = function(chapterId, chapterDataStr, e) {
+        if (e) e.stopPropagation();
+        const idx = starredList.findIndex(item => (typeof item === 'string' ? item === chapterId : item.id === chapterId));
+        if (idx > -1) {
+            starredList.splice(idx, 1);
+        } else {
+            try {
+                const data = JSON.parse(decodeURIComponent(chapterDataStr));
+                starredList.push(data);
+            } catch(e) {
+                starredList.push({ id: chapterId, name: 'Lecture' });
+            }
+        }
+        localStorage.setItem(STARRED_KEY, JSON.stringify(starredList));
+        document.getElementById('tabCount-starred').textContent = starredList.length;
+        // Re-render active section
+        const activeTab = document.querySelector('.section-tab-btn.active')?.dataset?.section || 'recorded';
+        if (activeTab === 'starred') renderStarredList();
+        else renderSectionPlaylists(activeTab);
+    };
+
+    function renderStarredList() {
+        const container = document.getElementById('chaptersContainer-starred');
+        if (!container) return;
+        if (!starredList.length) {
+            container.innerHTML = `<div class="empty-state">No starred lectures yet. Click ⭐ on any lecture to bookmark it for revision!</div>`;
+            return;
+        }
+        let html = '';
+        starredList.forEach((chapter, index) => {
+            const isWatched = watchedList.includes(chapter.id);
+            const playerId = `player-starred-${chapter.id || index}`;
+            const isStarred = true;
+
+            html += `
+                <div class="chapter-item ${isWatched ? 'is-watched' : ''}">
+                    <span class="chapter-number">⭐ #${index + 1}</span>
+                    <span class="chapter-name">${chapter.name}</span>
+                    <div class="chapter-actions">
+                        <button class="btn-star starred" title="Remove Star" onclick="window.toggleStar('${chapter.id}', '', event)">⭐</button>
+                        <button class="btn-watch-toggle ${isWatched ? 'watched' : ''}" onclick="window.toggleWatched('${chapter.id}', event)">
+                            ${isWatched ? '✅ Watched' : 'Mark Watched'}
+                        </button>
+                        <button class="play-btn" data-player-id="${playerId}" data-link="${chapter.link}">▶ Play</button>
+                    </div>
+                    <div class="player-wrapper" id="wrapper-${playerId}" style="display: none;"></div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+        attachPlayEvents(container);
+    }
+
+    // ==================== 🎬 FLOATING MINI PLAYER (Feature 1) ====================
+    window.addEventListener('scroll', function() {
+        if (!activePlayerWrapper) return;
+        const rect = activePlayerWrapper.getBoundingClientRect();
+        // If scrolled past the player view, float at bottom right
+        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+            if (!activePlayerWrapper.classList.contains('mini-player-active')) {
+                activePlayerWrapper.classList.add('mini-player-active');
+            }
+        } else {
+            if (activePlayerWrapper.classList.contains('mini-player-active')) {
+                activePlayerWrapper.classList.remove('mini-player-active');
+            }
+        }
+    });
 
     // ==================== SESSION MANAGEMENT ====================
     function generateSessionId() {
@@ -843,7 +805,7 @@
         return device + ' - ' + (navigator.platform || 'Unknown');
     }
 
-    // ==================== SESSION VALIDATION ====================
+    // ==================== SESSION VALIDATION (8s) ====================
     async function validateSession() {
         const session = getSession();
         if (!session) {
@@ -879,9 +841,7 @@
                 logout();
                 return false;
             }
-            
             return true;
-            
         } catch (error) {
             return true;
         }
@@ -890,9 +850,7 @@
     function showHijackNotification() {
         const el = document.getElementById('hijackNotification');
         el.classList.add('show');
-        setTimeout(() => {
-            el.classList.remove('show');
-        }, 5000);
+        setTimeout(() => { el.classList.remove('show'); }, 5000);
     }
 
     function handleSessionExpired() {
@@ -902,9 +860,7 @@
     }
 
     function startSessionValidation() {
-        if (sessionValidationInterval) {
-            clearInterval(sessionValidationInterval);
-        }
+        if (sessionValidationInterval) clearInterval(sessionValidationInterval);
         sessionValidationInterval = setInterval(() => {
             if (document.getElementById('videoContent').style.display !== 'none' && !isHijacked) {
                 validateSession();
@@ -938,8 +894,8 @@
             if (data.success) {
                 statusEl.innerHTML = `
                     ✅ Key generated: <strong>${data.key}</strong><br>
-                    <span style="font-size:0.8rem;color:#1a7a3a;">
-                        ⏱️ Valid for <strong>1 hour</strong> only<br>
+                    <span style="font-size:0.8rem;color:var(--success-text);">
+                        ⏱️ Valid for <strong>48 Hours</strong><br>
                         📊 <strong>${data.remaining_today || '3'}</strong> more key(s) left today
                     </span>
                 `;
@@ -952,14 +908,14 @@
                 if (data.limit_reached) {
                     statusEl.innerHTML = `
                         ❌ ${data.error}<br>
-                        <span style="font-size:0.8rem;color:#856404;">
+                        <span style="font-size:0.8rem;color:var(--warning-text);">
                             ⏳ Wait until tomorrow to generate more keys.
                         </span>
                     `;
                 } else if (data.wait_time) {
                     statusEl.innerHTML = `
                         ⏳ ${data.error}<br>
-                        <span style="font-size:0.8rem;color:#856404;">
+                        <span style="font-size:0.8rem;color:var(--warning-text);">
                             Please wait <strong>${data.wait_time}</strong> more minute(s).
                         </span>
                     `;
@@ -974,7 +930,7 @@
         }
     }
 
-    // ==================== AUTO DETECT TOKEN ====================
+    // ==================== AUTO DETECT GOOGLE TOKEN ====================
     (function() {
         const hash = window.location.hash;
         if (hash && hash.includes('access_token')) {
@@ -1107,9 +1063,6 @@
                 document.getElementById('hijackNotification').classList.remove('show');
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Login failed');
-                if (data.error && data.error.includes('already logged in')) {
-                    errorEl.textContent = '❌ You are already logged in on another device.';
-                }
             }
         } catch (error) {
             errorEl.textContent = '❌ Connection error: ' + error.message;
@@ -1129,9 +1082,7 @@
                         email: session.user.email
                     })
                 });
-            } catch(e) {
-                console.error('Logout error:', e);
-            }
+            } catch(e) {}
         }
         clearSession();
         if (sessionValidationInterval) {
@@ -1157,14 +1108,6 @@
         }
         document.getElementById('durationDisplay').textContent = '00:00:00';
         disposePlayer();
-        for (let key in window) {
-            if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
-                try { window[key].dispose(); } catch(e) {}
-            }
-            if (key.startsWith('hls_') && window[key] && typeof window[key].destroy === 'function') {
-                try { window[key].destroy(); } catch(e) {}
-            }
-        }
     };
 
     // ==================== PLAYER FUNCTIONS ====================
@@ -1179,6 +1122,10 @@
             activePlayer = null;
             activePlayerId = null;
         }
+        if (activePlayerWrapper) {
+            activePlayerWrapper.classList.remove('mini-player-active');
+            activePlayerWrapper = null;
+        }
     }
 
     function formatTime(seconds) {
@@ -1186,9 +1133,7 @@
         const h = Math.floor(seconds / 3600);
         const m = Math.floor((seconds % 3600) / 60);
         const s = Math.floor(seconds % 60);
-        if (h > 0) {
-            return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
-        }
+        if (h > 0) return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
         return m + ':' + String(s).padStart(2, '0');
     }
 
@@ -1196,12 +1141,12 @@
         const statusBar = document.getElementById('statusBar');
         if (statusBar) {
             statusBar.textContent = message;
-            statusBar.style.background = type === 'error' ? '#fee' : type === 'success' ? '#e6f5e6' : '#fff3cd';
-            statusBar.style.color = type === 'error' ? '#b33a3a' : type === 'success' ? '#1a5d3c' : '#856404';
+            statusBar.style.background = type === 'error' ? 'var(--danger-bg)' : type === 'success' ? 'var(--success-bg)' : 'var(--warning-bg)';
+            statusBar.style.color = type === 'error' ? 'var(--danger-text)' : type === 'success' ? 'var(--success-text)' : 'var(--warning-text)';
             setTimeout(() => {
-                statusBar.style.background = '#f0f4fb';
-                statusBar.style.color = '#4c637f';
-            }, 2000);
+                statusBar.style.background = 'var(--bg-alt)';
+                statusBar.style.color = 'var(--text-sub)';
+            }, 2500);
         }
     }
 
@@ -1214,12 +1159,10 @@
         return null;
     }
 
-    // ==================== INIT PROFESSIONAL PLAYER (FIXED - No Auto Pause) ====================
+    // ==================== INIT PLAYER ====================
     function initProfessionalPlayer(wrapper, link, playerId) {
         disposePlayer();
-        
-        const loadingSpinner = wrapper.querySelector('.loading-spinner-pos');
-        if (loadingSpinner) loadingSpinner.classList.add('show');
+        activePlayerWrapper = wrapper;
 
         const isYouTube = link && (link.includes('youtube.com') || link.includes('youtu.be'));
         const isHLS = link && link.includes('.m3u8');
@@ -1227,10 +1170,8 @@
         if (isYouTube) {
             const videoId = extractYouTubeId(link);
             if (videoId) {
-                let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&controls=0&showinfo=0&iv_load_policy=3`;
-                if (googleUser) {
-                    embedUrl += `&origin=${window.location.origin}`;
-                }
+                let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+                if (googleUser) embedUrl += `&origin=${window.location.origin}`;
                 wrapper.innerHTML = `
                     <iframe 
                         src="${embedUrl}"
@@ -1240,7 +1181,6 @@
                         style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"
                     ></iframe>
                 `;
-                if (loadingSpinner) loadingSpinner.classList.remove('show');
                 showToast('🎬 YouTube video loaded', 'info');
                 return;
             }
@@ -1261,58 +1201,21 @@
         const videoElement = document.getElementById(`professional-player-${playerId}`);
         if (!videoElement) return;
 
-        // 🔥 FIX: Proper player config - No auto pause on speed change
         const player = videojs(videoElement, {
             controls: true,
             autoplay: true,
             responsive: true,
             liveui: false,
-            userActions: {
-                hotkeys: true,
-                seek: 10
-            },
-            html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    overrideNative: true,
-                }
-            },
+            userActions: { hotkeys: true, seek: 10 },
+            html5: { hls: { enableLowInitialPlaylist: true, overrideNative: true } },
             controlBar: {
-                children: [
-                    'playToggle',
-                    'currentTimeDisplay',
-                    'durationDisplay',
-                    'progressControl',
-                    'volumePanel',
-                    'fullscreenToggle'
-                ]
+                children: ['playToggle', 'currentTimeDisplay', 'durationDisplay', 'progressControl', 'volumePanel', 'fullscreenToggle']
             }
         });
 
         activePlayer = player;
         activePlayerId = playerId;
 
-        // ---- LIVE Detection ----
-        player.on('loadedmetadata', function() {
-            const duration = player.duration();
-            if (!isFinite(duration) || duration === 0 || duration === Infinity) {
-                player.addClass('vjs-live');
-            } else {
-                player.removeClass('vjs-live');
-            }
-            if (loadingSpinner) loadingSpinner.classList.remove('show');
-        });
-
-        player.on('durationchange', function() {
-            const duration = player.duration();
-            if (!isFinite(duration) || duration === 0 || duration === Infinity) {
-                player.addClass('vjs-live');
-            } else {
-                player.removeClass('vjs-live');
-            }
-        });
-
-        // ---- Duration Tracking ----
         player.on('timeupdate', function() {
             const currentTime = player.currentTime();
             if (currentTime && !isNaN(currentTime) && currentTime > 0) {
@@ -1326,30 +1229,8 @@
             }
         });
 
-        player.on('ended', function() {
-            document.getElementById('durationDisplay').textContent = '00:00:00';
-        });
-
-        // ---- 🔥 CLICK SEEK ----
         player.ready(function() {
-            const progressControl = player.controlBar.progressControl;
-            if (progressControl) {
-                const progressHolder = progressControl.el().querySelector('.vjs-progress-holder');
-                if (progressHolder) {
-                    progressHolder.addEventListener('click', function(e) {
-                        const rect = this.getBoundingClientRect();
-                        const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-                        const duration = player.duration();
-                        if (duration && !isNaN(duration) && isFinite(duration) && duration > 0) {
-                            const seekTime = x * duration;
-                            player.currentTime(seekTime);
-                            showToast('⏩ ' + formatTime(seekTime), 'info');
-                        }
-                    });
-                }
-            }
-
-            // ---- Speed Select (FIXED - No auto pause) ----
+            // Speed Select
             const speedSelect = document.createElement('select');
             speedSelect.className = 'vjs-speed-select';
             const speeds = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
@@ -1367,63 +1248,18 @@
 
             const controlBar = player.controlBar.el();
             const volumePanel = controlBar.querySelector('.vjs-volume-panel');
-            if (volumePanel) {
-                volumePanel.parentNode.insertBefore(wrapper2, volumePanel.nextSibling);
-            } else {
-                controlBar.appendChild(wrapper2);
-            }
+            if (volumePanel) volumePanel.parentNode.insertBefore(wrapper2, volumePanel.nextSibling);
+            else controlBar.appendChild(wrapper2);
 
-            // 🔥 FIX: Speed change - No pause, just smooth speed change
             speedSelect.addEventListener('change', function() {
                 const val = parseFloat(this.value);
                 if (!isNaN(val) && val > 0) {
-                    // Simply change playback rate - no pause
                     player.playbackRate(val);
                     showToast('⚡ Speed: ' + val + 'x', 'success');
                 }
             });
-
-            player.playbackRate(1.0);
         });
 
-        // ---- Keyboard Shortcuts ----
-        document.addEventListener('keydown', function(e) {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-            if (e.shiftKey || e.ctrlKey || e.altKey || e.metaKey) return;
-            
-            const isLive = player.hasClass('vjs-live');
-            if (isLive && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) {
-                e.preventDefault();
-                showToast('⛔ LIVE stream mein forward/backward disabled', 'error');
-                return;
-            }
-            
-            if (e.key === 'ArrowRight') {
-                e.preventDefault();
-                const current = player.currentTime() || 0;
-                const duration = player.duration() || 0;
-                const newTime = Math.min(duration, current + 10);
-                player.currentTime(newTime);
-                showToast('⏩ +10s', 'info');
-            } else if (e.key === 'ArrowLeft') {
-                e.preventDefault();
-                const current = player.currentTime() || 0;
-                const newTime = Math.max(0, current - 10);
-                player.currentTime(newTime);
-                showToast('⏪ -10s', 'info');
-            } else if (e.code === 'Space') {
-                e.preventDefault();
-                if (player.paused()) player.play();
-                else player.pause();
-            }
-        });
-
-        player.on('error', function() {
-            showToast('❌ Video error - Please try again', 'error');
-            if (loadingSpinner) loadingSpinner.classList.remove('show');
-        });
-
-        window[`player_${playerId}`] = player;
         wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
@@ -1434,59 +1270,20 @@
         document.getElementById('loginContainer').style.display = 'none';
         document.getElementById('videoContent').style.display = 'block';
         const isGoogleLoggedIn = !!googleUser;
-        let googleStatus = '';
-        if (isGoogleLoggedIn) {
-            googleStatus = `
-                <div style="background:#e6f5e6;color:#1a5d3c;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;margin-bottom:6px;">
-                    ✅ Your Google account is logged in: <strong>${googleUser.email}</strong>
-                </div>
-            `;
-        } else {
-            googleStatus = `
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
-                    <span style="background:#fff3cd;color:#856404;padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;">
-                        ⚠️ Google not connected for YouTube Private Videos
-                    </span>
-                    <button onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});" 
-                            style="background:#1a2b4c;color:white;border:none;padding:4px 16px;border-radius:40px;cursor:pointer;font-size:0.75rem;">
-                        🔑 Sign in
-                    </button>
-                </div>
-            `;
-        }
+        let googleStatus = isGoogleLoggedIn
+            ? `<div style="background:var(--success-bg);color:var(--success-text);padding:6px 14px;border-radius:40px;font-size:0.75rem;display:inline-block;margin-bottom:6px;">✅ Google Account: <strong>${googleUser.email}</strong></div>`
+            : `<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px;"><span style="background:var(--warning-bg);color:var(--warning-text);padding:6px 14px;border-radius:40px;font-size:0.75rem;">⚠️ Google Not Connected</span></div>`;
+
         document.getElementById('userInfo').innerHTML = `
             <div style="display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;">
                 ${googleStatus}
                 <div class="row">
                     👤 Logged in as: <strong>${user.email}</strong>
-                    <span style="background:#e6f5e6;color:#1a5d3c;padding:2px 10px;border-radius:40px;font-size:0.7rem;">✅ Active</span>
+                    <span style="background:var(--success-bg);color:var(--success-text);padding:2px 10px;border-radius:40px;font-size:0.7rem;">✅ Active</span>
                     <button class="logout-btn" onclick="window.logout()">Logout</button>
                 </div>
             </div>
         `;
-        const statusBar = document.getElementById('statusBar');
-        if (statusBar) {
-            if (isGoogleLoggedIn) {
-                statusBar.innerHTML = `
-                    ✅ <strong>Google Connected:</strong> ${googleUser.email}
-                    <span style="margin-left:12px;font-size:0.75rem;background:#e6f5e6;color:#1a5d3c;padding:2px 10px;border-radius:40px;">Verified</span>
-                `;
-                statusBar.style.background = '#e6f5e6';
-                statusBar.style.color = '#1a5d3c';
-            } else {
-                statusBar.innerHTML = `
-                    ⚠️ <strong>Google Not Connected:</strong> 
-                    <span style="color:#1a2b4c;">Please </span>
-                    <a href="#" onclick="document.getElementById('loginContainer').style.display='block';document.getElementById('loginContainer').scrollIntoView({behavior:'smooth'});return false;" 
-                       style="color:#1a2b4c;font-weight:600;text-decoration:underline;cursor:pointer;">
-                        sign in
-                    </a>
-                    <span style="color:#1a2b4c;"> to watch private YouTube videos.</span>
-                `;
-                statusBar.style.background = '#fff3cd';
-                statusBar.style.color = '#856404';
-            }
-        }
         startResetTimer();
     }
 
@@ -1501,23 +1298,12 @@
                 data.items.forEach(item => {
                     const playerId = `important-${item.id}`;
                     const isVisible = item.is_visible !== 0;
-                    if (!isVisible) {
-                        isImportantHidden = true;
-                    }
+                    if (!isVisible) isImportantHidden = true;
                     html += `
                         <div class="important-item" data-id="${item.id}" data-visible="${isVisible}" data-player-id="${playerId}">
                             <span class="name">${item.title}</span>
-                            <button class="important-play-btn" 
-                                    data-player-id="${playerId}" 
-                                    data-link="${item.link}" 
-                                    data-title="${item.title}">
-                                ▶ Play
-                            </button>
-                            <div class="player-wrapper-professional" id="wrapper-${playerId}" style="display: none;">
-                                <div class="loading-spinner-pos" id="spinner-${playerId}">
-                                    <div class="spinner"></div>
-                                </div>
-                            </div>
+                            <button class="important-play-btn" data-player-id="${playerId}" data-link="${item.link}" data-title="${item.title}">▶ Play</button>
+                            <div class="player-wrapper-professional" id="wrapper-${playerId}" style="display: none;"></div>
                         </div>
                     `;
                 });
@@ -1538,26 +1324,16 @@
                 document.getElementById('durationBar').classList.add('hidden');
             }
         } catch (error) {
-            console.error('Error fetching important section:', error);
             container.innerHTML = `<div class="empty-important">⚠️ Failed to load Live classes</div>`;
         }
     }
 
-    // ==================== ATTACH IMPORTANT PLAY EVENTS ====================
     function attachImportantPlayEvents() {
         document.querySelectorAll('.important-play-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const playerId = this.dataset.playerId;
                 const link = this.dataset.link;
                 const wrapper = document.getElementById(`wrapper-${playerId}`);
-                const parentItem = this.closest('.important-item');
-                const isVisible = parentItem?.dataset?.visible === 'true';
-                
-                if (!isVisible) {
-                    showToast('⛔ This class is currently hidden by admin', 'error');
-                    return;
-                }
-                
                 if (!wrapper) return;
                 
                 if (wrapper.style.display === 'block' && wrapper.children.length > 0) {
@@ -1575,9 +1351,8 @@
         });
     }
 
-    // ==================== FETCH PLAYLISTS (per section) ====================
+    // ==================== FETCH PLAYLISTS ====================
     async function fetchSectionPlaylists(sectionKey) {
-        const statusBar = document.getElementById('statusBar');
         const dropdown = document.getElementById('playlistDropdown-' + sectionKey);
         const container = document.getElementById('chaptersContainer-' + sectionKey);
         const tabCount = document.getElementById('tabCount-' + sectionKey);
@@ -1595,6 +1370,12 @@
                     option.value = playlist.id;
                     option.textContent = playlist.name;
                     dropdown.appendChild(option);
+                    // Collect chapters for progress tracking
+                    if (playlist.chapters) {
+                        playlist.chapters.forEach(ch => {
+                            if (!allChaptersFlat.some(c => c.id === ch.id)) allChaptersFlat.push(ch);
+                        });
+                    }
                 });
                 if (data.playlists.length > 0) {
                     dropdown.value = data.playlists[0].id;
@@ -1606,34 +1387,36 @@
             }
         } catch (error) {
             container.innerHTML = `<div class="empty-state">❌ Failed to load videos</div>`;
-            console.error(error);
         }
     }
 
-    // Fetches all 5 sections (Recorded, Reasoning, Quant, Computer, English)
     async function fetchPlaylists() {
         const statusBar = document.getElementById('statusBar');
         statusBar.textContent = '🔄 Fetching videos...';
+        allChaptersFlat = [];
         await Promise.all(SECTIONS.map(sec => fetchSectionPlaylists(sec)));
-        // Backward-compatible alias (mirrors the 'recorded' section)
         playlists = sectionPlaylists.recorded;
         currentPlaylistId = sectionCurrentPlaylistId.recorded;
         const totalCount = SECTIONS.reduce((sum, sec) => sum + (sectionPlaylists[sec]?.length || 0), 0);
         statusBar.textContent = `✅ ${totalCount} playlists loaded`;
+        document.getElementById('tabCount-starred').textContent = starredList.length;
+        updateProgressUI();
     }
 
-    // ==================== RENDER PLAYLISTS (per section) ====================
+    // ==================== RENDER PLAYLISTS ====================
     function renderSectionPlaylists(sectionKey) {
         const container = document.getElementById('chaptersContainer-' + sectionKey);
         const dropdown = document.getElementById('playlistDropdown-' + sectionKey);
         const searchInput = document.getElementById('searchInput-' + sectionKey);
         if (!container || !dropdown || !searchInput) return;
+
         const searchTerm = searchInput.value.trim().toLowerCase();
         const allPlaylists = sectionPlaylists[sectionKey] || [];
         let filteredPlaylists = allPlaylists;
         if (searchTerm !== '') {
             filteredPlaylists = allPlaylists.filter(p => p.name.toLowerCase().includes(searchTerm));
         }
+
         const currentValue = dropdown.value;
         dropdown.innerHTML = '<option value="">Select a playlist...</option>';
         filteredPlaylists.forEach(playlist => {
@@ -1645,6 +1428,7 @@
         if (currentValue && filteredPlaylists.some(p => p.id === currentValue)) {
             dropdown.value = currentValue;
         }
+
         if (filteredPlaylists.length === 0 && searchTerm !== '') {
             container.innerHTML = `<div class="empty-state">🔍 No playlists found matching "${searchTerm}"</div>`;
             return;
@@ -1655,19 +1439,19 @@
             return;
         }
         sectionCurrentPlaylistId[sectionKey] = selectedId;
-        if (sectionKey === 'recorded') currentPlaylistId = selectedId;
         const playlist = filteredPlaylists.find(p => p.id === selectedId);
-        if (!playlist) {
-            container.innerHTML = `<div class="empty-state">Playlist not found</div>`;
-            return;
-        }
-        if (!playlist.chapters || playlist.chapters.length === 0) {
+        if (!playlist || !playlist.chapters || playlist.chapters.length === 0) {
             container.innerHTML = `<div class="empty-state">No chapters in this playlist</div>`;
             return;
         }
+
         let html = `<div class="playlist-title">📚 ${playlist.name}</div>`;
         playlist.chapters.forEach((chapter, index) => {
+            const isWatched = watchedList.includes(chapter.id);
+            const isStarred = starredList.some(item => (typeof item === 'string' ? item === chapter.id : item.id === chapter.id));
             const playerId = `player-${sectionKey}-${chapter.id || 'ch_' + Date.now()}`;
+            const chapterDataStr = encodeURIComponent(JSON.stringify(chapter));
+
             let badge = '';
             if (chapter.link && (chapter.link.includes('youtube.com') || chapter.link.includes('youtu.be'))) {
                 badge = `<span class="video-type-badge youtube">🎬 YouTube</span>`;
@@ -1676,12 +1460,21 @@
             } else if (chapter.link && (chapter.link.includes('.mp4') || chapter.link.includes('.webm'))) {
                 badge = `<span class="video-type-badge mp4">🎥 MP4</span>`;
             }
+
             html += `
-                <div class="chapter-item">
+                <div class="chapter-item ${isWatched ? 'is-watched' : ''}">
                     <span class="chapter-number">Lecture ${index + 1}</span>
                     <span class="chapter-name">${chapter.name}</span>
                     ${badge}
-                    <button class="play-btn" data-player-id="${playerId}" data-link="${chapter.link}">▶ Play</button>
+                    <div class="chapter-actions">
+                        <button class="btn-star ${isStarred ? 'starred' : ''}" title="${isStarred ? 'Unstar' : 'Star for Revision'}" onclick="window.toggleStar('${chapter.id}', '${chapterDataStr}', event)">
+                            ⭐
+                        </button>
+                        <button class="btn-watch-toggle ${isWatched ? 'watched' : ''}" onclick="window.toggleWatched('${chapter.id}', event)">
+                            ${isWatched ? '✅ Watched' : 'Mark Watched'}
+                        </button>
+                        <button class="play-btn" data-player-id="${playerId}" data-link="${chapter.link}">▶ Play</button>
+                    </div>
                     <div class="player-wrapper" id="wrapper-${playerId}" style="display: none;"></div>
                 </div>
             `;
@@ -1690,12 +1483,30 @@
         attachPlayEvents(container);
     }
 
-    // Backward-compatible alias for the 'recorded' section (used by any legacy references)
-    function renderPlaylists() {
-        renderSectionPlaylists('recorded');
+    // ==================== ATTACH PLAY EVENTS ====================
+    function attachPlayEvents(scope) {
+        const root = scope || document;
+        root.querySelectorAll('.play-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const playerId = this.dataset.playerId;
+                const link = this.dataset.link;
+                const wrapper = document.getElementById(`wrapper-${playerId}`);
+                if (!wrapper) return;
+
+                if (wrapper.style.display === 'block') {
+                    wrapper.style.display = 'none';
+                    wrapper.innerHTML = '';
+                    disposePlayer();
+                    return;
+                }
+
+                wrapper.style.display = 'block';
+                initProfessionalPlayer(wrapper, link, playerId);
+            });
+        });
     }
 
-    // ==================== SEARCH (per section) ====================
+    // ==================== SEARCH ====================
     function searchSectionPlaylists(sectionKey) {
         const dropdown = document.getElementById('playlistDropdown-' + sectionKey);
         if (!dropdown) return;
@@ -1710,178 +1521,6 @@
         searchInput.value = '';
         dropdown.value = '';
         renderSectionPlaylists(sectionKey);
-    }
-
-    // ==================== ATTACH PLAY EVENTS ====================
-    function attachPlayEvents(scope) {
-        const root = scope || document;
-        root.querySelectorAll('.play-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const playerId = this.dataset.playerId;
-                const link = this.dataset.link;
-                const wrapper = document.getElementById(`wrapper-${playerId}`);
-                if (!wrapper) return;
-                if (wrapper.style.display === 'block') {
-                    wrapper.style.display = 'none';
-                    wrapper.innerHTML = '';
-                    if (window[`hls_${playerId}`]) {
-                        try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-                        delete window[`hls_${playerId}`];
-                    }
-                    if (window[`player_${playerId}`]) {
-                        try { 
-                            window[`player_${playerId}`].off('timeupdate');
-                            window[`player_${playerId}`].off('ended');
-                            window[`player_${playerId}`].off('loadstart');
-                            window[`player_${playerId}`].dispose(); 
-                        } catch(e) {}
-                        delete window[`player_${playerId}`];
-                    }
-                    return;
-                }
-                wrapper.style.display = 'block';
-                if (window[`hls_${playerId}`]) {
-                    try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-                    delete window[`hls_${playerId}`];
-                }
-                if (window[`player_${playerId}`]) {
-                    try { 
-                        window[`player_${playerId}`].off('timeupdate');
-                        window[`player_${playerId}`].off('ended');
-                        window[`player_${playerId}`].off('loadstart');
-                        window[`player_${playerId}`].dispose(); 
-                    } catch(e) {}
-                    delete window[`player_${playerId}`];
-                }
-                if (link && (link.includes('youtube.com') || link.includes('youtu.be'))) {
-                    const videoId = extractYouTubeId(link);
-                    if (videoId) {
-                        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
-                        if (googleUser) {
-                            embedUrl += `&origin=${window.location.origin}`;
-                        }
-                        wrapper.innerHTML = `
-                            <iframe 
-                                src="${embedUrl}"
-                                frameborder="0" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                allowfullscreen
-                                style="width:100%;height:100%;aspect-ratio:16/9;border:none;border-radius:12px;"
-                            ></iframe>
-                        `;
-                        wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        return;
-                    }
-                }
-                if (link && link.includes('.m3u8') && Hls.isSupported()) {
-                    const videoEl = document.createElement('video');
-                    videoEl.id = playerId;
-                    videoEl.className = 'video-js vjs-default-skin';
-                    videoEl.setAttribute('controls', '');
-                    videoEl.setAttribute('preload', 'auto');
-                    videoEl.style.width = '100%';
-                    videoEl.style.height = '100%';
-                    videoEl.style.aspectRatio = '16/9';
-                    wrapper.innerHTML = '';
-                    wrapper.appendChild(videoEl);
-                    const hls = new Hls({
-                        enableWorker: true,
-                        lowLatencyMode: true,
-                        maxBufferLength: 30,
-                        maxMaxBufferLength: 60,
-                        xhrSetup: function(xhr, url) {
-                            xhr.setRequestHeader('Referer', 'https://classplusapp.com/');
-                            xhr.setRequestHeader('Origin', 'https://classplusapp.com');
-                            xhr.withCredentials = true;
-                        }
-                    });
-                    hls.loadSource(link);
-                    hls.attachMedia(videoEl);
-                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                        videoEl.play().catch(e => console.log('Play error:', e));
-                    });
-                    hls.on(Hls.Events.ERROR, function(event, data) {
-                        if (data.fatal) {
-                            tryFallbackHLSPlayer(videoEl, link, playerId);
-                        }
-                    });
-                    window[`hls_${playerId}`] = hls;
-                    const player = videojs(videoEl, {
-                        controls: true,
-                        fluid: true,
-                        html5: {
-                            nativeAudioTracks: false,
-                            nativeVideoTracks: false,
-                        }
-                    });
-                    window[`player_${playerId}`] = player;
-                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                if (link && (link.includes('.mp4') || link.includes('.webm'))) {
-                    const videoEl = document.createElement('video');
-                    videoEl.id = playerId;
-                    videoEl.className = 'video-js vjs-default-skin';
-                    videoEl.setAttribute('controls', '');
-                    videoEl.setAttribute('preload', 'auto');
-                    videoEl.style.width = '100%';
-                    videoEl.style.height = '100%';
-                    videoEl.style.aspectRatio = '16/9';
-                    wrapper.innerHTML = '';
-                    wrapper.appendChild(videoEl);
-                    const player = videojs(videoEl, {
-                        autoplay: true,
-                        controls: true,
-                        fluid: true,
-                        html5: {
-                            nativeAudioTracks: false,
-                            nativeVideoTracks: false,
-                        }
-                    });
-                    window[`player_${playerId}`] = player;
-                    player.src({ src: link, type: 'video/mp4' });
-                    player.play();
-                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    return;
-                }
-                wrapper.innerHTML = `
-                    <div style="padding:40px;text-align:center;color:#b33a3a;background:#0d1117;border-radius:12px;">
-                        ⚠️ Unsupported video format.<br>
-                        <small style="color:#6a7c94;">Supported: YouTube, HLS (.m3u8), MP4</small>
-                    </div>
-                `;
-                wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            });
-        });
-    }
-
-    // ========== FALLBACK HLS PLAYER ==========
-    function tryFallbackHLSPlayer(videoEl, link, playerId) {
-        if (window[`hls_${playerId}`]) {
-            try { window[`hls_${playerId}`].destroy(); } catch(e) {}
-            delete window[`hls_${playerId}`];
-        }
-        const player = videojs(videoEl, {
-            autoplay: true,
-            controls: true,
-            fluid: true,
-            html5: {
-                hls: {
-                    enableLowInitialPlaylist: true,
-                    smoothQualityChange: true,
-                    overrideNative: true,
-                },
-                nativeAudioTracks: false,
-                nativeVideoTracks: false,
-            }
-        });
-        window[`player_${playerId}`] = player;
-        if (link && link.includes('.m3u8')) {
-            player.src({ src: link, type: 'application/x-mpegURL' });
-        } else if (link) {
-            player.src({ src: link, type: 'video/mp4' });
-        }
-        player.play();
     }
 
     // ==================== CHECK SESSION ====================
@@ -1914,7 +1553,8 @@
     document.getElementById('loginEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') login(); });
     document.getElementById('genKeyBtn').addEventListener('click', generateKey);
     document.getElementById('genKeyEmail').addEventListener('keydown', (e) => { if (e.key === 'Enter') generateKey(); });
-    // 🔥 NEW: Tab switching — click a tab to show that section's playlist + chapters
+
+    // Section Tab Switching
     document.querySelectorAll('.section-tab-btn').forEach(tabBtn => {
         tabBtn.addEventListener('click', function() {
             const sectionKey = this.dataset.section;
@@ -1923,10 +1563,10 @@
             this.classList.add('active');
             const panel = document.getElementById('sectionPanel-' + sectionKey);
             if (panel) panel.classList.add('active');
+            if (sectionKey === 'starred') renderStarredList();
         });
     });
 
-    // 🔥 NEW: wire up dropdown/search/clear events for all 5 sections (Recorded, Reasoning, Quant, Computer, English)
     SECTIONS.forEach(sectionKey => {
         const dropdown = document.getElementById('playlistDropdown-' + sectionKey);
         const searchBtn = document.getElementById('searchBtn-' + sectionKey);
@@ -1937,11 +1577,7 @@
                 const selectedId = this.value;
                 if (selectedId) {
                     sectionCurrentPlaylistId[sectionKey] = selectedId;
-                    if (sectionKey === 'recorded') currentPlaylistId = selectedId;
                     renderSectionPlaylists(sectionKey);
-                } else {
-                    const container = document.getElementById('chaptersContainer-' + sectionKey);
-                    if (container) container.innerHTML = `<div class="empty-state">Select a playlist from the dropdown</div>`;
                 }
             });
         }
@@ -1955,22 +1591,8 @@
         }
     });
 
-    // ==================== DISPOSE PLAYERS ====================
-    window.addEventListener('beforeunload', function() {
-        if (resetCheckInterval) clearInterval(resetCheckInterval);
-        if (sessionValidationInterval) clearInterval(sessionValidationInterval);
-        disposePlayer();
-        for (let key in window) {
-            if (key.startsWith('player_') && window[key] && typeof window[key].dispose === 'function') {
-                try { window[key].dispose(); } catch(e) {}
-            }
-            if (key.startsWith('hls_') && window[key] && typeof window[key].destroy === 'function') {
-                try { window[key].destroy(); } catch(e) {}
-            }
-        }
-    });
-
-    // ==================== INIT ====================
+    // Init Theme & App
+    initTheme();
     if (!localStorage.getItem('timer_start')) {
         localStorage.setItem('timer_start', Date.now().toString());
     }
@@ -1979,7 +1601,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - Fixed (No auto pause on speed change + Mobile controls visible)');
+    console.log('✅ Video Portal Pro loaded with Dark Theme, Picture-in-Picture, Progress Bar, Star Bookmarks & Live Schedule!');
 })();
 </script>
 </body>
