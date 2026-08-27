@@ -99,6 +99,21 @@
     .visibility-badge { font-size: 0.7rem; padding: 2px 12px; border-radius: 40px; font-weight: 600; }
     .visibility-badge.visible { background: #e6f5e6; color: #1a5d3c; }
     .visibility-badge.hidden { background: #fee; color: #b33a3a; }
+
+    /* ===== NEW: Section badge ===== */
+    .section-badge {
+      font-size: 0.65rem;
+      padding: 2px 10px;
+      border-radius: 40px;
+      background: #1a2b4c;
+      color: white;
+      margin-left: 8px;
+    }
+    .section-badge.math { background: #2d7a9b; }
+    .section-badge.quant { background: #1a7a3a; }
+    .section-badge.reasoning { background: #b33a3a; }
+    .section-badge.computer { background: #6a7c94; }
+    .section-badge.english { background: #f7971e; }
   </style>
 </head>
 <body>
@@ -139,6 +154,19 @@
 
     <!-- Playlists Tab -->
     <div id="tab-playlists" class="tab-content active">
+      
+      <!-- ===== NEW: Section Selector for Playlist ===== -->
+      <div class="section-title">📂 Select Section for Playlist</div>
+      <div class="flex-row">
+        <select id="playlistSectionSelect">
+          <option value="math">📐 Math</option>
+          <option value="quant">🔢 Quant</option>
+          <option value="reasoning">🧠 Reasoning</option>
+          <option value="computer">💻 Computer</option>
+          <option value="english">📖 English</option>
+        </select>
+      </div>
+
       <div class="section-title">📁 Add New Playlist</div>
       <div class="flex-row">
         <input type="text" id="newPlaylistName" placeholder="Playlist name" />
@@ -147,6 +175,15 @@
       <div id="playlistFeedback" class="toast-msg"></div>
 
       <div class="section-title">📝 Add Chapter</div>
+      <div class="flex-row">
+        <select id="chapterSectionSelect">
+          <option value="math">📐 Math</option>
+          <option value="quant">🔢 Quant</option>
+          <option value="reasoning">🧠 Reasoning</option>
+          <option value="computer">💻 Computer</option>
+          <option value="english">📖 English</option>
+        </select>
+      </div>
       <div class="flex-row">
         <select id="playlistSelect"><option value="">Select playlist</option></select>
       </div>
@@ -163,7 +200,7 @@
       <div class="entry-list" id="adminList"><div class="empty-state">Loading...</div></div>
     </div>
 
-    <!-- Important Tab -->
+    <!-- Important Tab (Waisa hi) -->
     <div id="tab-important" class="tab-content">
       <div class="section-title">⭐ Live Section</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
@@ -187,7 +224,7 @@
       </div>
     </div>
 
-    <!-- Users Tab -->
+    <!-- Users Tab (Waisa hi) -->
     <div id="tab-users" class="tab-content">
       <div class="section-title">👤 Add New User</div>
       <div class="flex-row">
@@ -211,7 +248,7 @@
       <div class="entry-list" id="userList"><div class="empty-state">Loading...</div></div>
     </div>
 
-    <!-- Allowed Emails Tab (NEW) -->
+    <!-- Allowed Emails Tab (Waisa hi) -->
     <div id="tab-allowed-emails" class="tab-content">
       <div class="section-title">📧 Allowed Emails (No Key Required)</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
@@ -237,7 +274,7 @@
 
 <script>
 // ========================================================================
-//  ANTI-DEVELOPER TOOLS
+//  ANTI-DEVELOPER TOOLS (Waisa hi)
 // ========================================================================
 (function antiDevTools() {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -319,7 +356,16 @@
     let allowedEmails = [];
     let isAuthenticated = false;
 
-    // ----- Tabs -----
+    // ===== NEW: Section mapping =====
+    const SECTION_NAMES = {
+      math: '📐 Math',
+      quant: '🔢 Quant',
+      reasoning: '🧠 Reasoning',
+      computer: '💻 Computer',
+      english: '📖 English'
+    };
+
+    // ----- Tabs (Waisa hi) -----
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -334,7 +380,7 @@
         });
     });
 
-    // ----- API Call -----
+    // ----- API Call (Waisa hi) -----
     async function apiCall(endpoint, options = {}) {
         try {
             const url = API_BASE + endpoint;
@@ -350,7 +396,7 @@
         }
     }
 
-    // ==================== ADMIN LOGIN ====================
+    // ==================== ADMIN LOGIN (Waisa hi) ====================
     async function adminLogin() {
         const username = document.getElementById('adminUsername').value.trim();
         const password = document.getElementById('adminPwdInput').value.trim();
@@ -388,7 +434,7 @@
         }
     }
 
-    // ==================== ALLOWED EMAILS MANAGEMENT (NEW) ====================
+    // ==================== ALLOWED EMAILS (Waisa hi) ====================
     async function loadAllowedEmails() {
         try {
             const data = await apiCall('/allowed-emails');
@@ -467,7 +513,7 @@
         window.deleteAllowedEmail = deleteAllowedEmail;
     }
 
-    // ==================== IMPORTANT SECTION ====================
+    // ==================== IMPORTANT SECTION (Waisa hi) ====================
     async function loadImportant() {
         try {
             const data = await apiCall('/important/all');
@@ -581,7 +627,7 @@
         window.deleteImportant = deleteImportant;
     }
 
-    // ==================== LOAD PLAYLISTS ====================
+    // ==================== LOAD PLAYLISTS (Modified for Section) ====================
     async function loadPlaylists() {
         try {
             const data = await apiCall('/playlists');
@@ -598,9 +644,11 @@
         }
     }
 
-    // ==================== ADD PLAYLIST ====================
+    // ==================== ADD PLAYLIST (Modified with Section) ====================
     async function addPlaylist() {
         const name = document.getElementById('newPlaylistName').value.trim();
+        const section = document.getElementById('playlistSectionSelect').value;
+        
         if (!name) {
             showFeedback('⚠️ Enter playlist name', 'error', 'playlistFeedback');
             return;
@@ -608,11 +656,11 @@
         try {
             const data = await apiCall('/playlists', {
                 method: 'POST',
-                body: JSON.stringify({ name })
+                body: JSON.stringify({ name, section })
             });
             if (data.success) {
                 document.getElementById('newPlaylistName').value = '';
-                showFeedback('✅ Playlist added', 'success', 'playlistFeedback');
+                showFeedback('✅ Playlist added to ' + SECTION_NAMES[section], 'success', 'playlistFeedback');
                 loadPlaylists();
             }
         } catch (error) {
@@ -620,11 +668,35 @@
         }
     }
 
-    // ==================== ADD CHAPTER ====================
+    // ==================== CHAPTER SECTION CHANGE ====================
+    document.getElementById('chapterSectionSelect').addEventListener('change', function() {
+        updatePlaylistSelect();
+    });
+
+    // ==================== UPDATE PLAYLIST SELECT (Section-wise) ====================
+    function updatePlaylistSelect() {
+        const select = document.getElementById('playlistSelect');
+        const section = document.getElementById('chapterSectionSelect').value;
+        select.innerHTML = '<option value="">Select playlist</option>';
+        
+        const filteredPlaylists = playlists.filter(p => p.section === section);
+        
+        if (filteredPlaylists.length === 0) {
+            select.innerHTML += `<option value="" disabled>⚠️ No playlists in ${SECTION_NAMES[section]}</option>`;
+            return;
+        }
+        
+        filteredPlaylists.forEach(p => {
+            select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+        });
+    }
+
+    // ==================== ADD CHAPTER (Modified) ====================
     async function addChapter() {
         const playlistId = document.getElementById('playlistSelect').value;
         const name = document.getElementById('chapterName').value.trim();
         const link = document.getElementById('chapterLink').value.trim();
+        
         if (!playlistId || !name || !link) {
             showFeedback('⚠️ Fill all fields', 'error', 'chapterFeedback');
             return;
@@ -645,7 +717,7 @@
         }
     }
 
-    // ==================== DELETE PLAYLIST ====================
+    // ==================== DELETE PLAYLIST (Waisa hi) ====================
     async function deletePlaylist(playlistId) {
         if (!confirm('Delete this playlist?')) return;
         try {
@@ -660,7 +732,7 @@
         }
     }
 
-    // ==================== DELETE CHAPTER ====================
+    // ==================== DELETE CHAPTER (Waisa hi) ====================
     async function deleteChapter(playlistId, chapterId) {
         if (!confirm('Delete this chapter?')) return;
         try {
@@ -675,7 +747,7 @@
         }
     }
 
-    // ==================== LOAD USERS ====================
+    // ==================== LOAD USERS (Waisa hi) ====================
     async function loadUsers() {
         try {
             const data = await apiCall('/users');
@@ -692,7 +764,7 @@
         }
     }
 
-    // ==================== ADD USER ====================
+    // ==================== ADD USER (Waisa hi) ====================
     async function addUser() {
         const email = document.getElementById('newUserEmail').value.trim();
         if (!email) {
@@ -716,7 +788,7 @@
         }
     }
 
-    // ==================== DELETE USER ====================
+    // ==================== DELETE USER (Waisa hi) ====================
     async function deleteUser(userId) {
         if (!confirm('Delete this user?')) return;
         try {
@@ -731,7 +803,7 @@
         }
     }
 
-    // ==================== RESET USER ====================
+    // ==================== RESET USER (Waisa hi) ====================
     window.resetUser = async function(userId) {
         if (!confirm('⚠️ Are you sure you want to reset this user?')) return;
         try {
@@ -750,7 +822,7 @@
         }
     };
 
-    // ==================== GENERATE KEY ====================
+    // ==================== GENERATE KEY (Waisa hi) ====================
     async function generateKey() {
         const userId = document.getElementById('userSelect').value;
         if (!userId) {
@@ -775,7 +847,7 @@
         }
     }
 
-    // ==================== COPY KEY ====================
+    // ==================== COPY KEY (Waisa hi) ====================
     window.copyKey = function() {
         const keyText = document.getElementById('keyText').textContent;
         if (!keyText) {
@@ -817,7 +889,7 @@
         document.body.removeChild(textarea);
     }
 
-    // ==================== VIEW KEYS ====================
+    // ==================== VIEW KEYS (Waisa hi) ====================
     window.viewKeys = async function(userId) {
         try {
             const data = await apiCall('/keys?userId=' + userId);
@@ -839,7 +911,7 @@
         }
     };
 
-    // ==================== RENDER FUNCTIONS ====================
+    // ==================== RENDER FUNCTIONS (Modified with Section Badge) ====================
     function renderAdminList() {
         const list = document.getElementById('adminList');
         if (!playlists.length) {
@@ -848,9 +920,12 @@
         }
         let html = '';
         playlists.forEach(playlist => {
+            const section = playlist.section || 'math';
+            const sectionName = SECTION_NAMES[section] || section;
             html += `
                 <div class="playlist-header">
                     📁 ${playlist.name}
+                    <span class="section-badge ${section}">${sectionName}</span>
                     <button class="del-btn" onclick="window.deletePlaylist('${playlist.id}')">✕</button>
                 </div>
             `;
@@ -903,14 +978,6 @@
         window.resetUser = resetUser;
     }
 
-    function updatePlaylistSelect() {
-        const select = document.getElementById('playlistSelect');
-        select.innerHTML = '<option value="">Select playlist</option>';
-        playlists.forEach(p => {
-            select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-        });
-    }
-
     function updateUserSelect() {
         const select = document.getElementById('userSelect');
         select.innerHTML = '<option value="">Select user</option>';
@@ -944,7 +1011,7 @@
         setTimeout(() => { el.textContent = ''; el.className = 'toast-msg'; }, 5000);
     }
 
-    // ==================== AUTH ====================
+    // ==================== AUTH (Waisa hi) ====================
     function setupAuth() {
         const unlockBtn = document.getElementById('unlockBtn');
         const pwdInput = document.getElementById('adminPwdInput');
@@ -971,7 +1038,6 @@
     }
 
     // ==================== GLOBAL FUNCTIONS ====================
-    // Make all functions globally accessible for onclick
     window.deletePlaylist = deletePlaylist;
     window.deleteChapter = deleteChapter;
     window.deleteUser = deleteUser;
@@ -1004,14 +1070,13 @@
     document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
 
-    // Allowed Emails event listeners
     document.getElementById('addAllowedEmailBtn').addEventListener('click', addAllowedEmail);
     document.getElementById('allowedEmailInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') addAllowedEmail();
     });
 
     setupAuth();
-    console.log('✅ Admin panel loaded');
+    console.log('✅ Admin panel loaded with Section features');
 })();
 </script>
 </body>
