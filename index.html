@@ -97,7 +97,6 @@
     .key-gen-section h3 { font-size: 1rem; color: #0b1a33; margin-bottom: 8px; }
     .key-gen-section .info { font-size: 0.8rem; color: #6a7c94; margin-bottom: 12px; }
     
-    /* ===== IMPORTANT SECTION ===== */
     .important-section {
       background: linear-gradient(135deg, #0d1117, #161b22);
       border: 2px solid #f7971e;
@@ -204,7 +203,6 @@
     .duration-bar .live-icon { color: #ff0044; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== PLAYLIST SELECTOR (Har section ke ANDAR) ===== */
     .playlist-selector { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; padding: 16px; background: #f8faff; border-radius: 20px; align-items: center; }
     .playlist-selector select { padding: 10px 20px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; color: #1a2b4c; font-weight: 500; cursor: pointer; flex: 1; min-width: 150px; }
     .playlist-selector select:focus { border-color: #1a2b4c; outline: none; }
@@ -283,7 +281,6 @@
     .key-limit-info { font-size: 0.75rem; color: #6a7c94; margin-top: 6px; }
     .key-limit-info strong { color: #0b1a33; }
 
-    /* ===== VIDEO.JS CUSTOM STYLES ===== */
     .player-wrapper-professional {
       width: 100%;
       margin-top: 12px;
@@ -372,7 +369,6 @@
     .loading-spinner-pos .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.08); border-top-color: #f7971e; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ===== SECTION TABS STYLES ===== */
     .section-tabs {
       display: flex;
       gap: 10px;
@@ -488,26 +484,27 @@
     
     <!-- ===== SECTION TABS ===== -->
     <div class="section-tabs" id="sectionTabs">
-      <button class="section-tab active" data-section="math">📐 Math <span class="count" id="count-math">0</span></button>
+      <!-- RECORDED SECTION - Pehle Math ki jagah yeh aayega -->
+      <button class="section-tab active" data-section="recorded">📼 Recorded <span class="count" id="count-recorded">0</span></button>
       <button class="section-tab" data-section="quant">🔢 Quant <span class="count" id="count-quant">0</span></button>
       <button class="section-tab" data-section="reasoning">🧠 Reasoning <span class="count" id="count-reasoning">0</span></button>
       <button class="section-tab" data-section="computer">💻 Computer <span class="count" id="count-computer">0</span></button>
       <button class="section-tab" data-section="english">📖 English <span class="count" id="count-english">0</span></button>
     </div>
 
-    <!-- ===== MATH SECTION ===== -->
-    <div class="section-content active" data-section="math">
+    <!-- ===== RECORDED SECTION (Pehle Math ki jagah) ===== -->
+    <div class="section-content active" data-section="recorded">
       <div class="playlist-selector">
-        <select class="section-playlist" data-section="math">
+        <select class="section-playlist" data-section="recorded">
           <option value="">Select playlist...</option>
         </select>
         <div class="search-container">
-          <input type="text" class="section-search" data-section="math" placeholder="🔍 Search chapters..." />
-          <button class="search-btn section-search-btn" data-section="math">Search</button>
-          <button class="clear-btn section-clear-btn" data-section="math">Clear</button>
+          <input type="text" class="section-search" data-section="recorded" placeholder="🔍 Search chapters..." />
+          <button class="search-btn section-search-btn" data-section="recorded">Search</button>
+          <button class="clear-btn section-clear-btn" data-section="recorded">Clear</button>
         </div>
       </div>
-      <div class="chapters-container" data-section="math">
+      <div class="chapters-container" data-section="recorded">
         <div class="empty-state">Select a playlist to view chapters</div>
       </div>
     </div>
@@ -642,10 +639,10 @@
     let activePlayer = null;
     let activePlayerId = null;
 
-    // SECTION DATA
-    const SECTIONS = ['math', 'quant', 'reasoning', 'computer', 'english'];
+    // SECTIONS: Recorded + Quant + Reasoning + Computer + English
+    const SECTIONS = ['recorded', 'quant', 'reasoning', 'computer', 'english'];
     let sectionData = {};
-    let currentSection = 'math';
+    let currentSection = 'recorded';
 
     // ==================== SESSION MANAGEMENT ====================
     function generateSessionId() {
@@ -1763,8 +1760,7 @@
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
     }
-    console.log('✅ Video Portal loaded - 5 Sections (Math, Quant, Reasoning, Computer, English)');
-    console.log('✅ Original structure preserved - No compression!');
+    console.log('✅ Video Portal loaded - Recorded + Quant + Reasoning + Computer + English');
 })();
 </script>
 </body>
