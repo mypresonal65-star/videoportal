@@ -99,21 +99,6 @@
     .visibility-badge { font-size: 0.7rem; padding: 2px 12px; border-radius: 40px; font-weight: 600; }
     .visibility-badge.visible { background: #e6f5e6; color: #1a5d3c; }
     .visibility-badge.hidden { background: #fee; color: #b33a3a; }
-
-    /* ===== NEW: Section badge ===== */
-    .section-badge {
-      font-size: 0.65rem;
-      padding: 2px 10px;
-      border-radius: 40px;
-      background: #1a2b4c;
-      color: white;
-      margin-left: 8px;
-    }
-    .section-badge.math { background: #2d7a9b; }
-    .section-badge.quant { background: #1a7a3a; }
-    .section-badge.reasoning { background: #b33a3a; }
-    .section-badge.computer { background: #6a7c94; }
-    .section-badge.english { background: #f7971e; }
   </style>
 </head>
 <body>
@@ -154,38 +139,36 @@
 
     <!-- Playlists Tab -->
     <div id="tab-playlists" class="tab-content active">
-      
-      <!-- ===== NEW: Section Selector for Playlist ===== -->
-      <div class="section-title">📂 Select Section for Playlist</div>
+      <div class="section-title">📁 Add New Playlist</div>
+      <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:8px;">
+        Pehle Section select karo (Recorded / Reasoning / Quant / Computer / English), fir playlist name daal ke Add karo.
+      </p>
       <div class="flex-row">
-        <select id="playlistSectionSelect">
-          <option value="math">📐 Math</option>
-          <option value="quant">🔢 Quant</option>
+        <select id="newPlaylistSection" style="flex:1; min-width:150px;">
+          <option value="recorded">🎥 Recorded</option>
           <option value="reasoning">🧠 Reasoning</option>
+          <option value="quant">🔢 Quant</option>
           <option value="computer">💻 Computer</option>
           <option value="english">📖 English</option>
         </select>
-      </div>
-
-      <div class="section-title">📁 Add New Playlist</div>
-      <div class="flex-row">
-        <input type="text" id="newPlaylistName" placeholder="Playlist name" />
+        <input type="text" id="newPlaylistName" placeholder="Playlist name" style="flex:2;" />
         <button class="btn btn-success" id="addPlaylistBtn">➕ Add</button>
       </div>
       <div id="playlistFeedback" class="toast-msg"></div>
 
       <div class="section-title">📝 Add Chapter</div>
+      <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:8px;">
+        Pehle Section select karo, uske baad us section ki playlist chuno, fir chapter name aur video link daal ke save karo.
+      </p>
       <div class="flex-row">
-        <select id="chapterSectionSelect">
-          <option value="math">📐 Math</option>
-          <option value="quant">🔢 Quant</option>
+        <select id="chapterSectionFilter" style="flex:1; min-width:150px;">
+          <option value="recorded">🎥 Recorded</option>
           <option value="reasoning">🧠 Reasoning</option>
+          <option value="quant">🔢 Quant</option>
           <option value="computer">💻 Computer</option>
           <option value="english">📖 English</option>
         </select>
-      </div>
-      <div class="flex-row">
-        <select id="playlistSelect"><option value="">Select playlist</option></select>
+        <select id="playlistSelect" style="flex:2;"><option value="">Select playlist</option></select>
       </div>
       <div class="flex-row">
         <input type="text" id="chapterName" placeholder="Chapter name" />
@@ -200,7 +183,7 @@
       <div class="entry-list" id="adminList"><div class="empty-state">Loading...</div></div>
     </div>
 
-    <!-- Important Tab (Waisa hi) -->
+    <!-- Important Tab -->
     <div id="tab-important" class="tab-content">
       <div class="section-title">⭐ Live Section</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
@@ -224,7 +207,7 @@
       </div>
     </div>
 
-    <!-- Users Tab (Waisa hi) -->
+    <!-- Users Tab -->
     <div id="tab-users" class="tab-content">
       <div class="section-title">👤 Add New User</div>
       <div class="flex-row">
@@ -248,7 +231,7 @@
       <div class="entry-list" id="userList"><div class="empty-state">Loading...</div></div>
     </div>
 
-    <!-- Allowed Emails Tab (Waisa hi) -->
+    <!-- Allowed Emails Tab (NEW) -->
     <div id="tab-allowed-emails" class="tab-content">
       <div class="section-title">📧 Allowed Emails (No Key Required)</div>
       <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:12px;">
@@ -274,7 +257,7 @@
 
 <script>
 // ========================================================================
-//  ANTI-DEVELOPER TOOLS (Waisa hi)
+//  ANTI-DEVELOPER TOOLS
 // ========================================================================
 (function antiDevTools() {
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
@@ -356,16 +339,17 @@
     let allowedEmails = [];
     let isAuthenticated = false;
 
-    // ===== NEW: Section mapping =====
-    const SECTION_NAMES = {
-      math: '📐 Math',
-      quant: '🔢 Quant',
-      reasoning: '🧠 Reasoning',
-      computer: '💻 Computer',
-      english: '📖 English'
+    // 🔥 NEW: Sections (Recorded, Reasoning, Quant, Computer, English)
+    const SECTION_LABELS = {
+        recorded: '🎥 Recorded',
+        reasoning: '🧠 Reasoning',
+        quant: '🔢 Quant',
+        computer: '💻 Computer',
+        english: '📖 English'
     };
+    const SECTION_ORDER = ['recorded', 'reasoning', 'quant', 'computer', 'english'];
 
-    // ----- Tabs (Waisa hi) -----
+    // ----- Tabs -----
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -380,7 +364,7 @@
         });
     });
 
-    // ----- API Call (Waisa hi) -----
+    // ----- API Call -----
     async function apiCall(endpoint, options = {}) {
         try {
             const url = API_BASE + endpoint;
@@ -396,7 +380,7 @@
         }
     }
 
-    // ==================== ADMIN LOGIN (Waisa hi) ====================
+    // ==================== ADMIN LOGIN ====================
     async function adminLogin() {
         const username = document.getElementById('adminUsername').value.trim();
         const password = document.getElementById('adminPwdInput').value.trim();
@@ -434,7 +418,7 @@
         }
     }
 
-    // ==================== ALLOWED EMAILS (Waisa hi) ====================
+    // ==================== ALLOWED EMAILS MANAGEMENT (NEW) ====================
     async function loadAllowedEmails() {
         try {
             const data = await apiCall('/allowed-emails');
@@ -513,7 +497,7 @@
         window.deleteAllowedEmail = deleteAllowedEmail;
     }
 
-    // ==================== IMPORTANT SECTION (Waisa hi) ====================
+    // ==================== IMPORTANT SECTION ====================
     async function loadImportant() {
         try {
             const data = await apiCall('/important/all');
@@ -627,7 +611,7 @@
         window.deleteImportant = deleteImportant;
     }
 
-    // ==================== LOAD PLAYLISTS (Modified for Section) ====================
+    // ==================== LOAD PLAYLISTS ====================
     async function loadPlaylists() {
         try {
             const data = await apiCall('/playlists');
@@ -644,11 +628,10 @@
         }
     }
 
-    // ==================== ADD PLAYLIST (Modified with Section) ====================
+    // ==================== ADD PLAYLIST ====================
     async function addPlaylist() {
         const name = document.getElementById('newPlaylistName').value.trim();
-        const section = document.getElementById('playlistSectionSelect').value;
-        
+        const section = document.getElementById('newPlaylistSection').value || 'recorded';
         if (!name) {
             showFeedback('⚠️ Enter playlist name', 'error', 'playlistFeedback');
             return;
@@ -660,45 +643,23 @@
             });
             if (data.success) {
                 document.getElementById('newPlaylistName').value = '';
-                showFeedback('✅ Playlist added to ' + SECTION_NAMES[section], 'success', 'playlistFeedback');
+                showFeedback('✅ Playlist added to ' + (SECTION_LABELS[section] || section), 'success', 'playlistFeedback');
                 loadPlaylists();
+            } else {
+                showFeedback('❌ ' + (data.error || 'Failed to add playlist'), 'error', 'playlistFeedback');
             }
         } catch (error) {
             showFeedback('❌ Failed: ' + error.message, 'error', 'playlistFeedback');
         }
     }
 
-    // ==================== CHAPTER SECTION CHANGE ====================
-    document.getElementById('chapterSectionSelect').addEventListener('change', function() {
-        updatePlaylistSelect();
-    });
-
-    // ==================== UPDATE PLAYLIST SELECT (Section-wise) ====================
-    function updatePlaylistSelect() {
-        const select = document.getElementById('playlistSelect');
-        const section = document.getElementById('chapterSectionSelect').value;
-        select.innerHTML = '<option value="">Select playlist</option>';
-        
-        const filteredPlaylists = playlists.filter(p => p.section === section);
-        
-        if (filteredPlaylists.length === 0) {
-            select.innerHTML += `<option value="" disabled>⚠️ No playlists in ${SECTION_NAMES[section]}</option>`;
-            return;
-        }
-        
-        filteredPlaylists.forEach(p => {
-            select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-        });
-    }
-
-    // ==================== ADD CHAPTER (Modified) ====================
+    // ==================== ADD CHAPTER ====================
     async function addChapter() {
         const playlistId = document.getElementById('playlistSelect').value;
         const name = document.getElementById('chapterName').value.trim();
         const link = document.getElementById('chapterLink').value.trim();
-        
         if (!playlistId || !name || !link) {
-            showFeedback('⚠️ Fill all fields', 'error', 'chapterFeedback');
+            showFeedback('⚠️ Section + Playlist select karo aur sab fields bharo', 'error', 'chapterFeedback');
             return;
         }
         try {
@@ -717,7 +678,7 @@
         }
     }
 
-    // ==================== DELETE PLAYLIST (Waisa hi) ====================
+    // ==================== DELETE PLAYLIST ====================
     async function deletePlaylist(playlistId) {
         if (!confirm('Delete this playlist?')) return;
         try {
@@ -732,7 +693,7 @@
         }
     }
 
-    // ==================== DELETE CHAPTER (Waisa hi) ====================
+    // ==================== DELETE CHAPTER ====================
     async function deleteChapter(playlistId, chapterId) {
         if (!confirm('Delete this chapter?')) return;
         try {
@@ -747,7 +708,7 @@
         }
     }
 
-    // ==================== LOAD USERS (Waisa hi) ====================
+    // ==================== LOAD USERS ====================
     async function loadUsers() {
         try {
             const data = await apiCall('/users');
@@ -764,7 +725,7 @@
         }
     }
 
-    // ==================== ADD USER (Waisa hi) ====================
+    // ==================== ADD USER ====================
     async function addUser() {
         const email = document.getElementById('newUserEmail').value.trim();
         if (!email) {
@@ -788,7 +749,7 @@
         }
     }
 
-    // ==================== DELETE USER (Waisa hi) ====================
+    // ==================== DELETE USER ====================
     async function deleteUser(userId) {
         if (!confirm('Delete this user?')) return;
         try {
@@ -803,7 +764,7 @@
         }
     }
 
-    // ==================== RESET USER (Waisa hi) ====================
+    // ==================== RESET USER ====================
     window.resetUser = async function(userId) {
         if (!confirm('⚠️ Are you sure you want to reset this user?')) return;
         try {
@@ -822,7 +783,7 @@
         }
     };
 
-    // ==================== GENERATE KEY (Waisa hi) ====================
+    // ==================== GENERATE KEY ====================
     async function generateKey() {
         const userId = document.getElementById('userSelect').value;
         if (!userId) {
@@ -847,7 +808,7 @@
         }
     }
 
-    // ==================== COPY KEY (Waisa hi) ====================
+    // ==================== COPY KEY ====================
     window.copyKey = function() {
         const keyText = document.getElementById('keyText').textContent;
         if (!keyText) {
@@ -889,7 +850,7 @@
         document.body.removeChild(textarea);
     }
 
-    // ==================== VIEW KEYS (Waisa hi) ====================
+    // ==================== VIEW KEYS ====================
     window.viewKeys = async function(userId) {
         try {
             const data = await apiCall('/keys?userId=' + userId);
@@ -911,7 +872,8 @@
         }
     };
 
-    // ==================== RENDER FUNCTIONS (Modified with Section Badge) ====================
+    // ==================== RENDER FUNCTIONS ====================
+    // 🔥 UPDATED: playlists are now grouped by Section (Recorded, Reasoning, Quant, Computer, English)
     function renderAdminList() {
         const list = document.getElementById('adminList');
         if (!playlists.length) {
@@ -919,31 +881,33 @@
             return;
         }
         let html = '';
-        playlists.forEach(playlist => {
-            const section = playlist.section || 'math';
-            const sectionName = SECTION_NAMES[section] || section;
-            html += `
-                <div class="playlist-header">
-                    📁 ${playlist.name}
-                    <span class="section-badge ${section}">${sectionName}</span>
-                    <button class="del-btn" onclick="window.deletePlaylist('${playlist.id}')">✕</button>
-                </div>
-            `;
-            if (playlist.chapters?.length) {
-                playlist.chapters.forEach(chapter => {
-                    html += `
-                        <div class="entry-item" style="padding-left:32px;">
-                            <div class="info">
-                                <span class="name">${chapter.name}</span>
-                                <span class="sub">${chapter.link}</span>
+        SECTION_ORDER.forEach(sectionKey => {
+            const sectionPlaylists = playlists.filter(p => (p.section || 'recorded') === sectionKey);
+            if (!sectionPlaylists.length) return;
+            html += `<div class="section-title" style="margin-top:16px;">${SECTION_LABELS[sectionKey] || sectionKey}</div>`;
+            sectionPlaylists.forEach(playlist => {
+                html += `
+                    <div class="playlist-header">
+                        📁 ${playlist.name}
+                        <button class="del-btn" onclick="window.deletePlaylist('${playlist.id}')">✕</button>
+                    </div>
+                `;
+                if (playlist.chapters?.length) {
+                    playlist.chapters.forEach(chapter => {
+                        html += `
+                            <div class="entry-item" style="padding-left:32px;">
+                                <div class="info">
+                                    <span class="name">${chapter.name}</span>
+                                    <span class="sub">${chapter.link}</span>
+                                </div>
+                                <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
                             </div>
-                            <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
-                        </div>
-                    `;
-                });
-            } else {
-                html += `<div class="entry-item" style="padding-left:32px; color:#6a7c94; font-style:italic;">No chapters</div>`;
-            }
+                        `;
+                    });
+                } else {
+                    html += `<div class="entry-item" style="padding-left:32px; color:#6a7c94; font-style:italic;">No chapters</div>`;
+                }
+            });
         });
         list.innerHTML = html;
         window.deletePlaylist = deletePlaylist;
@@ -976,6 +940,19 @@
         window.deleteUser = deleteUser;
         window.viewKeys = viewKeys;
         window.resetUser = resetUser;
+    }
+
+    // 🔥 UPDATED: playlist dropdown (for Add Chapter) is now filtered by the selected Section
+    function updatePlaylistSelect() {
+        const select = document.getElementById('playlistSelect');
+        const sectionFilterEl = document.getElementById('chapterSectionFilter');
+        const sectionFilter = sectionFilterEl ? sectionFilterEl.value : 'recorded';
+        select.innerHTML = '<option value="">Select playlist</option>';
+        playlists
+            .filter(p => (p.section || 'recorded') === sectionFilter)
+            .forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
     }
 
     function updateUserSelect() {
@@ -1011,7 +988,7 @@
         setTimeout(() => { el.textContent = ''; el.className = 'toast-msg'; }, 5000);
     }
 
-    // ==================== AUTH (Waisa hi) ====================
+    // ==================== AUTH ====================
     function setupAuth() {
         const unlockBtn = document.getElementById('unlockBtn');
         const pwdInput = document.getElementById('adminPwdInput');
@@ -1038,6 +1015,7 @@
     }
 
     // ==================== GLOBAL FUNCTIONS ====================
+    // Make all functions globally accessible for onclick
     window.deletePlaylist = deletePlaylist;
     window.deleteChapter = deleteChapter;
     window.deleteUser = deleteUser;
@@ -1070,13 +1048,17 @@
     document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
     document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
 
+    // 🔥 NEW: when Section (for Add Chapter) changes, refresh the playlist dropdown to only show that section's playlists
+    document.getElementById('chapterSectionFilter').addEventListener('change', updatePlaylistSelect);
+
+    // Allowed Emails event listeners
     document.getElementById('addAllowedEmailBtn').addEventListener('click', addAllowedEmail);
     document.getElementById('allowedEmailInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') addAllowedEmail();
     });
 
     setupAuth();
-    console.log('✅ Admin panel loaded with Section features');
+    console.log('✅ Admin panel loaded');
 })();
 </script>
 </body>
