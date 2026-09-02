@@ -1,0 +1,814 @@
+// ========================================================================
+//  ANTI-DEVELOPER TOOLS
+// ========================================================================
+(function antiDevTools() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    if (!isMobile) {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                window.location.href = 'https://www.google.com';
+            }
+        });
+
+        let devToolsDetected = false;
+
+        function detectDevTools() {
+            const threshold = 160;
+            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+            
+            if (widthThreshold || heightThreshold) {
+                if (!devToolsDetected) {
+                    devToolsDetected = true;
+                    console.clear();
+                    setTimeout(function() {
+                        window.location.href = 'https://www.google.com';
+                    }, 100);
+                }
+            } else {
+                devToolsDetected = false;
+            }
+        }
+
+        setInterval(detectDevTools, 100);
+        setInterval(function() { console.clear(); }, 100);
+
+        const noop = function() {};
+        console.log = noop;
+        console.warn = noop;
+        console.error = noop;
+        console.info = noop;
+        console.debug = noop;
+        console.table = noop;
+        console.trace = noop;
+        console.dir = noop;
+        console.dirxml = noop;
+        console.group = noop;
+        console.groupEnd = noop;
+        console.groupCollapsed = noop;
+        console.clear = noop;
+        console.count = noop;
+        console.countReset = noop;
+        console.assert = noop;
+        console.profile = noop;
+        console.profileEnd = noop;
+        console.time = noop;
+        console.timeEnd = noop;
+        console.timeLog = noop;
+
+        window.open = function() {
+            window.location.href = 'https://www.google.com';
+            return null;
+        };
+
+        window.eval = function() {
+            window.location.href = 'https://www.google.com';
+            return null;
+        };
+    }
+})();
+
+// ==================== MAIN ADMIN APP ====================
+(function() {
+    const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
+    let playlists = [];
+    let users = [];
+    let importantItems = [];
+    let allowedEmails = [];
+    let isAuthenticated = false;
+
+    // Sections (Recorded, Reasoning, Quant, Computer, English)
+    const SECTION_LABELS = {
+        recorded: '📐 Math',
+        reasoning: '🧠 Reasoning',
+        quant: '🔢 Quant',
+        computer: '💻 Computer',
+        english: '📖 English'
+    };
+    // FIX: was ['Math', ...] (capital, wrong key) — must match the actual
+    // section values used everywhere else ('recorded', not 'Math').
+    // This was the reason recorded-section playlists never showed up.
+    const SECTION_ORDER = ['recorded', 'reasoning', 'quant', 'computer', 'english'];
+    // Any playlist saved before the "section" column existed has NULL/empty
+    // section in the DB — treat that as the default "recorded" section too.
+    const DEFAULT_SECTION = 'recorded';
+
+    // ----- Tabs -----
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.dataset.tab;
+            document.getElementById('tab-' + tabId).classList.add('active');
+            if (tabId === 'users') { loadUsers(); }
+            else if (tabId === 'playlists') { loadPlaylists(); }
+            else if (tabId === 'important') { loadImportant(); }
+            else if (tabId === 'allowed-emails') { loadAllowedEmails(); }
+        });
+    });
+
+    // ----- API Call -----
+    async function apiCall(endpoint, options = {}) {
+        try {
+            const url = API_BASE + endpoint;
+            const response = await fetch(url, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
+    }
+
+    // ==================== ADMIN LOGIN ====================
+    async function adminLogin() {
+        const username = document.getElementById('adminUsername').value.trim();
+        const password = document.getElementById('adminPwdInput').value.trim();
+        const errorEl = document.getElementById('pwdError');
+
+        if (!username || !password) {
+            errorEl.textContent = '❌ Please enter username and password';
+            return;
+        }
+
+        try {
+            const data = await apiCall('/admin/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            if (data.success) {
+                isAuthenticated = true;
+                document.getElementById('passwordGate').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                errorEl.textContent = '';
+                loadPlaylists();
+                loadUsers();
+                loadImportant();
+                loadAllowedEmails();
+                showFeedback('✅ Welcome ' + data.admin.username, 'success', 'playlistFeedback');
+            } else {
+                errorEl.textContent = '❌ ' + (data.error || 'Invalid credentials');
+                document.getElementById('adminPwdInput').value = '';
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminUsername').focus();
+            }
+        } catch (error) {
+            errorEl.textContent = '❌ Connection error: ' + error.message;
+        }
+    }
+
+    // ==================== ALLOWED EMAILS MANAGEMENT (NEW) ====================
+    async function loadAllowedEmails() {
+        try {
+            const data = await apiCall('/allowed-emails');
+            if (data.success) {
+                allowedEmails = data.emails || [];
+                renderAllowedEmailsList();
+                showFeedback('✅ Allowed emails loaded', 'success', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function addAllowedEmail() {
+        const email = document.getElementById('allowedEmailInput').value.trim();
+        if (!email) {
+            showFeedback('⚠️ Enter email', 'error', 'allowedEmailFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                document.getElementById('allowedEmailInput').value = '';
+                loadAllowedEmails();
+                showFeedback('✅ Email added: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ ' + data.error, 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function deleteAllowedEmail(email) {
+        if (!confirm(`Remove ${email}?`)) return;
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'DELETE',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                loadAllowedEmails();
+                showFeedback('✅ Removed: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ Failed to remove', 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    function renderAllowedEmailsList() {
+        const list = document.getElementById('allowedEmailsList');
+        if (!allowedEmails.length) {
+            list.innerHTML = `<div class="empty-state">No allowed emails added</div>`;
+            return;
+        }
+        let html = '';
+        allowedEmails.forEach(item => {
+            html += `
+                <div class="entry-item">
+                    <div class="info">
+                        <span class="name">📧 ${item.email}</span>
+                        <span class="sub">Added: ${new Date(item.created_at).toLocaleString()}</span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="del-btn" onclick="window.deleteAllowedEmail('${item.email}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteAllowedEmail = deleteAllowedEmail;
+    }
+
+    // ==================== IMPORTANT SECTION ====================
+    async function loadImportant() {
+        try {
+            const data = await apiCall('/important/all');
+            if (data.success) {
+                importantItems = data.items || [];
+                renderImportantList();
+                showFeedback('✅ Important items loaded', 'success', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function saveImportant() {
+        const title = document.getElementById('importantTitle').value.trim();
+        const link = document.getElementById('importantLink').value.trim();
+
+        if (!title || !link) {
+            showFeedback('⚠️ Please fill both Title and URL', 'error', 'importantFeedback');
+            return;
+        }
+
+        try {
+            const data = await apiCall('/important', {
+                method: 'POST',
+                body: JSON.stringify({ title, link })
+            });
+
+            if (data.success) {
+                document.getElementById('importantTitle').value = '';
+                document.getElementById('importantLink').value = '';
+                showFeedback('✅ Important class saved!', 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to save: ' + data.error, 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function toggleImportantVisibility(id) {
+        try {
+            const data = await apiCall('/important/toggle', {
+                method: 'POST',
+                body: JSON.stringify({ id })
+            });
+
+            if (data.success) {
+                showFeedback(data.message, 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to toggle: ' + data.error, 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function deleteImportant(id) {
+        if (!confirm('Delete this important class?')) return;
+        try {
+            const data = await apiCall('/important', {
+                method: 'DELETE',
+                body: JSON.stringify({ id })
+            });
+            if (data.success) {
+                showFeedback('🗑️ Deleted', 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to delete', 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    function renderImportantList() {
+        const list = document.getElementById('importantList');
+        if (!importantItems.length) {
+            list.innerHTML = `<div class="empty-state">No important classes added yet</div>`;
+            return;
+        }
+        let html = '';
+        importantItems.forEach(item => {
+            const isVisible = item.is_visible === 1;
+            const itemClass = isVisible ? '' : 'hidden';
+            html += `
+                <div class="entry-item important-item ${itemClass}">
+                    <div class="info">
+                        <span class="name">
+                            ${isVisible ? '👁️' : '🚫'} ${item.title}
+                            <span class="visibility-badge ${isVisible ? 'visible' : 'hidden'}" style="margin-left:8px;">
+                                ${isVisible ? 'Visible' : 'Hidden'}
+                            </span>
+                        </span>
+                        <span class="sub">${item.link}</span>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-highlight ${isVisible ? 'active' : 'inactive'}" 
+                                onclick="window.toggleImportantVisibility('${item.id}')">
+                            ${isVisible ? '👁️ Hide' : '🚫 Show'}
+                        </button>
+                        <button class="del-btn" onclick="window.deleteImportant('${item.id}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.toggleImportantVisibility = toggleImportantVisibility;
+        window.deleteImportant = deleteImportant;
+    }
+
+    // ==================== LOAD PLAYLISTS ====================
+    async function loadPlaylists() {
+        try {
+            const data = await apiCall('/playlists');
+            if (data.success) {
+                playlists = data.playlists;
+                renderAdminList();
+                updatePlaylistSelect();
+                updateApiStatus('connected');
+                showFeedback('✅ Playlists loaded', 'success', 'playlistFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'playlistFeedback');
+            updateApiStatus('error');
+        }
+    }
+
+    // ==================== ADD PLAYLIST ====================
+    async function addPlaylist() {
+        const name = document.getElementById('newPlaylistName').value.trim();
+        // FIX: default fallback should match the real section key 'recorded'
+        const section = document.getElementById('newPlaylistSection').value || DEFAULT_SECTION;
+        if (!name) {
+            showFeedback('⚠️ Enter playlist name', 'error', 'playlistFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/playlists', {
+                method: 'POST',
+                body: JSON.stringify({ name, section })
+            });
+            if (data.success) {
+                document.getElementById('newPlaylistName').value = '';
+                showFeedback('✅ Playlist added to ' + (SECTION_LABELS[section] || section), 'success', 'playlistFeedback');
+                loadPlaylists();
+            } else {
+                showFeedback('❌ ' + (data.error || 'Failed to add playlist'), 'error', 'playlistFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== ADD CHAPTER ====================
+    async function addChapter() {
+        const playlistId = document.getElementById('playlistSelect').value;
+        const name = document.getElementById('chapterName').value.trim();
+        const link = document.getElementById('chapterLink').value.trim();
+        if (!playlistId || !name || !link) {
+            showFeedback('⚠️ Section + Playlist select karo aur sab fields bharo', 'error', 'chapterFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/playlists/chapter', {
+                method: 'POST',
+                body: JSON.stringify({ playlistId, chapterName: name, chapterLink: link })
+            });
+            if (data.success) {
+                document.getElementById('chapterName').value = '';
+                document.getElementById('chapterLink').value = '';
+                showFeedback('✅ Chapter added', 'success', 'chapterFeedback');
+                loadPlaylists();
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'chapterFeedback');
+        }
+    }
+
+    // ==================== DELETE PLAYLIST ====================
+    async function deletePlaylist(playlistId) {
+        if (!confirm('Delete this playlist?')) return;
+        try {
+            await apiCall('/playlists', {
+                method: 'DELETE',
+                body: JSON.stringify({ playlistId })
+            });
+            loadPlaylists();
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== DELETE CHAPTER ====================
+    async function deleteChapter(playlistId, chapterId) {
+        if (!confirm('Delete this chapter?')) return;
+        try {
+            await apiCall('/playlists/chapter', {
+                method: 'DELETE',
+                body: JSON.stringify({ playlistId, chapterId })
+            });
+            loadPlaylists();
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== LOAD USERS ====================
+    async function loadUsers() {
+        try {
+            const data = await apiCall('/users');
+            if (data.success) {
+                users = data.users;
+                renderUserList();
+                updateUserSelect();
+                updateApiStatus('connected');
+                showFeedback('✅ Users loaded', 'success', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load users: ' + error.message, 'error', 'userFeedback');
+            updateApiStatus('error');
+        }
+    }
+
+    // ==================== ADD USER ====================
+    async function addUser() {
+        const email = document.getElementById('newUserEmail').value.trim();
+        if (!email) {
+            showFeedback('⚠️ Enter email', 'error', 'userFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/users', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                document.getElementById('newUserEmail').value = '';
+                showFeedback('✅ User added. Key: ' + data.key, 'success', 'userFeedback');
+                loadUsers();
+            } else {
+                showFeedback('❌ ' + data.error, 'error', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'userFeedback');
+        }
+    }
+
+    // ==================== DELETE USER ====================
+    async function deleteUser(userId) {
+        if (!confirm('Delete this user?')) return;
+        try {
+            await apiCall('/users', {
+                method: 'DELETE',
+                body: JSON.stringify({ userId })
+            });
+            loadUsers();
+            showFeedback('🗑️ User deleted', 'success', 'userFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'userFeedback');
+        }
+    }
+
+    // ==================== RESET USER ====================
+    window.resetUser = async function(userId) {
+        if (!confirm('⚠️ Are you sure you want to reset this user?')) return;
+        try {
+            const data = await apiCall('/admin/reset-user', {
+                method: 'POST',
+                body: JSON.stringify({ userId })
+            });
+            if (data.success) {
+                showFeedback('✅ User reset!', 'success', 'userFeedback');
+                loadUsers();
+            } else {
+                showFeedback('❌ Failed to reset', 'error', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Network error', 'error', 'userFeedback');
+        }
+    };
+
+    // ==================== GENERATE KEY ====================
+    async function generateKey() {
+        const userId = document.getElementById('userSelect').value;
+        if (!userId) {
+            showFeedback('⚠️ Select a user', 'error', 'keyFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/keys/generate', {
+                method: 'POST',
+                body: JSON.stringify({ userId })
+            });
+            if (data.success) {
+                const display = document.getElementById('keyDisplay');
+                const keyText = document.getElementById('keyText');
+                display.style.display = 'flex';
+                keyText.textContent = data.key;
+                showFeedback('✅ Key generated!', 'success', 'keyFeedback');
+                loadUsers();
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'keyFeedback');
+        }
+    }
+
+    // ==================== COPY KEY ====================
+    window.copyKey = function() {
+        const keyText = document.getElementById('keyText').textContent;
+        if (!keyText) {
+            showFeedback('⚠️ No key to copy', 'error', 'keyFeedback');
+            return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(keyText)
+                .then(() => {
+                    showFeedback('✅ Key copied!', 'success', 'keyFeedback');
+                    document.getElementById('copyKeyBtn').textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        document.getElementById('copyKeyBtn').textContent = '📋 Copy';
+                    }, 2000);
+                })
+                .catch(() => fallbackCopy(keyText));
+        } else {
+            fallbackCopy(keyText);
+        }
+    };
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showFeedback('✅ Key copied!', 'success', 'keyFeedback');
+            document.getElementById('copyKeyBtn').textContent = '✅ Copied!';
+            setTimeout(() => {
+                document.getElementById('copyKeyBtn').textContent = '📋 Copy';
+            }, 2000);
+        } catch (err) {
+            showFeedback('❌ Failed to copy', 'error', 'keyFeedback');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    // ==================== VIEW KEYS ====================
+    window.viewKeys = async function(userId) {
+        try {
+            const data = await apiCall('/keys?userId=' + userId);
+            if (data.success) {
+                let msg = '🔑 Keys for this user:\n\n';
+                if (data.keys.length === 0) {
+                    msg += 'No keys generated yet.';
+                } else {
+                    data.keys.forEach(k => {
+                        const status = k.is_used ? '✅ Used' : '❌ Not used';
+                        const expires = new Date(k.expires_at).toLocaleString();
+                        msg += `Key: ${k.key_value}\nStatus: ${status}\nExpires: ${expires}\n\n`;
+                    });
+                }
+                alert(msg);
+            }
+        } catch (error) {
+            alert('Failed to load keys');
+        }
+    };
+
+    // ==================== RENDER FUNCTIONS ====================
+    // Playlists grouped by Section (Recorded, Reasoning, Quant, Computer, English)
+    function renderAdminList() {
+        const list = document.getElementById('adminList');
+        if (!playlists.length) {
+            list.innerHTML = `<div class="empty-state">No playlists</div>`;
+            return;
+        }
+        let html = '';
+        SECTION_ORDER.forEach(sectionKey => {
+            // FIX: fallback for old rows with NULL/empty section is now
+            // DEFAULT_SECTION ('recorded') instead of the never-matching 'math'
+            const sectionPlaylists = playlists.filter(p => (p.section || DEFAULT_SECTION) === sectionKey);
+            if (!sectionPlaylists.length) return;
+            html += `<div class="section-title" style="margin-top:16px;">${SECTION_LABELS[sectionKey] || sectionKey}</div>`;
+            sectionPlaylists.forEach(playlist => {
+                html += `
+                    <div class="playlist-header">
+                        📁 ${playlist.name}
+                        <button class="del-btn" onclick="window.deletePlaylist('${playlist.id}')">✕</button>
+                    </div>
+                `;
+                if (playlist.chapters?.length) {
+                    playlist.chapters.forEach(chapter => {
+                        html += `
+                            <div class="entry-item" style="padding-left:32px;">
+                                <div class="info">
+                                    <span class="name">${chapter.name}</span>
+                                    <span class="sub">${chapter.link}</span>
+                                </div>
+                                <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="entry-item" style="padding-left:32px; color:#6a7c94; font-style:italic;">No chapters</div>`;
+                }
+            });
+        });
+        list.innerHTML = html;
+        window.deletePlaylist = deletePlaylist;
+        window.deleteChapter = deleteChapter;
+    }
+
+    function renderUserList() {
+        const list = document.getElementById('userList');
+        if (!users.length) {
+            list.innerHTML = `<div class="empty-state">No users</div>`;
+            return;
+        }
+        let html = '';
+        users.forEach(user => {
+            html += `
+                <div class="entry-item">
+                    <div class="info">
+                        <span class="name">${user.email}</span>
+                        <span class="sub">ID: ${user.id}</span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="key-btn" onclick="window.viewKeys('${user.id}')">🔑 Keys</button>
+                        <button class="reset-btn" onclick="window.resetUser('${user.id}')">🔄 Reset</button>
+                        <button class="del-btn" onclick="window.deleteUser('${user.id}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteUser = deleteUser;
+        window.viewKeys = viewKeys;
+        window.resetUser = resetUser;
+    }
+
+    // Playlist dropdown (for Add Chapter) filtered by the selected Section
+    function updatePlaylistSelect() {
+        const select = document.getElementById('playlistSelect');
+        const sectionFilterEl = document.getElementById('chapterSectionFilter');
+        // FIX: default was 'math', now correctly 'recorded'
+        const sectionFilter = sectionFilterEl ? sectionFilterEl.value : DEFAULT_SECTION;
+        select.innerHTML = '<option value="">Select playlist</option>';
+        playlists
+            .filter(p => (p.section || DEFAULT_SECTION) === sectionFilter)
+            .forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+    }
+
+    function updateUserSelect() {
+        const select = document.getElementById('userSelect');
+        select.innerHTML = '<option value="">Select user</option>';
+        users.forEach(u => {
+            select.innerHTML += `<option value="${u.id}">${u.email}</option>`;
+        });
+    }
+
+    function updateApiStatus(mode) {
+        const el = document.getElementById('apiStatus');
+        if (mode === 'connected') {
+            el.textContent = '✅ D1 Database Connected';
+            el.className = 'api-status status-connected';
+        } else if (mode === 'error') {
+            el.textContent = '❌ Connection Failed';
+            el.className = 'api-status status-error';
+        } else {
+            el.textContent = '🔄 Connecting...';
+            el.className = 'api-status';
+        }
+    }
+
+    function showFeedback(msg, type, elId) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'toast-msg';
+        if (type === 'error') el.classList.add('toast-error');
+        else if (type === 'success') el.classList.add('toast-success');
+        else el.classList.add('toast-info');
+        setTimeout(() => { el.textContent = ''; el.className = 'toast-msg'; }, 5000);
+    }
+
+    // ==================== AUTH ====================
+    function setupAuth() {
+        const unlockBtn = document.getElementById('unlockBtn');
+        const pwdInput = document.getElementById('adminPwdInput');
+        const usernameInput = document.getElementById('adminUsername');
+
+        unlockBtn.addEventListener('click', adminLogin);
+        pwdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') adminLogin();
+        });
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                pwdInput.focus();
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            isAuthenticated = false;
+            document.getElementById('passwordGate').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('adminPwdInput').value = '';
+            document.getElementById('adminUsername').value = 'admin';
+            document.getElementById('pwdError').textContent = '';
+        });
+    }
+
+    // ==================== GLOBAL FUNCTIONS ====================
+    // Make all functions globally accessible for onclick
+    window.deletePlaylist = deletePlaylist;
+    window.deleteChapter = deleteChapter;
+    window.deleteUser = deleteUser;
+    window.resetUser = resetUser;
+    window.copyKey = copyKey;
+    window.viewKeys = viewKeys;
+    window.toggleImportantVisibility = toggleImportantVisibility;
+    window.deleteImportant = deleteImportant;
+    window.deleteAllowedEmail = deleteAllowedEmail;
+
+    // ==================== EVENT LISTENERS ====================
+    document.getElementById('addPlaylistBtn').addEventListener('click', addPlaylist);
+    document.getElementById('addChapterBtn').addEventListener('click', addChapter);
+    document.getElementById('addUserBtn').addEventListener('click', addUser);
+    document.getElementById('generateKeyBtn').addEventListener('click', generateKey);
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        loadPlaylists();
+        loadUsers();
+        loadImportant();
+        loadAllowedEmails();
+        showFeedback('🔄 Refreshed', 'info', 'playlistFeedback');
+    });
+
+    document.getElementById('saveImportantBtn').addEventListener('click', saveImportant);
+    document.getElementById('importantTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
+    document.getElementById('importantLink').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
+
+    document.getElementById('newPlaylistName').addEventListener('keydown', e => { if (e.key === 'Enter') addPlaylist(); });
+    document.getElementById('chapterName').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
+    document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
+    document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
+
+    // When Section (for Add Chapter) changes, refresh the playlist dropdown to only show that section's playlists
+    document.getElementById('chapterSectionFilter').addEventListener('change', updatePlaylistSelect);
+
+    // Allowed Emails event listeners
+    document.getElementById('addAllowedEmailBtn').addEventListener('click', addAllowedEmail);
+    document.getElementById('allowedEmailInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addAllowedEmail();
+    });
+
+    setupAuth();
+    console.log('✅ Admin panel loaded');
+})();
