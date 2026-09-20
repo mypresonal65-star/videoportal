@@ -1028,7 +1028,7 @@
 <div class="header">
     <h1>📽️ Video Portal</h1>
     <div class="header-right">
-        <div class="live-users-pill" id="liveUsersBadge" title="👥 Click to see who is online">
+        <div class="live-users-pill" id="liveUsersBadge" title="👥 Click to see who is online" style="display: none;">
             <span class="pulsing-green-dot-wrap">
                 <span class="pulsing-green-ring"></span>
                 <span class="pulsing-green-dot"></span>
@@ -1296,7 +1296,7 @@
 </div>
 
 <!-- ===== FLOATING STUDY CHAT WIDGET ===== -->
-<button class="floating-chat-btn" id="floatingChatBtn" title="Study & Doubts Community Chat">
+<button class="floating-chat-btn" id="floatingChatBtn" title="Study & Doubts Community Chat" style="display: none;">
   <span style="font-size:1.2rem;">💬</span>
   <span>Study Chat</span>
   <span class="chat-unread-badge" id="chatUnreadBadge" style="display:none;">0</span>
@@ -1662,6 +1662,11 @@
 
     // Modal: Who is online
     function openOnlineUsersModal() {
+        const user = currentUser || googleUser;
+        if (!user) {
+            showToast('⚠️ Please login first to see online students', 'error');
+            return;
+        }
         const modal = document.getElementById('onlineUsersModal');
         if (!modal) return;
         modal.classList.add('show');
@@ -1674,6 +1679,8 @@
     }
 
     async function fetchOnlineUsersList() {
+        const user = currentUser || googleUser;
+        if (!user) return;
         const container = document.getElementById('onlineUsersList');
         const countBadge = document.getElementById('modalOnlineCount');
         if (!container) return;
@@ -1902,11 +1909,21 @@
 
     // Study Chat: Open/Close/Toggle
     function toggleStudyChat() {
+        const user = currentUser || googleUser;
+        if (!user) {
+            showToast('⚠️ Please login first to access Study Chat', 'error');
+            return;
+        }
         if (isChatOpen) closeStudyChat();
         else openStudyChat();
     }
 
     function openStudyChat() {
+        const user = currentUser || googleUser;
+        if (!user) {
+            showToast('⚠️ Please login first to access Study Chat', 'error');
+            return;
+        }
         const chatWin = document.getElementById('studyChatWindow');
         const badge = document.getElementById('chatUnreadBadge');
         if (!chatWin) return;
@@ -1946,6 +1963,8 @@
     }
 
     async function fetchChatMessages(forceScrollBottom = false) {
+        const user = currentUser || googleUser;
+        if (!user) return;
         const box = document.getElementById('studyChatMessages');
         if (!box || box.style.display === 'none') return;
 
@@ -2296,6 +2315,17 @@
         }
         clearSession();
         if (sessionValidationInterval) { clearInterval(sessionValidationInterval); sessionValidationInterval = null; }
+        if (activeUsersPollInterval) { clearInterval(activeUsersPollInterval); activeUsersPollInterval = null; }
+        if (chatBackgroundCheckInterval) { clearInterval(chatBackgroundCheckInterval); chatBackgroundCheckInterval = null; }
+        if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; }
+        closeStudyChat();
+        closeOnlineUsersModal();
+
+        const liveUsersBadge = document.getElementById('liveUsersBadge');
+        if (liveUsersBadge) liveUsersBadge.style.display = 'none';
+        const chatBtn = document.getElementById('floatingChatBtn');
+        if (chatBtn) chatBtn.style.display = 'none';
+
         localStorage.removeItem(GOOGLE_SESSION_KEY);
         currentUser = null; googleUser = null; googleAccessToken = null;
         document.getElementById('loginContainer').style.display = 'block';
@@ -2596,6 +2626,20 @@
         document.getElementById('googleStatusBar').style.display = 'flex';
         document.getElementById('userBar').style.display = 'flex';
         document.getElementById('userEmail').textContent = user.email;
+
+        // Show Online Badge & Floating Study Chat only inside portal
+        const liveUsers = document.getElementById('liveUsersBadge');
+        if (liveUsers) liveUsers.style.display = 'inline-flex';
+        const chatBtn = document.getElementById('floatingChatBtn');
+        if (chatBtn) chatBtn.style.display = 'flex';
+
+        startActiveUsersPolling();
+        if (!chatBackgroundCheckInterval) {
+            setTimeout(() => { if (currentUser || googleUser) fetchChatMessages(false); }, 1200);
+            chatBackgroundCheckInterval = setInterval(() => {
+                if (!isChatOpen && (currentUser || googleUser)) fetchChatMessages(false);
+            }, 15000);
+        }
         
         const isGoogleLoggedIn = !!googleUser;
         const dot = document.getElementById('googleStatusDot');
@@ -3148,13 +3192,6 @@
     // ===== INIT =====
     if (!localStorage.getItem('timer_start')) localStorage.setItem('timer_start', Date.now().toString());
     updateDisplayNameUI();
-    startActiveUsersPolling();
-
-    // Check initial chat messages once in background so unread badge shows if messages exist
-    setTimeout(() => { fetchChatMessages(false); }, 2000);
-    chatBackgroundCheckInterval = setInterval(() => {
-        if (!isChatOpen) fetchChatMessages(false);
-    }, 15000);
 
     const hasSession = checkExistingSession();
     if (!hasSession) {
@@ -3162,6 +3199,12 @@
         document.getElementById('videoContent').style.display = 'none';
         document.getElementById('googleStatusBar').style.display = 'none';
         document.getElementById('userBar').style.display = 'none';
+        const liveUsers = document.getElementById('liveUsersBadge');
+        if (liveUsers) liveUsers.style.display = 'none';
+        const chatBtn = document.getElementById('floatingChatBtn');
+        if (chatBtn) chatBtn.style.display = 'none';
+        closeStudyChat();
+        closeOnlineUsersModal();
     }
     console.log('✅ Video Portal loaded - Real-time active users & Study Chat enabled');
 })();
