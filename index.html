@@ -1583,6 +1583,7 @@
     document.addEventListener('visibilitychange', function() {
         if (!document.hidden) {
             fetchActiveUsersCount();
+            validateSession();
             if (isChatOpen) fetchChatMessages(false);
         }
     });
@@ -1605,7 +1606,6 @@
         } catch (e) {}
     }
     window.addEventListener('beforeunload', sendOfflineSignal);
-    window.addEventListener('pagehide', sendOfflineSignal);
 
     // ===== DISPLAY NAME MANAGEMENT =====
     const STUDENT_NAME_KEY = 'student_display_name';
@@ -2044,7 +2044,7 @@
 
     async function validateSession() {
         const session = getSession();
-        if (!session) { handleSessionExpired(); return false; }
+        if (!session || !session.user) { return false; }
         try {
             const response = await fetch(API_BASE + '/session/validate', {
                 method: 'POST',
@@ -2056,11 +2056,16 @@
                     device: session.device || 'Unknown'
                 })
             });
+            if (!response.ok) {
+                // Network or server status (500, 502, 429) -> NEVER logout legitimate student
+                return true;
+            }
             const data = await response.json();
             if (data.activeCount !== undefined) {
                 updateActiveUsersCount(data.activeCount);
             }
-            if (data.hijacked || data.autoLogout) {
+            // ONLY logout if session was genuinely hijacked by another user
+            if (data.hijacked === true) {
                 isHijacked = true;
                 clearSession();
                 localStorage.removeItem(GOOGLE_SESSION_KEY);
@@ -2068,9 +2073,11 @@
                 logout();
                 return false;
             }
-            if (!data.valid) { clearSession(); localStorage.removeItem(GOOGLE_SESSION_KEY); logout(); return false; }
             return true;
-        } catch { return true; }
+        } catch (e) {
+            // Offline or temporary network blip -> Keep user logged in
+            return true;
+        }
     }
 
     function showHijackNotification() {
@@ -2200,6 +2207,7 @@
             const data = await response.json();
             if (data.success) {
                 currentUser = data.user;
+                localStorage.setItem('timer_start', Date.now().toString());
                 successEl.textContent = '✅ Login successful! Loading videos...';
                 saveSession(data.user, key, sessionId);
                 isHijacked = false;
@@ -3071,8 +3079,6 @@
             }
         }
     });
-
-    window.addEventListener('pagehide', sendOfflineSignal);
 
     // ===== INIT =====
     if (!localStorage.getItem('timer_start')) localStorage.setItem('timer_start', Date.now().toString());
