@@ -229,6 +229,26 @@
       margin: 4px;
       font-weight: 500;
     }
+    .chat-type-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .chat-type-pill.group {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    .chat-type-pill.direct {
+      background: #f5f3ff;
+      color: #6d28d9;
+      border: 1px solid #ddd6fe;
+    }
   </style>
 </head>
 <body>
@@ -417,8 +437,13 @@
 
       <div id="adminChatFeedback" class="toast-msg"></div>
 
-      <div class="section-title" style="margin-top:16px;">
+      <div class="section-title" style="margin-top:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <span>📋 Messages Stream (<span id="adminChatMessageCount">0</span>)</span>
+        <div style="display:flex; gap:6px;" id="adminChatFilterGroup">
+          <button type="button" class="btn btn-sm btn-primary" data-chat-filter="all" id="filterChatAllBtn">🔘 All (<span id="filterCountAll">0</span>)</button>
+          <button type="button" class="btn btn-sm btn-outline" data-chat-filter="group" id="filterChatGroupBtn">🌐 Group Only (<span id="filterCountGroup">0</span>)</button>
+          <button type="button" class="btn btn-sm btn-outline" data-chat-filter="direct" id="filterChatDirectBtn">🔒 1-on-1 Only (<span id="filterCountDirect">0</span>)</button>
+        </div>
       </div>
       <div class="entry-list" id="adminChatList" style="max-height: 480px;">
         <div class="empty-state">Loading chat messages...</div>
@@ -1211,16 +1236,43 @@
 
     // ==================== CHAT MONITOR & MODERATION ====================
     let adminChatMessages = [];
+    let adminChatFilter = 'all'; // 'all' | 'group' | 'direct'
+
+    function setAdminChatFilter(filter) {
+        adminChatFilter = filter;
+        const allBtn = document.getElementById('filterChatAllBtn');
+        const groupBtn = document.getElementById('filterChatGroupBtn');
+        const directBtn = document.getElementById('filterChatDirectBtn');
+
+        if (allBtn) allBtn.className = filter === 'all' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+        if (groupBtn) groupBtn.className = filter === 'group' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+        if (directBtn) directBtn.className = filter === 'direct' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline';
+
+        renderAdminChatList();
+    }
 
     async function loadAdminChat(notify = false) {
         try {
-            const data = await apiCall('/chat/messages');
+            const data = await apiCall('/chat/messages?view=admin');
             if (data.success && Array.isArray(data.messages)) {
                 adminChatMessages = data.messages;
-                renderAdminChatList();
+                
+                // Update badge counts
+                const allCount = adminChatMessages.length;
+                const groupCount = adminChatMessages.filter(m => (m.chat_type || 'group') === 'group').length;
+                const directCount = adminChatMessages.filter(m => m.chat_type === 'direct').length;
+
                 const cntEl = document.getElementById('adminChatMessageCount');
-                if (cntEl) cntEl.textContent = adminChatMessages.length;
-                if (notify) showFeedback('✅ Chat feed updated (' + adminChatMessages.length + ' msgs)', 'info', 'adminChatFeedback');
+                if (cntEl) cntEl.textContent = allCount;
+                const filterAllEl = document.getElementById('filterCountAll');
+                if (filterAllEl) filterAllEl.textContent = allCount;
+                const filterGroupEl = document.getElementById('filterCountGroup');
+                if (filterGroupEl) filterGroupEl.textContent = groupCount;
+                const filterDirectEl = document.getElementById('filterCountDirect');
+                if (filterDirectEl) filterDirectEl.textContent = directCount;
+
+                renderAdminChatList();
+                if (notify) showFeedback('✅ Chat feed updated (' + allCount + ' total msgs)', 'info', 'adminChatFeedback');
             }
         } catch (err) {
             console.error('Error loading admin chat:', err);
@@ -1232,13 +1284,21 @@
         const list = document.getElementById('adminChatList');
         if (!list) return;
 
-        if (!adminChatMessages || adminChatMessages.length === 0) {
-            list.innerHTML = `<div class="empty-state">💬 No student chat messages found.</div>`;
+        let filtered = adminChatMessages;
+        if (adminChatFilter === 'group') {
+            filtered = adminChatMessages.filter(m => (m.chat_type || 'group') === 'group');
+        } else if (adminChatFilter === 'direct') {
+            filtered = adminChatMessages.filter(m => m.chat_type === 'direct');
+        }
+
+        if (filtered.length === 0) {
+            const filterLabel = adminChatFilter === 'direct' ? '1-on-1 private' : adminChatFilter === 'group' ? 'group' : '';
+            list.innerHTML = `<div class="empty-state">💬 No ${filterLabel} student chat messages found.</div>`;
             return;
         }
 
         // Display newest messages first on admin panel for easy monitoring
-        const sorted = [...adminChatMessages].reverse();
+        const sorted = [...filtered].reverse();
         list.innerHTML = '';
 
         sorted.forEach(m => {
@@ -1252,9 +1312,31 @@
             const header = document.createElement('div');
             header.className = 'chat-msg-header';
 
-            const sender = document.createElement('span');
+            const sender = document.createElement('div');
             sender.className = 'chat-sender-badge';
-            sender.textContent = `🎓 ${m.email}`;
+            sender.style.display = 'flex';
+            sender.style.alignItems = 'center';
+            sender.style.gap = '6px';
+            sender.style.flexWrap = 'wrap';
+
+            const senderName = m.sender_name || 'Student';
+            if (m.chat_type === 'direct') {
+                const receiverName = m.receiver_name || m.receiver_email || 'Student';
+                sender.innerHTML = `
+                    <span class="chat-type-pill direct">🔒 1-on-1 Private</span>
+                    <span style="font-weight:700; color:#1e293b;">${senderName}</span>
+                    <span style="color:#64748b; font-size:0.75rem;">(${m.email})</span>
+                    <span style="color:#8b5cf6; font-weight:700; margin:0 2px;">➔</span>
+                    <span style="font-weight:700; color:#1e293b;">${receiverName}</span>
+                    <span style="color:#64748b; font-size:0.75rem;">(${m.receiver_email || '-'})</span>
+                `;
+            } else {
+                sender.innerHTML = `
+                    <span class="chat-type-pill group">🌐 Study Group</span>
+                    <span style="font-weight:700; color:#1e293b;">${senderName}</span>
+                    <span style="color:#64748b; font-size:0.75rem;">(${m.email})</span>
+                `;
+            }
 
             const time = document.createElement('span');
             time.className = 'chat-time-badge';
@@ -1340,10 +1422,11 @@
                         let html = '<div style="font-weight:600; font-size:0.82rem; color:#1a2b4c; margin-bottom:8px;">Currently logged in students:</div>';
                         html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
                         users.forEach(u => {
+                            const nameStr = u.name ? `<strong>${u.name}</strong> <span style="color:#64748b;font-size:0.75rem;">(${u.email})</span>` : `<span>${u.email}</span>`;
                             html += `
                                 <div class="admin-online-badge">
                                     <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
-                                    <span>${u.email}</span>
+                                    <span>${nameStr}</span>
                                 </div>
                             `;
                         });
@@ -1411,6 +1494,7 @@
     window.loadAdminChat = loadAdminChat;
     window.loadAdminOnlineUsers = loadAdminOnlineUsers;
     window.toggleOnlineUsersPanel = toggleOnlineUsersPanel;
+    window.setAdminChatFilter = setAdminChatFilter;
 
     // ==================== EVENT LISTENERS ====================
     document.getElementById('addPlaylistBtn').addEventListener('click', addPlaylist);
@@ -1458,6 +1542,16 @@
 
     const toggleOnlineUsersBtn = document.getElementById('toggleOnlineUsersBtn');
     if (toggleOnlineUsersBtn) toggleOnlineUsersBtn.addEventListener('click', toggleOnlineUsersPanel);
+
+    // Filter Buttons for Chat
+    const filterChatAllBtn = document.getElementById('filterChatAllBtn');
+    if (filterChatAllBtn) filterChatAllBtn.addEventListener('click', () => setAdminChatFilter('all'));
+
+    const filterChatGroupBtn = document.getElementById('filterChatGroupBtn');
+    if (filterChatGroupBtn) filterChatGroupBtn.addEventListener('click', () => setAdminChatFilter('group'));
+
+    const filterChatDirectBtn = document.getElementById('filterChatDirectBtn');
+    if (filterChatDirectBtn) filterChatDirectBtn.addEventListener('click', () => setAdminChatFilter('direct'));
 
     setupAuth();
     fetchAdminActiveUsers();
