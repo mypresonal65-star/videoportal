@@ -1594,7 +1594,7 @@
             const session = getSession();
             const email = (session && session.user && session.user.email) || (currentUser && currentUser.email) || (googleUser && googleUser.email);
             if (email) {
-                const payload = JSON.stringify({ email: email });
+                const payload = JSON.stringify({ email: email, sessionId: session ? session.sessionId : undefined });
                 const url = API_BASE + '/session/offline';
                 if (navigator.sendBeacon) {
                     const blob = new Blob([payload], { type: 'application/json' });
@@ -2109,13 +2109,14 @@
             if (data.activeCount !== undefined) {
                 updateActiveUsersCount(data.activeCount);
             }
-            // ONLY logout if session was genuinely hijacked by another user
-            if (data.hijacked === true) {
+            // Trigger auto-logout when user logs in from another device or session is superseded
+            if (data.valid === false || data.hijacked === true || data.loggedOutByOtherDevice === true) {
                 isHijacked = true;
+                const reasonMsg = data.reason || '⚠️ Aapka account kisi dusre device par login kiya gaya hai. Is device se auto-logout kar diya gaya hai.';
                 clearSession();
                 localStorage.removeItem(GOOGLE_SESSION_KEY);
-                showHijackNotification();
-                logout();
+                showHijackNotification(reasonMsg);
+                logout(reasonMsg);
                 return false;
             }
             return true;
@@ -2125,19 +2126,27 @@
         }
     }
 
-    function showHijackNotification() {
+    function showHijackNotification(msg) {
         const el = document.getElementById('hijackNotification');
-        el.classList.add('show');
-        setTimeout(() => el.classList.remove('show'), 5000);
+        if (el) {
+            if (msg) el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 6000);
+        }
     }
     function handleSessionExpired() {
         if (document.getElementById('videoContent').style.display !== 'none') logout();
     }
     function startSessionValidation() {
         if (sessionValidationInterval) clearInterval(sessionValidationInterval);
+        // Fast initial check after 800ms to detect any pre-existing session hijack on reload
+        setTimeout(() => {
+            if (document.getElementById('videoContent').style.display !== 'none' && !isHijacked) validateSession();
+        }, 800);
+        // Responsive check every 5 seconds for rapid single-device enforcement
         sessionValidationInterval = setInterval(() => {
             if (document.getElementById('videoContent').style.display !== 'none' && !isHijacked) validateSession();
-        }, 8000);
+        }, 5000);
     }
 
     // ===== KEY GENERATION =====
@@ -2254,13 +2263,15 @@
                 currentUser = data.user;
                 localStorage.setItem('timer_start', Date.now().toString());
                 successEl.textContent = '✅ Login successful! Loading videos...';
-                saveSession(data.user, key, sessionId);
+                const actualSessionId = data.sessionId || sessionId;
+                saveSession(data.user, key, actualSessionId);
                 isHijacked = false;
                 showVideoContent();
                 fetchPlaylists();
                 fetchImportantSection();
                 startSessionValidation();
-                document.getElementById('hijackNotification').classList.remove('show');
+                const hijackEl = document.getElementById('hijackNotification');
+                if (hijackEl) hijackEl.classList.remove('show');
             } else {
                 errorEl.textContent = '❌ ' + (data.error || 'Login failed');
                 if (data.error && data.error.includes('already logged in')) errorEl.textContent = '❌ You are already logged in on another device.';
@@ -2271,10 +2282,10 @@
     }
 
     // ===== LOGOUT =====
-    window.logout = async function() {
+    window.logout = async function(reasonMessage) {
         sendOfflineSignal();
         const session = getSession();
-        if (session && session.user) {
+        if (session && session.user && !isHijacked) {
             try {
                 await fetch(API_BASE + '/auth/logout', {
                     method: 'POST',
@@ -2286,7 +2297,7 @@
         clearSession();
         if (sessionValidationInterval) { clearInterval(sessionValidationInterval); sessionValidationInterval = null; }
         localStorage.removeItem(GOOGLE_SESSION_KEY);
-        currentUser = null; googleUser = null; googleAccessToken = null; isHijacked = false;
+        currentUser = null; googleUser = null; googleAccessToken = null;
         document.getElementById('loginContainer').style.display = 'block';
         document.getElementById('videoContent').style.display = 'none';
         document.getElementById('googleStatusBar').style.display = 'none';
@@ -2294,9 +2305,18 @@
         document.getElementById('userEmail').textContent = '-';
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginKey').value = '';
-        document.getElementById('loginError').textContent = '';
         document.getElementById('loginSuccess').textContent = '';
         document.getElementById('resetBanner').style.display = 'none';
+        
+        const loginErrorEl = document.getElementById('loginError');
+        if (reasonMessage) {
+            loginErrorEl.innerHTML = `<strong>${reasonMessage}</strong>`;
+            loginErrorEl.style.display = 'block';
+            loginErrorEl.style.color = '#b33a3a';
+        } else {
+            loginErrorEl.textContent = '';
+        }
+
         if (resetCheckInterval) { clearInterval(resetCheckInterval); resetCheckInterval = null; }
         document.getElementById('durationDisplay').textContent = '00:00:00';
         disposePlayer();
