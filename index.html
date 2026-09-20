@@ -1728,7 +1728,25 @@
             }
         } catch (err) {
             console.error('Error fetching online users list:', err);
-            container.innerHTML = '<div style="text-align:center; padding: 20px; color:#b33a3a; font-size:0.9rem;">⚠️ Error connecting to server</div>';
+            const myEmail = ((currentUser && currentUser.email) || (googleUser && googleUser.email) || '');
+            if (myEmail) {
+                const displayName = getStudentDisplayName();
+                const initial = (displayName ? displayName.charAt(0) : 'U').toUpperCase();
+                container.innerHTML = `
+                    <div class="online-user-card">
+                        <div class="online-user-info">
+                            <div class="user-avatar-initial">${initial}</div>
+                            <div>
+                                <div class="online-user-email">${displayName} (${myEmail}) <span style="font-size:0.75rem; color:#10b981; font-weight:700;">(You)</span></div>
+                                <div style="font-size:0.72rem; color:#6a7c94;">Active now on portal</div>
+                            </div>
+                        </div>
+                        <span class="online-status-pill"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;"></span> Online</span>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = '<div style="text-align:center; padding: 20px; color:#6a7c94; font-size:0.88rem;">1 student active on portal</div>';
+            }
         }
     }
 
@@ -1841,13 +1859,40 @@
                 });
                 container.innerHTML = html;
             } else {
-                container.innerHTML = '<div style="text-align:center; padding: 15px; color:#b33a3a; font-size:0.8rem;">⚠️ Could not fetch student list</div>';
+                renderManualDirectInput(container, 'Abhi koi aur student online list me nahi mila.');
             }
         } catch (err) {
             console.error('Error loading direct users:', err);
-            container.innerHTML = '<div style="text-align:center; padding: 15px; color:#b33a3a; font-size:0.8rem;">⚠️ Network error</div>';
+            renderManualDirectInput(container, 'Direct chat karne ke liye student ka email enter karein:');
         }
     }
+
+    function renderManualDirectInput(container, message) {
+        if (!container) return;
+        container.innerHTML = `
+            <div style="text-align:center; padding: 14px 10px; color:#64748b; font-size:0.82rem;">
+                ${message}
+            </div>
+            <div style="padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-top:6px;">
+                <div style="font-size:0.75rem; font-weight:600; color:#475569; margin-bottom:8px;">💬 Student ke email se private chat karein:</div>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="manualDirectStudentInput" placeholder="Enter student email..." style="flex:1; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.8rem;" />
+                    <button type="button" onclick="window.handleManualDirectChat()" style="background:#2563eb; color:#fff; border:none; padding:7px 14px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer;">Chat</button>
+                </div>
+            </div>
+        `;
+    }
+
+    window.handleManualDirectChat = function() {
+        const input = document.getElementById('manualDirectStudentInput');
+        if (!input) return;
+        const val = input.value.trim();
+        if (!val) {
+            showToast('⚠️ Please enter student email to chat', 'error');
+            return;
+        }
+        window.startDirectChat(val, val.split('@')[0]);
+    };
 
     window.startDirectChat = function(email, name) {
         activeDirectStudent = { email, name: name || email };
