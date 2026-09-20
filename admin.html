@@ -4,13 +4,247 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Admin Panel</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: #f0f4fb; min-height: 100vh; display: flex; justify-content: center; padding: 30px 16px; }
+    .app { max-width: 900px; width: 100%; background: white; border-radius: 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.04); padding: 28px 30px; }
+    
+    @media (max-width: 768px) {
+      .app { padding: 16px; border-radius: 20px; }
+      .header h1 { font-size: 1.3rem; }
+      .flex-row { flex-direction: column; }
+      .flex-row > * { min-width: auto; width: 100%; }
+      .btn { min-width: auto; padding: 10px 20px; }
+      .tab-btn { padding: 8px 16px; font-size: 0.85rem; }
+      .entry-item { flex-wrap: wrap; gap: 8px; }
+      .key-display { flex-direction: column; align-items: stretch; }
+    }
+
+    @media (max-width: 480px) {
+      .app { padding: 12px; border-radius: 16px; }
+      .header h1 { font-size: 1.1rem; }
+      .tab-buttons { gap: 8px; }
+      .tab-btn { padding: 6px 12px; font-size: 0.75rem; }
+      .section-title { font-size: 0.95rem; }
+    }
+
+    .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e8edf6; padding-bottom: 18px; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+    .header h1 { font-weight: 600; font-size: 1.9rem; color: #0b1a33; }
+    .badge { background: #eef3fa; padding: 6px 16px; border-radius: 40px; font-size: 0.8rem; color: #4c637f; }
+    
+    .section-title { font-weight: 600; color: #0b1a33; margin-top: 24px; margin-bottom: 8px; font-size: 1.1rem; border-bottom: 2px solid #e8edf6; padding-bottom: 8px; }
+    .flex-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .flex-row > * { flex: 1; min-width: 150px; }
+    
+    input, select { width: 100%; padding: 12px 16px; border: 1px solid #d9e1ec; border-radius: 20px; font-size: 0.95rem; background: #fafcff; }
+    input:focus, select:focus { border-color: #1a2b4c; outline: none; background: white; }
+    
+    .btn { padding: 12px 28px; border: none; border-radius: 60px; font-weight: 500; cursor: pointer; transition: 0.15s; flex:1; min-width:120px; }
+    .btn-primary { background: #1a2b4c; color: white; }
+    .btn-primary:hover { background: #2f4370; }
+    .btn-success { background: #1a7a3a; color: white; }
+    .btn-success:hover { background: #1f944a; }
+    .btn-danger { background: #b33a3a; color: white; }
+    .btn-danger:hover { background: #992e2e; }
+    .btn-outline { background: transparent; color: #1a2b4c; border: 1px solid #d0dae8; }
+    .btn-outline:hover { background: #f0f4fe; }
+    .btn-sm { padding: 8px 18px; font-size: 0.85rem; flex: 0; }
+    .btn-copy { background: #2d7a9b; color: white; padding: 6px 16px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.8rem; }
+    .btn-copy:hover { background: #1f5f7a; }
+    .btn-highlight { padding: 4px 14px; border: none; border-radius: 40px; cursor: pointer; font-size: 0.75rem; transition: 0.15s; }
+    .btn-highlight.active { background: #1a7a3a; color: white; }
+    .btn-highlight.active:hover { background: #0f5c28; }
+    .btn-highlight.inactive { background: #6a7c94; color: white; }
+    .btn-highlight.inactive:hover { background: #5a6a80; }
+    
+    .entry-list { background: #f5f8fe; border-radius: 20px; padding: 6px 0; margin: 12px 0 6px; max-height: 350px; overflow-y: auto; }
+    .entry-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-bottom: 1px solid #e6edf6; }
+    .entry-item:last-child { border-bottom: none; }
+    .entry-item .info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+    .entry-item .name { font-weight: 600; color: #0b1a33; }
+    .entry-item .sub { color: #4c637f; font-size: 0.8rem; word-break: break-all; }
+    .entry-item .del-btn { background: none; border: none; color: #b33a3a; font-size: 1.2rem; cursor: pointer; padding: 4px 10px; border-radius: 40px; }
+    .entry-item .del-btn:hover { background: #ffe6e6; }
+    .entry-item .key-btn { background: none; border: 1px solid #d0dae8; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.8rem; }
+    .entry-item .key-btn:hover { background: #e6edf6; }
+    .entry-item .reset-btn { background: #fff3cd; border: 1px solid #856404; border-radius: 40px; padding: 4px 12px; cursor: pointer; font-size: 0.8rem; }
+    .entry-item .reset-btn:hover { background: #ffe6b3; }
+    
+    .empty-state { color: #6a7c94; padding: 20px 0; text-align: center; font-style: italic; }
+    .toast-msg { font-size: 0.9rem; margin-top: 12px; padding: 8px 16px; border-radius: 60px; display: inline-block; }
+    .toast-error { background: #fee; color: #b33a3a; }
+    .toast-success { background: #e6f5e6; color: #1a5d3c; }
+    .toast-info { background: #e6f0fa; color: #1a3f5c; }
+    
+    .password-gate { background: #f8faff; border-radius: 20px; padding: 24px; margin-top: 10px; }
+    .password-gate label { font-weight: 500; color: #1a2b4c; display: block; margin-top: 12px; margin-bottom: 5px; font-size: 0.9rem; }
+    .password-gate .pwd-error { color: #b33a3a; font-size: 0.9rem; margin-top: 6px; }
+    .api-status { font-size: 0.8rem; color: #4c637f; padding: 6px 14px; background: #eef3fa; border-radius: 40px; display: inline-block; }
+    .status-connected { background: #e6f5e6; color: #1a5d3c; }
+    .status-error { background: #fee; color: #b33a3a; }
+    
+    .playlist-header { background: #eef3fa; padding: 10px 16px; font-weight: 700; border-radius: 12px; margin: 8px 0 4px; display: flex; justify-content: space-between; align-items: center; }
+    .tab-buttons { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .tab-btn { padding: 10px 24px; border: 2px solid #d9e1ec; border-radius: 40px; background: white; cursor: pointer; font-weight: 500; }
+    .tab-btn.active { border-color: #1a2b4c; background: #1a2b4c; color: white; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    
+    .key-display { background: #f0f4fb; padding: 12px 16px; border-radius: 12px; font-family: monospace; word-break: break-all; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .key-display .key-text { font-size: 1.1rem; color: #0b1a33; }
+    
+    .important-item { background: #fef9e7; border-left: 4px solid #f7971e; }
+    .important-item.hidden { opacity: 0.6; border-left-color: #6a7c94; }
+    
+    .visibility-badge { font-size: 0.7rem; padding: 2px 12px; border-radius: 40px; font-weight: 600; }
+    .visibility-badge.visible { background: #e6f5e6; color: #1a5d3c; }
+    .visibility-badge.hidden { background: #fee; color: #b33a3a; }
+
+    /* ===== REAL-TIME ACTIVE USERS BADGE (GREEN DOT) ===== */
+    .live-users-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border-radius: 40px;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #065f46;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+    .pulsing-green-dot-wrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 10px;
+      height: 10px;
+    }
+    .pulsing-green-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+      z-index: 2;
+    }
+    .pulsing-green-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: rgba(16, 185, 129, 0.55);
+      animation: live-ring-pulse 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+      z-index: 1;
+    }
+    @keyframes live-ring-pulse {
+      0% { transform: scale(0.8); opacity: 0.95; }
+      70% { transform: scale(2.3); opacity: 0; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+    .live-users-text strong {
+      font-weight: 700;
+      color: #047857;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ===== CHAT MONITOR STYLES ===== */
+    .chat-msg-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e6edf6;
+      gap: 12px;
+      transition: background 0.2s;
+    }
+    .chat-msg-row:hover { background: #eef4fc; }
+    .chat-msg-row:last-child { border-bottom: none; }
+    .chat-msg-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .chat-msg-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .chat-sender-badge {
+      font-weight: 700;
+      color: #1a2b4c;
+      font-size: 0.88rem;
+    }
+    .chat-time-badge {
+      font-size: 0.72rem;
+      color: #6a7c94;
+    }
+    .chat-msg-body {
+      font-size: 0.92rem;
+      color: #0b1a33;
+      line-height: 1.4;
+      word-break: break-word;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      margin-top: 4px;
+    }
+    .chat-delete-btn {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fca5a5;
+      border-radius: 40px;
+      padding: 6px 14px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+    .chat-delete-btn:hover {
+      background: #b91c1c;
+      color: white;
+      border-color: #b91c1c;
+    }
+    .admin-online-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: white;
+      border: 1px solid #cbd5e1;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      color: #1e293b;
+      margin: 4px;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
 <div class="app">
   <div class="header">
     <h1>⚙️ Admin Panel</h1>
-    <span class="badge">🔐 Protected</span>
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div class="live-users-pill" id="adminLiveUsersBadge" title="Real-time Active Students Online">
+        <span class="pulsing-green-dot-wrap">
+          <span class="pulsing-green-ring"></span>
+          <span class="pulsing-green-dot"></span>
+        </span>
+        <span class="live-users-text"><strong id="adminActiveUsersCount">0</strong> Active Online</span>
+      </div>
+      <span class="badge">🔐 Protected</span>
+    </div>
   </div>
 
   <!-- Password Gate -->
@@ -40,6 +274,7 @@
       <button class="tab-btn" data-tab="important">⭐ Live</button>
       <button class="tab-btn" data-tab="users">👥 Users</button>
       <button class="tab-btn" data-tab="allowed-emails">📧 Allowed Emails</button>
+      <button class="tab-btn" data-tab="chat" id="adminChatTabBtn">💬 Chat Monitor</button>
     </div>
 
     <!-- Playlists Tab -->
@@ -153,6 +388,42 @@
       </div>
       <div id="allowedEmailFeedback" class="toast-msg"></div>
     </div>
+
+    <!-- Chat Monitor Tab (NEW) -->
+    <div id="tab-chat" class="tab-content">
+      <div class="section-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <span>💬 Student Study & Doubts Chat Monitor</span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary btn-sm" id="refreshChatBtn">🔄 Refresh</button>
+          <button class="btn btn-danger btn-sm" id="clearAllChatBtn">🧹 Clear All Chat</button>
+        </div>
+      </div>
+      <p style="color:#6a7c94;font-size:0.85rem;margin-bottom:14px;">
+        Aap yahan real-time dekh sakte hain ki students study se related discussions kar rahe hain ya kya baat ho rahi hai. Kisi bhi inappropriate message ko delete kar sakte hain.
+      </p>
+
+      <!-- Active Online Students Summary -->
+      <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:18px; padding:12px 18px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; color:#065f46; font-weight:600; font-size:0.9rem;">
+          <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#10b981;"></span>
+          <span>Online Students Right Now: <strong id="adminOnlineUsersListCount">0</strong></span>
+        </div>
+        <button class="btn btn-outline btn-sm" id="toggleOnlineUsersBtn" style="padding:4px 14px; font-size:0.75rem;">👥 View Online Students</button>
+      </div>
+
+      <div id="adminOnlineUsersPanel" style="display:none; background:#f8faff; border:1px solid #e2e8f0; border-radius:16px; padding:14px; margin-bottom:16px; max-height:220px; overflow-y:auto;">
+        <div id="adminOnlineUsersContent" style="color:#6a7c94; font-size:0.85rem;">Loading active students...</div>
+      </div>
+
+      <div id="adminChatFeedback" class="toast-msg"></div>
+
+      <div class="section-title" style="margin-top:16px;">
+        <span>📋 Messages Stream (<span id="adminChatMessageCount">0</span>)</span>
+      </div>
+      <div class="entry-list" id="adminChatList" style="max-height: 480px;">
+        <div class="empty-state">Loading chat messages...</div>
+      </div>
+    </div>
     
     <div style="margin-top:20px; border-top:1px solid #e8edf6; padding-top:18px;">
       <button class="btn btn-danger" id="logoutBtn" style="flex:0; padding:8px 24px;">🚪 Logout</button>
@@ -160,6 +431,1039 @@
   </div>
 </div>
 
-<script src="js/admin.js"></script>
+<script>
+// ========================================================================
+//  ANTI-DEVELOPER TOOLS
+// ========================================================================
+(function antiDevTools() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+    
+    if (!isMobile) {
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) ||
+                (e.ctrlKey && e.key === 'U')) {
+                e.preventDefault();
+                window.location.href = 'https://www.google.com';
+            }
+        });
+
+        let devToolsDetected = false;
+
+        function detectDevTools() {
+            const threshold = 160;
+            const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+            const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+            
+            if (widthThreshold || heightThreshold) {
+                if (!devToolsDetected) {
+                    devToolsDetected = true;
+                    console.clear();
+                    setTimeout(function() {
+                        window.location.href = 'https://www.google.com';
+                    }, 100);
+                }
+            } else {
+                devToolsDetected = false;
+            }
+        }
+
+        setInterval(detectDevTools, 100);
+        setInterval(function() { console.clear(); }, 100);
+
+        const noop = function() {};
+        console.log = noop;
+        console.warn = noop;
+        console.error = noop;
+        console.info = noop;
+        console.debug = noop;
+        console.table = noop;
+        console.trace = noop;
+        console.dir = noop;
+        console.dirxml = noop;
+        console.group = noop;
+        console.groupEnd = noop;
+        console.groupCollapsed = noop;
+        console.clear = noop;
+        console.count = noop;
+        console.countReset = noop;
+        console.assert = noop;
+        console.profile = noop;
+        console.profileEnd = noop;
+        console.time = noop;
+        console.timeEnd = noop;
+        console.timeLog = noop;
+
+        window.open = function() {
+            window.location.href = 'https://www.google.com';
+            return null;
+        };
+
+        window.eval = function() {
+            window.location.href = 'https://www.google.com';
+            return null;
+        };
+    }
+})();
+
+// ==================== MAIN ADMIN APP ====================
+(function() {
+    const API_BASE = 'https://video-play-api.newstreamcp.workers.dev/api';
+    let playlists = [];
+    let users = [];
+    let importantItems = [];
+    let allowedEmails = [];
+    let isAuthenticated = false;
+
+    // Sections (Recorded, Reasoning, Quant, Computer, English)
+    const SECTION_LABELS = {
+        recorded: '📐 Math',
+        reasoning: '🧠 Reasoning',
+        quant: '🔢 Quant',
+        computer: '💻 Computer',
+        english: '📖 English'
+    };
+    // FIX: was ['Math', ...] (capital, wrong key) — must match the actual
+    // section values used everywhere else ('recorded', not 'Math').
+    // This was the reason recorded-section playlists never showed up.
+    const SECTION_ORDER = ['recorded', 'reasoning', 'quant', 'computer', 'english'];
+    // Any playlist saved before the "section" column existed has NULL/empty
+    // section in the DB — treat that as the default "recorded" section too.
+    const DEFAULT_SECTION = 'recorded';
+
+    // ----- Tabs -----
+    let adminChatPollInterval = null;
+
+    function startAdminChatPolling() {
+        if (adminChatPollInterval) clearInterval(adminChatPollInterval);
+        adminChatPollInterval = setInterval(() => {
+            loadAdminChat(false);
+        }, 4000);
+    }
+
+    function stopAdminChatPolling() {
+        if (adminChatPollInterval) {
+            clearInterval(adminChatPollInterval);
+            adminChatPollInterval = null;
+        }
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            const tabId = this.dataset.tab;
+            document.getElementById('tab-' + tabId).classList.add('active');
+            if (tabId === 'users') { loadUsers(); stopAdminChatPolling(); }
+            else if (tabId === 'playlists') { loadPlaylists(); stopAdminChatPolling(); }
+            else if (tabId === 'important') { loadImportant(); stopAdminChatPolling(); }
+            else if (tabId === 'allowed-emails') { loadAllowedEmails(); stopAdminChatPolling(); }
+            else if (tabId === 'chat') {
+                loadAdminChat(true);
+                loadAdminOnlineUsers();
+                startAdminChatPolling();
+            }
+        });
+    });
+
+    // ----- API Call -----
+    async function apiCall(endpoint, options = {}) {
+        try {
+            const url = API_BASE + endpoint;
+            const response = await fetch(url, {
+                ...options,
+                headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            console.error('API Error:', error);
+            throw error;
+        }
+    }
+
+    // ==================== ADMIN LOGIN ====================
+    async function adminLogin() {
+        const username = document.getElementById('adminUsername').value.trim();
+        const password = document.getElementById('adminPwdInput').value.trim();
+        const errorEl = document.getElementById('pwdError');
+
+        if (!username || !password) {
+            errorEl.textContent = '❌ Please enter username and password';
+            return;
+        }
+
+        try {
+            const data = await apiCall('/admin/login', {
+                method: 'POST',
+                body: JSON.stringify({ username, password })
+            });
+
+            if (data.success) {
+                isAuthenticated = true;
+                document.getElementById('passwordGate').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                errorEl.textContent = '';
+                loadPlaylists();
+                loadUsers();
+                loadImportant();
+                loadAllowedEmails();
+                fetchAdminActiveUsers();
+                showFeedback('✅ Welcome ' + data.admin.username, 'success', 'playlistFeedback');
+            } else {
+                errorEl.textContent = '❌ ' + (data.error || 'Invalid credentials');
+                document.getElementById('adminPwdInput').value = '';
+                document.getElementById('adminUsername').value = '';
+                document.getElementById('adminUsername').focus();
+            }
+        } catch (error) {
+            errorEl.textContent = '❌ Connection error: ' + error.message;
+        }
+    }
+
+    // ==================== ALLOWED EMAILS MANAGEMENT (NEW) ====================
+    async function loadAllowedEmails() {
+        try {
+            const data = await apiCall('/allowed-emails');
+            if (data.success) {
+                allowedEmails = data.emails || [];
+                renderAllowedEmailsList();
+                showFeedback('✅ Allowed emails loaded', 'success', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function addAllowedEmail() {
+        const email = document.getElementById('allowedEmailInput').value.trim();
+        if (!email) {
+            showFeedback('⚠️ Enter email', 'error', 'allowedEmailFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                document.getElementById('allowedEmailInput').value = '';
+                loadAllowedEmails();
+                showFeedback('✅ Email added: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ ' + data.error, 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    async function deleteAllowedEmail(email) {
+        if (!confirm(`Remove ${email}?`)) return;
+        try {
+            const data = await apiCall('/allowed-emails', {
+                method: 'DELETE',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                loadAllowedEmails();
+                showFeedback('✅ Removed: ' + email, 'success', 'allowedEmailFeedback');
+            } else {
+                showFeedback('❌ Failed to remove', 'error', 'allowedEmailFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'allowedEmailFeedback');
+        }
+    }
+
+    function renderAllowedEmailsList() {
+        const list = document.getElementById('allowedEmailsList');
+        if (!allowedEmails.length) {
+            list.innerHTML = `<div class="empty-state">No allowed emails added</div>`;
+            return;
+        }
+        let html = '';
+        allowedEmails.forEach(item => {
+            html += `
+                <div class="entry-item">
+                    <div class="info">
+                        <span class="name">📧 ${item.email}</span>
+                        <span class="sub">Added: ${new Date(item.created_at).toLocaleString()}</span>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <button class="del-btn" onclick="window.deleteAllowedEmail('${item.email}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteAllowedEmail = deleteAllowedEmail;
+    }
+
+    // ==================== IMPORTANT SECTION ====================
+    async function loadImportant() {
+        try {
+            const data = await apiCall('/important/all');
+            if (data.success) {
+                importantItems = data.items || [];
+                renderImportantList();
+                showFeedback('✅ Important items loaded', 'success', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function saveImportant() {
+        const title = document.getElementById('importantTitle').value.trim();
+        const link = document.getElementById('importantLink').value.trim();
+
+        if (!title || !link) {
+            showFeedback('⚠️ Please fill both Title and URL', 'error', 'importantFeedback');
+            return;
+        }
+
+        try {
+            const data = await apiCall('/important', {
+                method: 'POST',
+                body: JSON.stringify({ title, link })
+            });
+
+            if (data.success) {
+                document.getElementById('importantTitle').value = '';
+                document.getElementById('importantLink').value = '';
+                showFeedback('✅ Important class saved!', 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to save: ' + data.error, 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function toggleImportantVisibility(id) {
+        try {
+            const data = await apiCall('/important/toggle', {
+                method: 'POST',
+                body: JSON.stringify({ id })
+            });
+
+            if (data.success) {
+                showFeedback(data.message, 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to toggle: ' + data.error, 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    async function deleteImportant(id) {
+        if (!confirm('Delete this important class?')) return;
+        try {
+            const data = await apiCall('/important', {
+                method: 'DELETE',
+                body: JSON.stringify({ id })
+            });
+            if (data.success) {
+                showFeedback('🗑️ Deleted', 'success', 'importantFeedback');
+                loadImportant();
+            } else {
+                showFeedback('❌ Failed to delete', 'error', 'importantFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Error: ' + error.message, 'error', 'importantFeedback');
+        }
+    }
+
+    function renderImportantList() {
+        const list = document.getElementById('importantList');
+        if (!importantItems.length) {
+            list.innerHTML = `<div class="empty-state">No important classes added yet</div>`;
+            return;
+        }
+        let html = '';
+        importantItems.forEach(item => {
+            const isVisible = item.is_visible === 1;
+            const itemClass = isVisible ? '' : 'hidden';
+            html += `
+                <div class="entry-item important-item ${itemClass}">
+                    <div class="info">
+                        <span class="name">
+                            ${isVisible ? '👁️' : '🚫'} ${item.title}
+                            <span class="visibility-badge ${isVisible ? 'visible' : 'hidden'}" style="margin-left:8px;">
+                                ${isVisible ? 'Visible' : 'Hidden'}
+                            </span>
+                        </span>
+                        <span class="sub">${item.link}</span>
+                    </div>
+                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                        <button class="btn-highlight ${isVisible ? 'active' : 'inactive'}" 
+                                onclick="window.toggleImportantVisibility('${item.id}')">
+                            ${isVisible ? '👁️ Hide' : '🚫 Show'}
+                        </button>
+                        <button class="del-btn" onclick="window.deleteImportant('${item.id}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.toggleImportantVisibility = toggleImportantVisibility;
+        window.deleteImportant = deleteImportant;
+    }
+
+    // ==================== LOAD PLAYLISTS ====================
+    async function loadPlaylists() {
+        try {
+            const data = await apiCall('/playlists');
+            if (data.success) {
+                playlists = data.playlists;
+                renderAdminList();
+                updatePlaylistSelect();
+                updateApiStatus('connected');
+                showFeedback('✅ Playlists loaded', 'success', 'playlistFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load: ' + error.message, 'error', 'playlistFeedback');
+            updateApiStatus('error');
+        }
+    }
+
+    // ==================== ADD PLAYLIST ====================
+    async function addPlaylist() {
+        const name = document.getElementById('newPlaylistName').value.trim();
+        // FIX: default fallback should match the real section key 'recorded'
+        const section = document.getElementById('newPlaylistSection').value || DEFAULT_SECTION;
+        if (!name) {
+            showFeedback('⚠️ Enter playlist name', 'error', 'playlistFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/playlists', {
+                method: 'POST',
+                body: JSON.stringify({ name, section })
+            });
+            if (data.success) {
+                document.getElementById('newPlaylistName').value = '';
+                showFeedback('✅ Playlist added to ' + (SECTION_LABELS[section] || section), 'success', 'playlistFeedback');
+                loadPlaylists();
+            } else {
+                showFeedback('❌ ' + (data.error || 'Failed to add playlist'), 'error', 'playlistFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== ADD CHAPTER ====================
+    async function addChapter() {
+        const playlistId = document.getElementById('playlistSelect').value;
+        const name = document.getElementById('chapterName').value.trim();
+        const link = document.getElementById('chapterLink').value.trim();
+        if (!playlistId || !name || !link) {
+            showFeedback('⚠️ Section + Playlist select karo aur sab fields bharo', 'error', 'chapterFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/playlists/chapter', {
+                method: 'POST',
+                body: JSON.stringify({ playlistId, chapterName: name, chapterLink: link })
+            });
+            if (data.success) {
+                document.getElementById('chapterName').value = '';
+                document.getElementById('chapterLink').value = '';
+                showFeedback('✅ Chapter added', 'success', 'chapterFeedback');
+                loadPlaylists();
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'chapterFeedback');
+        }
+    }
+
+    // ==================== DELETE PLAYLIST ====================
+    async function deletePlaylist(playlistId) {
+        if (!confirm('Delete this playlist?')) return;
+        try {
+            await apiCall('/playlists', {
+                method: 'DELETE',
+                body: JSON.stringify({ playlistId })
+            });
+            loadPlaylists();
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== DELETE CHAPTER ====================
+    async function deleteChapter(playlistId, chapterId) {
+        if (!confirm('Delete this chapter?')) return;
+        try {
+            await apiCall('/playlists/chapter', {
+                method: 'DELETE',
+                body: JSON.stringify({ playlistId, chapterId })
+            });
+            loadPlaylists();
+            showFeedback('🗑️ Deleted', 'success', 'playlistFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'playlistFeedback');
+        }
+    }
+
+    // ==================== LOAD USERS ====================
+    async function loadUsers() {
+        try {
+            const data = await apiCall('/users');
+            if (data.success) {
+                users = data.users;
+                renderUserList();
+                updateUserSelect();
+                updateApiStatus('connected');
+                showFeedback('✅ Users loaded', 'success', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed to load users: ' + error.message, 'error', 'userFeedback');
+            updateApiStatus('error');
+        }
+    }
+
+    // ==================== ADD USER ====================
+    async function addUser() {
+        const email = document.getElementById('newUserEmail').value.trim();
+        if (!email) {
+            showFeedback('⚠️ Enter email', 'error', 'userFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/users', {
+                method: 'POST',
+                body: JSON.stringify({ email })
+            });
+            if (data.success) {
+                document.getElementById('newUserEmail').value = '';
+                showFeedback('✅ User added. Key: ' + data.key, 'success', 'userFeedback');
+                loadUsers();
+            } else {
+                showFeedback('❌ ' + data.error, 'error', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'userFeedback');
+        }
+    }
+
+    // ==================== DELETE USER ====================
+    async function deleteUser(userId) {
+        if (!confirm('Delete this user?')) return;
+        try {
+            await apiCall('/users', {
+                method: 'DELETE',
+                body: JSON.stringify({ userId })
+            });
+            loadUsers();
+            showFeedback('🗑️ User deleted', 'success', 'userFeedback');
+        } catch (error) {
+            showFeedback('❌ Failed to delete', 'error', 'userFeedback');
+        }
+    }
+
+    // ==================== RESET USER ====================
+    window.resetUser = async function(userId) {
+        if (!confirm('⚠️ Are you sure you want to reset this user?')) return;
+        try {
+            const data = await apiCall('/admin/reset-user', {
+                method: 'POST',
+                body: JSON.stringify({ userId })
+            });
+            if (data.success) {
+                showFeedback('✅ User reset!', 'success', 'userFeedback');
+                loadUsers();
+            } else {
+                showFeedback('❌ Failed to reset', 'error', 'userFeedback');
+            }
+        } catch (error) {
+            showFeedback('❌ Network error', 'error', 'userFeedback');
+        }
+    };
+
+    // ==================== GENERATE KEY ====================
+    async function generateKey() {
+        const userId = document.getElementById('userSelect').value;
+        if (!userId) {
+            showFeedback('⚠️ Select a user', 'error', 'keyFeedback');
+            return;
+        }
+        try {
+            const data = await apiCall('/keys/generate', {
+                method: 'POST',
+                body: JSON.stringify({ userId })
+            });
+            if (data.success) {
+                const display = document.getElementById('keyDisplay');
+                const keyText = document.getElementById('keyText');
+                display.style.display = 'flex';
+                keyText.textContent = data.key;
+                showFeedback('✅ Key generated!', 'success', 'keyFeedback');
+                loadUsers();
+            }
+        } catch (error) {
+            showFeedback('❌ Failed: ' + error.message, 'error', 'keyFeedback');
+        }
+    }
+
+    // ==================== COPY KEY ====================
+    window.copyKey = function() {
+        const keyText = document.getElementById('keyText').textContent;
+        if (!keyText) {
+            showFeedback('⚠️ No key to copy', 'error', 'keyFeedback');
+            return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(keyText)
+                .then(() => {
+                    showFeedback('✅ Key copied!', 'success', 'keyFeedback');
+                    document.getElementById('copyKeyBtn').textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        document.getElementById('copyKeyBtn').textContent = '📋 Copy';
+                    }, 2000);
+                })
+                .catch(() => fallbackCopy(keyText));
+        } else {
+            fallbackCopy(keyText);
+        }
+    };
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showFeedback('✅ Key copied!', 'success', 'keyFeedback');
+            document.getElementById('copyKeyBtn').textContent = '✅ Copied!';
+            setTimeout(() => {
+                document.getElementById('copyKeyBtn').textContent = '📋 Copy';
+            }, 2000);
+        } catch (err) {
+            showFeedback('❌ Failed to copy', 'error', 'keyFeedback');
+        }
+        document.body.removeChild(textarea);
+    }
+
+    // ==================== VIEW KEYS ====================
+    window.viewKeys = async function(userId) {
+        try {
+            const data = await apiCall('/keys?userId=' + userId);
+            if (data.success) {
+                let msg = '🔑 Keys for this user:\n\n';
+                if (data.keys.length === 0) {
+                    msg += 'No keys generated yet.';
+                } else {
+                    data.keys.forEach(k => {
+                        const status = k.is_used ? '✅ Used' : '❌ Not used';
+                        const expires = new Date(k.expires_at).toLocaleString();
+                        msg += `Key: ${k.key_value}\nStatus: ${status}\nExpires: ${expires}\n\n`;
+                    });
+                }
+                alert(msg);
+            }
+        } catch (error) {
+            alert('Failed to load keys');
+        }
+    };
+
+    // ==================== RENDER FUNCTIONS ====================
+    // Playlists grouped by Section (Recorded, Reasoning, Quant, Computer, English)
+    function renderAdminList() {
+        const list = document.getElementById('adminList');
+        if (!playlists.length) {
+            list.innerHTML = `<div class="empty-state">No playlists</div>`;
+            return;
+        }
+        let html = '';
+        SECTION_ORDER.forEach(sectionKey => {
+            // FIX: fallback for old rows with NULL/empty section is now
+            // DEFAULT_SECTION ('recorded') instead of the never-matching 'math'
+            const sectionPlaylists = playlists.filter(p => (p.section || DEFAULT_SECTION) === sectionKey);
+            if (!sectionPlaylists.length) return;
+            html += `<div class="section-title" style="margin-top:16px;">${SECTION_LABELS[sectionKey] || sectionKey}</div>`;
+            sectionPlaylists.forEach(playlist => {
+                html += `
+                    <div class="playlist-header">
+                        📁 ${playlist.name}
+                        <button class="del-btn" onclick="window.deletePlaylist('${playlist.id}')">✕</button>
+                    </div>
+                `;
+                if (playlist.chapters?.length) {
+                    playlist.chapters.forEach(chapter => {
+                        html += `
+                            <div class="entry-item" style="padding-left:32px;">
+                                <div class="info">
+                                    <span class="name">${chapter.name}</span>
+                                    <span class="sub">${chapter.link}</span>
+                                </div>
+                                <button class="del-btn" onclick="window.deleteChapter('${playlist.id}', '${chapter.id}')">✕</button>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += `<div class="entry-item" style="padding-left:32px; color:#6a7c94; font-style:italic;">No chapters</div>`;
+                }
+            });
+        });
+        list.innerHTML = html;
+        window.deletePlaylist = deletePlaylist;
+        window.deleteChapter = deleteChapter;
+    }
+
+    function renderUserList() {
+        const list = document.getElementById('userList');
+        if (!users.length) {
+            list.innerHTML = `<div class="empty-state">No users</div>`;
+            return;
+        }
+        let html = '';
+        users.forEach(user => {
+            html += `
+                <div class="entry-item">
+                    <div class="info">
+                        <span class="name">${user.email}</span>
+                        <span class="sub">ID: ${user.id}</span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="key-btn" onclick="window.viewKeys('${user.id}')">🔑 Keys</button>
+                        <button class="reset-btn" onclick="window.resetUser('${user.id}')">🔄 Reset</button>
+                        <button class="del-btn" onclick="window.deleteUser('${user.id}')">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+        list.innerHTML = html;
+        window.deleteUser = deleteUser;
+        window.viewKeys = viewKeys;
+        window.resetUser = resetUser;
+    }
+
+    // Playlist dropdown (for Add Chapter) filtered by the selected Section
+    function updatePlaylistSelect() {
+        const select = document.getElementById('playlistSelect');
+        const sectionFilterEl = document.getElementById('chapterSectionFilter');
+        // FIX: default was 'math', now correctly 'recorded'
+        const sectionFilter = sectionFilterEl ? sectionFilterEl.value : DEFAULT_SECTION;
+        select.innerHTML = '<option value="">Select playlist</option>';
+        playlists
+            .filter(p => (p.section || DEFAULT_SECTION) === sectionFilter)
+            .forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+    }
+
+    function updateUserSelect() {
+        const select = document.getElementById('userSelect');
+        select.innerHTML = '<option value="">Select user</option>';
+        users.forEach(u => {
+            select.innerHTML += `<option value="${u.id}">${u.email}</option>`;
+        });
+    }
+
+    function updateApiStatus(mode) {
+        const el = document.getElementById('apiStatus');
+        if (mode === 'connected') {
+            el.textContent = '✅ D1 Database Connected';
+            el.className = 'api-status status-connected';
+        } else if (mode === 'error') {
+            el.textContent = '❌ Connection Failed';
+            el.className = 'api-status status-error';
+        } else {
+            el.textContent = '🔄 Connecting...';
+            el.className = 'api-status';
+        }
+    }
+
+    function showFeedback(msg, type, elId) {
+        const el = document.getElementById(elId);
+        if (!el) return;
+        el.textContent = msg;
+        el.className = 'toast-msg';
+        if (type === 'error') el.classList.add('toast-error');
+        else if (type === 'success') el.classList.add('toast-success');
+        else el.classList.add('toast-info');
+        setTimeout(() => { el.textContent = ''; el.className = 'toast-msg'; }, 5000);
+    }
+
+    // ===== REAL-TIME ACTIVE USERS (ADMIN) =====
+    async function fetchAdminActiveUsers() {
+        try {
+            const data = await apiCall('/active-users');
+            const el = document.getElementById('adminActiveUsersCount');
+            if (el && data && data.activeCount !== undefined) {
+                el.textContent = data.activeCount;
+            }
+        } catch (e) {
+            // graceful fallback
+        }
+    }
+
+    // ==================== CHAT MONITOR & MODERATION ====================
+    let adminChatMessages = [];
+
+    async function loadAdminChat(notify = false) {
+        try {
+            const data = await apiCall('/chat/messages');
+            if (data.success && Array.isArray(data.messages)) {
+                adminChatMessages = data.messages;
+                renderAdminChatList();
+                const cntEl = document.getElementById('adminChatMessageCount');
+                if (cntEl) cntEl.textContent = adminChatMessages.length;
+                if (notify) showFeedback('✅ Chat feed updated (' + adminChatMessages.length + ' msgs)', 'info', 'adminChatFeedback');
+            }
+        } catch (err) {
+            console.error('Error loading admin chat:', err);
+            if (notify) showFeedback('❌ Failed to load chat: ' + err.message, 'error', 'adminChatFeedback');
+        }
+    }
+
+    function renderAdminChatList() {
+        const list = document.getElementById('adminChatList');
+        if (!list) return;
+
+        if (!adminChatMessages || adminChatMessages.length === 0) {
+            list.innerHTML = `<div class="empty-state">💬 No student chat messages found.</div>`;
+            return;
+        }
+
+        // Display newest messages first on admin panel for easy monitoring
+        const sorted = [...adminChatMessages].reverse();
+        list.innerHTML = '';
+
+        sorted.forEach(m => {
+            const row = document.createElement('div');
+            row.className = 'chat-msg-row';
+            row.id = 'admin-msg-' + m.id;
+
+            const main = document.createElement('div');
+            main.className = 'chat-msg-main';
+
+            const header = document.createElement('div');
+            header.className = 'chat-msg-header';
+
+            const sender = document.createElement('span');
+            sender.className = 'chat-sender-badge';
+            sender.textContent = `🎓 ${m.email}`;
+
+            const time = document.createElement('span');
+            time.className = 'chat-time-badge';
+            time.textContent = `🕒 ${m.created_at ? new Date(m.created_at).toLocaleString() : ''}`;
+
+            header.appendChild(sender);
+            header.appendChild(time);
+
+            const body = document.createElement('div');
+            body.className = 'chat-msg-body';
+            body.textContent = m.message; // Safe textContent prevents XSS
+
+            main.appendChild(header);
+            main.appendChild(body);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'chat-delete-btn';
+            delBtn.innerHTML = '🗑️ Delete';
+            delBtn.title = 'Delete this message from community chat';
+            delBtn.onclick = () => deleteChatMessage(m.id);
+
+            row.appendChild(main);
+            row.appendChild(delBtn);
+            list.appendChild(row);
+        });
+    }
+
+    async function deleteChatMessage(msgId) {
+        if (!confirm('Are you sure you want to delete this message?\nIt will be permanently hidden from all student screens.')) return;
+
+        try {
+            const data = await apiCall('/chat/messages', {
+                method: 'DELETE',
+                body: JSON.stringify({ id: msgId })
+            });
+
+            if (data.success) {
+                showFeedback('🗑️ Message deleted successfully', 'success', 'adminChatFeedback');
+                loadAdminChat(false);
+            } else {
+                showFeedback('❌ ' + (data.error || 'Failed to delete message'), 'error', 'adminChatFeedback');
+            }
+        } catch (err) {
+            showFeedback('❌ Error deleting message: ' + err.message, 'error', 'adminChatFeedback');
+        }
+    }
+
+    async function clearAllChat() {
+        if (!confirm('⚠️ DANGER: Are you sure you want to clear ALL chat history?\nThis will remove all messages for all students.')) return;
+
+        try {
+            const data = await apiCall('/admin/chat/clear', {
+                method: 'POST'
+            });
+
+            if (data.success) {
+                showFeedback('🧹 All chat messages cleared successfully!', 'success', 'adminChatFeedback');
+                loadAdminChat(false);
+            } else {
+                showFeedback('❌ ' + (data.error || 'Failed to clear chat'), 'error', 'adminChatFeedback');
+            }
+        } catch (err) {
+            showFeedback('❌ Error clearing chat: ' + err.message, 'error', 'adminChatFeedback');
+        }
+    }
+
+    async function loadAdminOnlineUsers() {
+        const countEl = document.getElementById('adminOnlineUsersListCount');
+        const badgeEl = document.getElementById('adminActiveUsersCount');
+        const contentEl = document.getElementById('adminOnlineUsersContent');
+
+        try {
+            const data = await apiCall('/active-users/list');
+            if (data.success && Array.isArray(data.users)) {
+                const users = data.users;
+                if (countEl) countEl.textContent = users.length;
+                if (badgeEl) badgeEl.textContent = users.length;
+
+                if (contentEl) {
+                    if (users.length === 0) {
+                        contentEl.innerHTML = '<span style="color:#6a7c94; font-style:italic;">No active students currently online</span>';
+                    } else {
+                        let html = '<div style="font-weight:600; font-size:0.82rem; color:#1a2b4c; margin-bottom:8px;">Currently logged in students:</div>';
+                        html += '<div style="display:flex; flex-wrap:wrap; gap:6px;">';
+                        users.forEach(u => {
+                            html += `
+                                <div class="admin-online-badge">
+                                    <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
+                                    <span>${u.email}</span>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                        contentEl.innerHTML = html;
+                    }
+                }
+            }
+        } catch (err) {
+            console.error('Error loading online users in admin:', err);
+        }
+    }
+
+    function toggleOnlineUsersPanel() {
+        const panel = document.getElementById('adminOnlineUsersPanel');
+        if (!panel) return;
+        if (panel.style.display === 'none' || !panel.style.display) {
+            panel.style.display = 'block';
+            loadAdminOnlineUsers();
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+
+    // ==================== AUTH ====================
+    function setupAuth() {
+        const unlockBtn = document.getElementById('unlockBtn');
+        const pwdInput = document.getElementById('adminPwdInput');
+        const usernameInput = document.getElementById('adminUsername');
+
+        unlockBtn.addEventListener('click', adminLogin);
+        pwdInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') adminLogin();
+        });
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                pwdInput.focus();
+            }
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            isAuthenticated = false;
+            stopAdminChatPolling();
+            document.getElementById('passwordGate').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('adminPwdInput').value = '';
+            document.getElementById('adminUsername').value = 'admin';
+            document.getElementById('pwdError').textContent = '';
+        });
+    }
+
+    // ==================== GLOBAL FUNCTIONS ====================
+    // Make all functions globally accessible for onclick
+    window.deletePlaylist = deletePlaylist;
+    window.deleteChapter = deleteChapter;
+    window.deleteUser = deleteUser;
+    window.resetUser = resetUser;
+    window.copyKey = copyKey;
+    window.viewKeys = viewKeys;
+    window.toggleImportantVisibility = toggleImportantVisibility;
+    window.deleteImportant = deleteImportant;
+    window.deleteAllowedEmail = deleteAllowedEmail;
+    window.deleteChatMessage = deleteChatMessage;
+    window.clearAllChat = clearAllChat;
+    window.loadAdminChat = loadAdminChat;
+    window.loadAdminOnlineUsers = loadAdminOnlineUsers;
+    window.toggleOnlineUsersPanel = toggleOnlineUsersPanel;
+
+    // ==================== EVENT LISTENERS ====================
+    document.getElementById('addPlaylistBtn').addEventListener('click', addPlaylist);
+    document.getElementById('addChapterBtn').addEventListener('click', addChapter);
+    document.getElementById('addUserBtn').addEventListener('click', addUser);
+    document.getElementById('generateKeyBtn').addEventListener('click', generateKey);
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+        loadPlaylists();
+        loadUsers();
+        loadImportant();
+        loadAllowedEmails();
+        fetchAdminActiveUsers();
+        loadAdminOnlineUsers();
+        const chatTab = document.getElementById('tab-chat');
+        if (chatTab && chatTab.classList.contains('active')) {
+            loadAdminChat(true);
+        }
+        showFeedback('🔄 Refreshed', 'info', 'playlistFeedback');
+    });
+
+    document.getElementById('saveImportantBtn').addEventListener('click', saveImportant);
+    document.getElementById('importantTitle').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
+    document.getElementById('importantLink').addEventListener('keydown', e => { if (e.key === 'Enter') saveImportant(); });
+
+    document.getElementById('newPlaylistName').addEventListener('keydown', e => { if (e.key === 'Enter') addPlaylist(); });
+    document.getElementById('chapterName').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
+    document.getElementById('chapterLink').addEventListener('keydown', e => { if (e.key === 'Enter') addChapter(); });
+    document.getElementById('newUserEmail').addEventListener('keydown', e => { if (e.key === 'Enter') addUser(); });
+
+    // When Section (for Add Chapter) changes, refresh the playlist dropdown to only show that section's playlists
+    document.getElementById('chapterSectionFilter').addEventListener('change', updatePlaylistSelect);
+
+    // Allowed Emails event listeners
+    document.getElementById('addAllowedEmailBtn').addEventListener('click', addAllowedEmail);
+    document.getElementById('allowedEmailInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') addAllowedEmail();
+    });
+
+    // Chat Monitor event listeners
+    const refreshChatBtn = document.getElementById('refreshChatBtn');
+    if (refreshChatBtn) refreshChatBtn.addEventListener('click', () => { loadAdminChat(true); loadAdminOnlineUsers(); });
+
+    const clearAllChatBtn = document.getElementById('clearAllChatBtn');
+    if (clearAllChatBtn) clearAllChatBtn.addEventListener('click', clearAllChat);
+
+    const toggleOnlineUsersBtn = document.getElementById('toggleOnlineUsersBtn');
+    if (toggleOnlineUsersBtn) toggleOnlineUsersBtn.addEventListener('click', toggleOnlineUsersPanel);
+
+    setupAuth();
+    fetchAdminActiveUsers();
+    setInterval(fetchAdminActiveUsers, 12000);
+    console.log('✅ Admin panel loaded');
+})();
+</script>
 </body>
 </html>
