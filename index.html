@@ -716,6 +716,156 @@
     }
     .study-chat-close:hover { background: rgba(255,255,255,0.3); }
 
+    /* Dual Chat Mode Tabs */
+    .study-chat-tabs {
+      display: flex;
+      background: #f1f5f9;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    body.dark-mode .study-chat-tabs {
+      background: #0f172a;
+      border-bottom-color: #334155;
+    }
+    .chat-mode-tab {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    body.dark-mode .chat-mode-tab { color: #94a3b8; }
+    .chat-mode-tab.active {
+      color: #1a2b4c;
+      border-bottom-color: #2563eb;
+      background: #ffffff;
+    }
+    body.dark-mode .chat-mode-tab.active {
+      color: #38bdf8;
+      border-bottom-color: #38bdf8;
+      background: #1e293b;
+    }
+    .chat-my-name-bar {
+      padding: 5px 14px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.72rem;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    body.dark-mode .chat-my-name-bar {
+      background: #0d1117;
+      border-bottom-color: #1f2937;
+      color: #9ca3af;
+    }
+    .edit-name-btn {
+      background: transparent;
+      border: none;
+      color: #2563eb;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-decoration: underline;
+    }
+    body.dark-mode .edit-name-btn { color: #60a5fa; }
+    .direct-chat-active-bar {
+      background: #eff6ff;
+      border-bottom: 1px solid #bfdbfe;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    body.dark-mode .direct-chat-active-bar {
+      background: #1e293b;
+      border-bottom-color: #334155;
+    }
+    .direct-back-btn {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      color: #1e293b;
+      transition: 0.15s;
+    }
+    .direct-back-btn:hover { background: #e2e8f0; }
+    body.dark-mode .direct-back-btn {
+      background: #334155;
+      color: #f1f5f9;
+      border-color: #475569;
+    }
+    body.dark-mode .direct-back-btn:hover { background: #475569; }
+    .direct-with-info {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    body.dark-mode .direct-with-info { color: #93c5fd; }
+    .direct-user-select-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px;
+      background: #f8faff;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    body.dark-mode .direct-user-select-list { background: #0d1117; }
+    .direct-user-header-text {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 2px;
+    }
+    body.dark-mode .direct-user-header-text { color: #8b949e; }
+    .direct-user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 12px;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    body.dark-mode .direct-user-item {
+      background: #161b22;
+      border-color: #283348;
+    }
+    .direct-user-item:hover {
+      border-color: #2563eb;
+      transform: translateX(3px);
+    }
+    .direct-chat-btn-action {
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .direct-chat-btn-action:hover { background: #1d4ed8; }
+
     .study-chat-guideline {
       background: #fffbeb;
       border-bottom: 1px solid #fef3c7;
@@ -1155,17 +1305,49 @@
 <div class="study-chat-window" id="studyChatWindow">
   <div class="study-chat-header">
     <div class="study-chat-title-wrap">
-      <div class="study-chat-title">💬 Study & Doubts Chat</div>
+      <div class="study-chat-title" id="studyChatMainTitle">💬 Study & Doubts Chat</div>
       <div class="study-chat-sub"><span class="dot"></span> Online Discussion</div>
     </div>
     <button class="study-chat-close" id="closeChatBtn" title="Close Chat">✕</button>
   </div>
+
+  <!-- Dual Mode Tabs (Group vs 1-on-1 Personal) -->
+  <div class="study-chat-tabs">
+    <button type="button" class="chat-mode-tab active" id="chatTabGroupBtn">🌐 Study Group</button>
+    <button type="button" class="chat-mode-tab" id="chatTabDirectBtn">🔒 Personal (1-on-1)</button>
+  </div>
+
+  <!-- My Display Name Bar -->
+  <div class="chat-my-name-bar">
+    <span>Chatting as: <strong id="chatMyDisplayName">Student</strong></span>
+    <button type="button" class="edit-name-btn" id="editDisplayNameBtn" title="Change your display name">✏️ Edit Name</button>
+  </div>
+
+  <!-- 1-on-1 Direct Chat Active Bar (shown when chatting with a specific student) -->
+  <div id="directChatActiveBar" class="direct-chat-active-bar" style="display:none;">
+    <button type="button" class="direct-back-btn" id="directBackBtn">← All Students</button>
+    <div class="direct-with-info">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10b981;"></span>
+      <span id="directWithStudentName">Chatting with Student</span>
+    </div>
+  </div>
+
   <div class="study-chat-guideline">
     <span>⚠️ <strong>Study Discussion Only:</strong> Ask doubts & discuss classes. Monitored by Admin.</span>
   </div>
+
+  <!-- Direct 1-on-1 Student Selection View -->
+  <div id="directChatUserList" class="direct-user-select-list" style="display:none;">
+    <div class="direct-user-header-text">Select a student to chat privately:</div>
+    <div id="directUserCardsContainer" style="display:flex; flex-direction:column; gap:6px;"></div>
+  </div>
+
+  <!-- Messages List -->
   <div class="study-chat-messages" id="studyChatMessages">
     <div style="text-align:center; padding:30px 10px; color:#8b949e; font-size:0.8rem;">Loading messages...</div>
   </div>
+
+  <!-- Input Bar -->
   <form class="study-chat-input-bar" id="studyChatForm">
     <input type="text" class="study-chat-input" id="studyChatInput" placeholder="Ask a doubt or discuss study topic..." maxlength="500" autocomplete="off" />
     <button type="submit" class="study-chat-send-btn" id="studyChatSendBtn" title="Send Message">➤</button>
@@ -1405,11 +1587,66 @@
         }
     });
 
+    // ===== OFFLINE BEACON (INSTANT OFFLINE STATUS ON TAB / BROWSER CLOSE) =====
+    function sendOfflineSignal() {
+        try {
+            const session = getSession();
+            const email = (session && session.user && session.user.email) || (currentUser && currentUser.email) || (googleUser && googleUser.email);
+            if (email) {
+                const payload = JSON.stringify({ email: email });
+                const url = API_BASE + '/session/offline';
+                if (navigator.sendBeacon) {
+                    const blob = new Blob([payload], { type: 'application/json' });
+                    navigator.sendBeacon(url, blob);
+                } else {
+                    fetch(url, { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' }, keepalive: true }).catch(() => {});
+                }
+            }
+        } catch (e) {}
+    }
+    window.addEventListener('beforeunload', sendOfflineSignal);
+    window.addEventListener('pagehide', sendOfflineSignal);
+
+    // ===== DISPLAY NAME MANAGEMENT =====
+    const STUDENT_NAME_KEY = 'student_display_name';
+
+    function getStudentDisplayName() {
+        let saved = localStorage.getItem(STUDENT_NAME_KEY);
+        if (saved && saved.trim()) return saved.trim();
+        if (googleUser && googleUser.name) return googleUser.name;
+        if (currentUser && currentUser.name) return currentUser.name;
+        const email = (currentUser && currentUser.email) || (googleUser && googleUser.email);
+        if (email) {
+            const prefix = email.split('@')[0];
+            return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+        }
+        return 'Student';
+    }
+
+    function updateDisplayNameUI() {
+        const el = document.getElementById('chatMyDisplayName');
+        if (el) el.textContent = getStudentDisplayName();
+    }
+
+    function promptEditDisplayName() {
+        const curr = getStudentDisplayName();
+        const newName = prompt('Apna chat display name likhein (Enter your name for Study Chat):', curr);
+        if (newName && newName.trim()) {
+            const trimmed = newName.trim().slice(0, 30);
+            localStorage.setItem(STUDENT_NAME_KEY, trimmed);
+            updateDisplayNameUI();
+            showToast('✅ Display name updated: ' + trimmed, 'success');
+            validateSession();
+        }
+    }
+
     // ===== ONLINE USERS MODAL & STUDY CHAT =====
     let chatPollInterval = null;
     let chatBackgroundCheckInterval = null;
     let lastRenderedChatCount = 0;
     let isChatOpen = false;
+    let currentChatMode = 'group'; // 'group' | 'direct'
+    let activeDirectStudent = null; // { email: '', name: '' }
 
     function maskEmailForPrivacy(email) {
         if (!email) return 'Student';
@@ -1457,12 +1694,15 @@
                     return;
                 }
 
-                const myEmail = (currentUser && currentUser.email) || (googleUser && googleUser.email) || '';
+                const myEmail = ((currentUser && currentUser.email) || (googleUser && googleUser.email) || '').toLowerCase();
                 let html = '';
                 users.forEach(u => {
-                    const isMe = myEmail && u.email && myEmail.toLowerCase() === u.email.toLowerCase();
-                    const initial = (u.email ? u.email.charAt(0) : 'U').toUpperCase();
-                    const displayEmail = isMe ? `${u.email} <span style="font-size:0.75rem; color:#10b981; font-weight:700;">(You)</span>` : maskEmailForPrivacy(u.email);
+                    const isMe = myEmail && u.email && myEmail === u.email.toLowerCase();
+                    const displayName = u.name || maskEmailForPrivacy(u.email);
+                    const initial = (displayName ? displayName.charAt(0) : 'U').toUpperCase();
+                    const displayEmail = isMe ? `${displayName} (${u.email}) <span style="font-size:0.75rem; color:#10b981; font-weight:700;">(You)</span>` : displayName;
+                    const safeEmail = (u.email || '').replace(/'/g, "\\'");
+                    const safeName = (displayName || '').replace(/'/g, "\\'");
                     
                     html += `
                         <div class="online-user-card">
@@ -1473,9 +1713,12 @@
                                     <div style="font-size:0.72rem; color:#6a7c94;">Active now on portal</div>
                                 </div>
                             </div>
-                            <span class="online-status-pill">
-                                <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;"></span> Online
-                            </span>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="online-status-pill">
+                                    <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;"></span> Online
+                                </span>
+                                ${!isMe ? `<button type="button" onclick="closeOnlineUsersModal(); window.startDirectChat('${safeEmail}', '${safeName}');" style="background:#2563eb; color:#fff; border:none; padding:4px 9px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer;">💬 Chat</button>` : ''}
+                            </div>
                         </div>
                     `;
                 });
@@ -1488,6 +1731,129 @@
             container.innerHTML = '<div style="text-align:center; padding: 20px; color:#b33a3a; font-size:0.9rem;">⚠️ Error connecting to server</div>';
         }
     }
+
+    // ===== DUAL CHAT SYSTEM (GROUP & DIRECT 1-ON-1) =====
+    function switchChatMode(mode) {
+        currentChatMode = mode;
+        const groupBtn = document.getElementById('chatTabGroupBtn');
+        const directBtn = document.getElementById('chatTabDirectBtn');
+        const directActiveBar = document.getElementById('directChatActiveBar');
+        const directUserList = document.getElementById('directChatUserList');
+        const messagesBox = document.getElementById('studyChatMessages');
+        const inputForm = document.getElementById('studyChatForm');
+        const inputEl = document.getElementById('studyChatInput');
+        const chatSub = document.querySelector('.study-chat-sub');
+
+        if (mode === 'group') {
+            if (groupBtn) groupBtn.classList.add('active');
+            if (directBtn) directBtn.classList.remove('active');
+            if (directActiveBar) directActiveBar.style.display = 'none';
+            if (directUserList) directUserList.style.display = 'none';
+            if (messagesBox) messagesBox.style.display = 'flex';
+            if (inputForm) inputForm.style.display = 'flex';
+            if (inputEl) {
+                inputEl.placeholder = "Ask a doubt or discuss study topic (Sabke Liye)...";
+                inputEl.focus();
+            }
+            if (chatSub) chatSub.innerHTML = '<span class="dot"></span> Online Discussion (Study Group)';
+            lastRenderedChatCount = 0;
+            fetchChatMessages(true);
+        } else {
+            if (directBtn) directBtn.classList.add('active');
+            if (groupBtn) groupBtn.classList.remove('active');
+            if (activeDirectStudent && activeDirectStudent.email) {
+                if (directActiveBar) directActiveBar.style.display = 'flex';
+                if (directUserList) directUserList.style.display = 'none';
+                if (messagesBox) messagesBox.style.display = 'flex';
+                if (inputForm) inputForm.style.display = 'flex';
+                const targetName = activeDirectStudent.name || activeDirectStudent.email;
+                const targetNameEl = document.getElementById('directWithStudentName');
+                if (targetNameEl) targetNameEl.textContent = targetName;
+                if (inputEl) {
+                    inputEl.placeholder = `Message ${targetName} privately...`;
+                    inputEl.focus();
+                }
+                if (chatSub) chatSub.innerHTML = `<span class="dot" style="background:#3b82f6;"></span> 1-on-1 with ${targetName}`;
+                lastRenderedChatCount = 0;
+                fetchChatMessages(true);
+            } else {
+                if (directActiveBar) directActiveBar.style.display = 'none';
+                if (directUserList) directUserList.style.display = 'block';
+                if (messagesBox) messagesBox.style.display = 'none';
+                if (inputForm) inputForm.style.display = 'none';
+                if (chatSub) chatSub.innerHTML = '<span class="dot" style="background:#3b82f6;"></span> Personal 1-on-1 Chat';
+                loadDirectUsersList();
+            }
+        }
+    }
+
+    async function loadDirectUsersList() {
+        const container = document.getElementById('directUserCardsContainer');
+        if (!container) return;
+        container.innerHTML = '<div style="text-align:center; padding: 20px; color:#8b949e; font-size:0.85rem;">⏳ Loading online students...</div>';
+        
+        try {
+            const res = await fetch(API_BASE + '/active-users/list');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            const data = await res.json();
+            
+            if (data.success && Array.isArray(data.users)) {
+                const myEmail = ((currentUser && currentUser.email) || (googleUser && googleUser.email) || '').toLowerCase();
+                const otherUsers = data.users.filter(u => u.email && u.email.toLowerCase() !== myEmail);
+                
+                if (otherUsers.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding: 25px 12px; color:#6a7c94; font-size:0.85rem;">
+                            👥 Abhi koi dusra student online nahi hai.<br>
+                            <span style="font-size:0.75rem; color:#8b949e; margin-top:4px; display:inline-block;">Aap <strong>Study Group</strong> me doubt puch sakte hain ya students ke aane ka wait karein.</span>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                otherUsers.forEach(u => {
+                    const displayName = u.name || maskEmailForPrivacy(u.email);
+                    const initial = (displayName.charAt(0) || 'S').toUpperCase();
+                    const safeEmail = (u.email || '').replace(/'/g, "\\'");
+                    const safeName = (displayName || '').replace(/'/g, "\\'");
+
+                    html += `
+                        <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; transition:all 0.2s;">
+                            <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                                <div style="width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg, #2563eb, #3b82f6); color:#fff; font-weight:700; font-size:0.75rem; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                    ${initial}
+                                </div>
+                                <div style="min-width:0;">
+                                    <div style="font-weight:600; font-size:0.82rem; color:#1e293b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                                        ${displayName}
+                                    </div>
+                                    <div style="font-size:0.7rem; color:#64748b;">
+                                        <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#10b981;margin-right:3px;"></span> Online
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="window.startDirectChat('${safeEmail}', '${safeName}')" style="background:#2563eb; color:#fff; border:none; padding:5px 10px; border-radius:6px; font-size:0.75rem; font-weight:600; cursor:pointer; flex-shrink:0; display:flex; align-items:center; gap:4px;">
+                                💬 Chat
+                            </button>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div style="text-align:center; padding: 15px; color:#b33a3a; font-size:0.8rem;">⚠️ Could not fetch student list</div>';
+            }
+        } catch (err) {
+            console.error('Error loading direct users:', err);
+            container.innerHTML = '<div style="text-align:center; padding: 15px; color:#b33a3a; font-size:0.8rem;">⚠️ Network error</div>';
+        }
+    }
+
+    window.startDirectChat = function(email, name) {
+        activeDirectStudent = { email, name: name || email };
+        openStudyChat();
+        switchChatMode('direct');
+    };
 
     // Study Chat: Open/Close/Toggle
     function toggleStudyChat() {
@@ -1505,12 +1871,21 @@
             badge.style.display = 'none';
             badge.textContent = '0';
         }
-        fetchChatMessages(true);
+        updateDisplayNameUI();
+        if (currentChatMode === 'direct' && (!activeDirectStudent || !activeDirectStudent.email)) {
+            loadDirectUsersList();
+        } else {
+            fetchChatMessages(true);
+        }
         if (chatPollInterval) clearInterval(chatPollInterval);
-        chatPollInterval = setInterval(() => fetchChatMessages(false), 3500);
+        chatPollInterval = setInterval(() => {
+            if (currentChatMode === 'group' || (currentChatMode === 'direct' && activeDirectStudent && activeDirectStudent.email)) {
+                fetchChatMessages(false);
+            }
+        }, 3500);
         setTimeout(() => {
             const input = document.getElementById('studyChatInput');
-            if (input) input.focus();
+            if (input && input.offsetParent !== null) input.focus();
         }, 150);
     }
 
@@ -1527,16 +1902,25 @@
 
     async function fetchChatMessages(forceScrollBottom = false) {
         const box = document.getElementById('studyChatMessages');
-        if (!box) return;
+        if (!box || box.style.display === 'none') return;
+
+        const myEmail = ((currentUser && currentUser.email) || (googleUser && googleUser.email) || '').toLowerCase();
+        let url = API_BASE + '/chat/messages';
+        
+        if (currentChatMode === 'direct') {
+            if (!activeDirectStudent || !activeDirectStudent.email) return;
+            url += `?type=direct&myEmail=${encodeURIComponent(myEmail)}&withEmail=${encodeURIComponent(activeDirectStudent.email)}`;
+        } else {
+            url += `?type=group`;
+        }
 
         try {
-            const res = await fetch(API_BASE + '/chat/messages');
+            const res = await fetch(url);
             if (!res.ok) return;
             const data = await res.json();
             if (!data.success || !Array.isArray(data.messages)) return;
 
             const messages = data.messages;
-            const myEmail = (currentUser && currentUser.email) || (googleUser && googleUser.email) || '';
             
             // Unread badge when chat is closed
             if (!isChatOpen && messages.length > lastRenderedChatCount && lastRenderedChatCount > 0) {
@@ -1548,11 +1932,15 @@
                 }
             }
 
-            // Detect if user was at the bottom before re-rendering
             const isNearBottom = (box.scrollHeight - box.scrollTop - box.clientHeight) < 70;
 
             if (messages.length === 0) {
-                box.innerHTML = '<div style="text-align:center; padding:30px 10px; color:#8b949e; font-size:0.85rem;">👋 No messages yet.<br>Start asking doubts or discuss today\'s classes!</div>';
+                if (currentChatMode === 'direct') {
+                    const targetName = activeDirectStudent ? (activeDirectStudent.name || activeDirectStudent.email) : 'student';
+                    box.innerHTML = `<div style="text-align:center; padding:30px 10px; color:#8b949e; font-size:0.85rem;">🔒 No private messages yet with <strong>${targetName}</strong>.<br>Send a message below to start chatting!</div>`;
+                } else {
+                    box.innerHTML = '<div style="text-align:center; padding:30px 10px; color:#8b949e; font-size:0.85rem;">👋 No messages yet.<br>Start asking doubts or discuss today\'s classes with everyone!</div>';
+                }
                 lastRenderedChatCount = 0;
                 return;
             }
@@ -1561,17 +1949,20 @@
             if (messages.length !== lastRenderedChatCount || forceScrollBottom || box.children.length <= 1) {
                 box.innerHTML = '';
                 messages.forEach(m => {
-                    const isSelf = myEmail && m.email && (myEmail.toLowerCase() === m.email.toLowerCase());
+                    const isSelf = myEmail && m.email && (myEmail === m.email.toLowerCase());
                     const wrap = document.createElement('div');
                     wrap.className = 'chat-bubble-wrap ' + (isSelf ? 'self' : 'other');
 
                     const sender = document.createElement('div');
                     sender.className = 'chat-sender-name';
                     const timeStr = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                    const senderDisplay = m.sender_name ? m.sender_name : (m.email ? maskEmailForPrivacy(m.email) : 'Student');
+                    
                     if (isSelf) {
-                        sender.textContent = `You • ${timeStr}`;
+                        sender.textContent = `You (${senderDisplay}) • ${timeStr}`;
                     } else {
-                        sender.textContent = `🎓 ${maskEmailForPrivacy(m.email)} • ${timeStr}`;
+                        const prefixIcon = currentChatMode === 'direct' ? '🔒' : '🎓';
+                        sender.textContent = `${prefixIcon} ${senderDisplay} • ${timeStr}`;
                     }
 
                     const bubble = document.createElement('div');
@@ -1609,14 +2000,32 @@
         const text = input.value.trim();
         if (!text) return;
 
+        if (currentChatMode === 'direct' && (!activeDirectStudent || !activeDirectStudent.email)) {
+            showToast('⚠️ Please select a student to chat with first', 'error');
+            return;
+        }
+
         const sendBtn = document.getElementById('studyChatSendBtn');
         if (sendBtn) sendBtn.disabled = true;
+
+        const myDisplayName = getStudentDisplayName();
+        const payload = {
+            email: student.email,
+            sender_name: myDisplayName,
+            message: text,
+            chat_type: currentChatMode === 'direct' ? 'direct' : 'group'
+        };
+
+        if (currentChatMode === 'direct') {
+            payload.receiver_email = activeDirectStudent.email;
+            payload.receiver_name = activeDirectStudent.name || activeDirectStudent.email;
+        }
 
         try {
             const res = await fetch(API_BASE + '/chat/messages', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: student.email, message: text })
+                body: JSON.stringify(payload)
             });
             const data = await res.json();
             if (data.success) {
@@ -1640,7 +2049,12 @@
             const response = await fetch(API_BASE + '/session/validate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: session.sessionId, email: session.user.email, device: session.device || 'Unknown' })
+                body: JSON.stringify({
+                    sessionId: session.sessionId,
+                    email: session.user.email,
+                    name: getStudentDisplayName(),
+                    device: session.device || 'Unknown'
+                })
             });
             const data = await response.json();
             if (data.activeCount !== undefined) {
@@ -1781,7 +2195,7 @@
             const response = await fetch(API_BASE + '/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, key: key || '', sessionId, device })
+                body: JSON.stringify({ email, name: getStudentDisplayName(), key: key || '', sessionId, device })
             });
             const data = await response.json();
             if (data.success) {
@@ -1805,6 +2219,7 @@
 
     // ===== LOGOUT =====
     window.logout = async function() {
+        sendOfflineSignal();
         const session = getSession();
         if (session && session.user) {
             try {
@@ -2620,8 +3035,27 @@
     const studyChatForm = document.getElementById('studyChatForm');
     if (studyChatForm) studyChatForm.addEventListener('submit', sendStudyMessage);
 
-    // ===== DISPOSE =====
+    // Chat Tabs (Group vs 1-on-1 Direct)
+    const chatTabGroupBtn = document.getElementById('chatTabGroupBtn');
+    if (chatTabGroupBtn) chatTabGroupBtn.addEventListener('click', () => switchChatMode('group'));
+
+    const chatTabDirectBtn = document.getElementById('chatTabDirectBtn');
+    if (chatTabDirectBtn) chatTabDirectBtn.addEventListener('click', () => switchChatMode('direct'));
+
+    // Edit Name
+    const editDisplayNameBtn = document.getElementById('editDisplayNameBtn');
+    if (editDisplayNameBtn) editDisplayNameBtn.addEventListener('click', promptEditDisplayName);
+
+    // Direct 1-on-1 Back to User List Button
+    const directBackBtn = document.getElementById('directBackBtn');
+    if (directBackBtn) directBackBtn.addEventListener('click', () => {
+        activeDirectStudent = null;
+        switchChatMode('direct');
+    });
+
+    // ===== DISPOSE & OFFLINE =====
     window.addEventListener('beforeunload', function() {
+        sendOfflineSignal();
         if (resetCheckInterval) clearInterval(resetCheckInterval);
         if (sessionValidationInterval) clearInterval(sessionValidationInterval);
         if (activeUsersPollInterval) clearInterval(activeUsersPollInterval);
@@ -2638,8 +3072,11 @@
         }
     });
 
+    window.addEventListener('pagehide', sendOfflineSignal);
+
     // ===== INIT =====
     if (!localStorage.getItem('timer_start')) localStorage.setItem('timer_start', Date.now().toString());
+    updateDisplayNameUI();
     startActiveUsersPolling();
 
     // Check initial chat messages once in background so unread badge shows if messages exist
