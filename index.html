@@ -1103,7 +1103,7 @@
       <h3>🔑 Generate New Access Key</h3>
       <p class="info">Enter your registered email to generate a new key</p>
       <div style="background: #f0f4fb; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.75rem; color: #4c637f;">
-        ⏱️ Valid for <strong>1 hour</strong> only · 📊 <strong>4 keys</strong> per day limit
+        ⏱️ Valid for <strong>1 hour</strong> only · 📊 <strong>2 keys</strong> per day limit · ⏳ <strong>10 min</strong> cooldown
       </div>
       <input type="email" id="genKeyEmail" placeholder="Enter your registered email" style="margin-bottom:8px;" />
       <button id="genKeyBtn" style="background:#2d7a9b;width:100%;">🔄 Generate Key</button>
@@ -2182,7 +2182,7 @@
             });
             const data = await response.json();
             if (data.success) {
-                statusEl.innerHTML = `✅ Key generated: <strong>${data.key}</strong><br><span style="font-size:0.8rem;color:#1a7a3a;">⏱️ Valid for <strong>1 hour</strong> only<br>📊 <strong>${data.remaining_today || '3'}</strong> more key(s) left today</span>`;
+                statusEl.innerHTML = `✅ Key generated: <strong>${data.key}</strong><br><span style="font-size:0.8rem;color:#1a7a3a;">⏱️ Valid for <strong>1 hour</strong> only<br>📊 <strong>${data.remaining_today !== undefined ? data.remaining_today : '1'}</strong> more key(s) left today</span>`;
                 statusEl.className = 'key-gen-status success';
                 if (navigator.clipboard) navigator.clipboard.writeText(data.key);
             } else {
